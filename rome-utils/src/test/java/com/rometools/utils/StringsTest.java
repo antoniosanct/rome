@@ -20,8 +20,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
+
+/**
+ * Test case for Strings
+ *
+ */
 public class StringsTest {
 
+	/**
+	 * testIsNull
+	 */
     @Test
     public void testIsNull() {
 
@@ -37,6 +45,9 @@ public class StringsTest {
 
     }
 
+    /**
+	 * testIsEmpty
+	 */
     @Test
     public void testIsEmpty() {
 
@@ -52,6 +63,9 @@ public class StringsTest {
 
     }
 
+    /**
+	 * testIsNotEmpty
+	 */
     @Test
     public void testIsNotEmpty() {
 
@@ -66,6 +80,9 @@ public class StringsTest {
         assertThat(Strings.isNotEmpty(string), Is.is(true));
     }
 
+    /**
+	 * testIsBlank
+	 */
     @Test
     public void testIsBlank() {
 
@@ -80,6 +97,9 @@ public class StringsTest {
         assertThat(Strings.isBlank(string), Is.is(false));
     }
 
+    /**
+	 * testTrim
+	 */
     @Test
     public void testTrim() {
 
@@ -94,6 +114,9 @@ public class StringsTest {
         assertThat(Strings.trim(string), Is.is("a"));
     }
 
+    /**
+	 * testTrimToEmpty
+	 */
     @Test
     public void testTrimToEmpty() {
 
@@ -108,6 +131,9 @@ public class StringsTest {
         assertThat(Strings.trimToEmpty(string), Is.is("a"));
     }
 
+    /**
+	 * testTrimToNull
+	 */
     @Test
     public void testTrimToNull() {
 
@@ -122,6 +148,9 @@ public class StringsTest {
         assertThat(Strings.trimToNull(string), Is.is("a"));
     }
 
+    /**
+	 * testToLowerCase
+	 */
     @Test
     public void testToLowerCase() {
 

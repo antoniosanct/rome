@@ -29,7 +29,12 @@ public class GenderEnumeration implements CloneableType {
         this.value = value;
     }
 
-    /** Returns the proper instance based on the string value */
+    /** 
+     * Returns the proper instance based on the string value.
+     * 
+     * @param value the string value
+     * @return a GenderEnumeration proper instance.
+     */
     public static GenderEnumeration findByValue(final String value) {
         if (value == null) {
             return null;
@@ -46,7 +51,10 @@ public class GenderEnumeration implements CloneableType {
         }
     }
 
-    /** Returns the value of the instance */
+    /**
+     * Returns the value of the instance
+     * @return the value of the instance.
+     */
     public String getValue() {
         return value;
     }
@@ -57,6 +65,9 @@ public class GenderEnumeration implements CloneableType {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return value;

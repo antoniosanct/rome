@@ -26,8 +26,15 @@ import java.util.List;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
+/**
+ * Test case for Lists
+ *
+ */
 public class ListsTest {
 
+	/**
+	 * testCreateWhenNull
+	 */
     @Test
     public void testCreateWhenNull() {
 
@@ -40,6 +47,9 @@ public class ListsTest {
 
     }
 
+    /**
+     * testCreate
+     */
     @Test
     public void testCreate() {
 
@@ -50,6 +60,9 @@ public class ListsTest {
 
     }
 
+    /**
+     * testFirstEntry
+     */
     @Test
     public void testFirstEntry() {
 
@@ -65,6 +78,9 @@ public class ListsTest {
 
     }
 
+    /**
+     * testIsEmpty
+     */
     @Test
     public void testIsEmpty() {
 
@@ -78,6 +94,9 @@ public class ListsTest {
 
     }
 
+    /**
+     * testIsNotEmpty
+     */
     @Test
     public void testIsNotEmpty() {
 
@@ -90,6 +109,9 @@ public class ListsTest {
         assertThat(Lists.isNotEmpty(listWithOneEntry), Is.is(true));
     }
 
+    /**
+     * testSizeIs
+     */
     @Test
     public void testSizeIs() {
 
@@ -103,6 +125,9 @@ public class ListsTest {
 
     }
 
+    /**
+     * testEmptyToNull
+     */
     @Test
     public void testEmptyToNull() {
 

@@ -494,11 +494,17 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
         return (DCModule) getModule(DCModule.URI);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Class<SyndEntry> getInterface() {
         return SyndEntry.class;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void copyFrom(final CopyFrom obj) {
         COPY_FROM_HELPER.copy(this, obj);
@@ -548,16 +554,25 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
         this.updatedDate = new Date(updatedDate.getTime());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<SyndPerson> getAuthors() {
         return authors = Lists.createWhenNull(authors);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setAuthors(final List<SyndPerson> authors) {
         this.authors = authors;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getAuthor() {
 
@@ -599,21 +614,33 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<SyndPerson> getContributors() {
         return contributors = Lists.createWhenNull(contributors);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setContributors(final List<SyndPerson> contributors) {
         this.contributors = contributors;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SyndFeed getSource() {
         return source;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSource(final SyndFeed source) {
         this.source = source;
@@ -644,25 +671,41 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
         this.foreignMarkup = foreignMarkup;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getComments() {
         return comments;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setComments(final String comments) {
         this.comments = comments;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getWireEntry() {
         return wireEntry;
     }
 
+    /**
+     * Sets the wire entry
+     * @param wireEntry the wire entry to set.
+     */
     public void setWireEntry(final Object wireEntry) {
         this.wireEntry = wireEntry;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SyndLink findRelatedLink(final String relation) {
         final List<SyndLink> syndLinks = getLinks();

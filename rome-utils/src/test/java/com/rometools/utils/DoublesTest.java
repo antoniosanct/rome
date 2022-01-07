@@ -20,8 +20,15 @@ import static org.hamcrest.CoreMatchers.nullValue;
 
 import org.junit.Test;
 
+/**
+ * Test case for Doubles
+ *
+ */
 public class DoublesTest {
 
+	/**
+	 * TestParse for Doubles.
+	 */
     @Test
     public void testParse() {
 

@@ -17,6 +17,10 @@ package com.rometools.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A List util class
+ *
+ */
 public final class Lists {
 
     private Lists() {

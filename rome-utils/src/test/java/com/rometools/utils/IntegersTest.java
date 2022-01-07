@@ -20,8 +20,15 @@ import static org.hamcrest.CoreMatchers.nullValue;
 
 import org.junit.Test;
 
+/**
+ * Test case for Integers
+ *
+ */
 public class IntegersTest {
 
+	/**
+	 * TestParse for Integers.
+	 */
     @Test
     public void testParse() {
 

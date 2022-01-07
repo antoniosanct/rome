@@ -23,8 +23,15 @@ import java.util.Date;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
+/**
+ * Test case for Dates
+ *
+ */
 public class DatesTest {
 
+	/**
+	 * TestCopy for Dates.
+	 */
     @Test
     public void testCopy() {
 

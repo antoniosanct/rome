@@ -16,6 +16,10 @@ package com.rometools.utils;
 
 import java.util.Date;
 
+/**
+ * A Date util class
+ *
+ */
 public final class Dates {
 
     private Dates() {

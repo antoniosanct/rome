@@ -14,6 +14,10 @@
 
 package com.rometools.utils;
 
+/**
+ * A Double util class
+ *
+ */
 public class Doubles {
 
     private Doubles() {
