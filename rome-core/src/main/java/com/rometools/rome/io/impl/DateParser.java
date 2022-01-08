@@ -93,6 +93,7 @@ public class DateParser {
      *
      * @param masks array of masks to use for parsing the string
      * @param sDate string to parse for a date.
+     * @param locale the Locale instance
      * @return the Date represented by the given string using one of the given masks. It returns
      *         <b>null</b> if it was not possible to parse the the string with any of the masks.
      *

@@ -90,9 +90,10 @@ public class ToStringBean {
 
     /**
      * Returns the String representation of the bean given in the constructor.
-
      *
-     * @param prefix to use for bean properties.
+     * @param beanClass the bean Class
+     * @param obj the object invoked.
+     * @param prefix  to use for bean properties.
      * @return bean object String representation.
      *
      */

@@ -622,6 +622,8 @@ public class Atom10Parser extends BaseWireFeedParser {
      * Find base URI of feed considering relative URIs.
      *
      * @param root Root element of feed.
+     * @return the resolved URI
+     * @throws MalformedURLException any malformed URL exception.
      */
     private String findBaseURI(final Element root) throws MalformedURLException {
         String ret = null;
@@ -644,6 +646,7 @@ public class Atom10Parser extends BaseWireFeedParser {
      *
      * @param parent Consider only children of this parent element
      * @param rel Consider only links with this relationship
+     * @return the resolved URI
      */
     private String findAtomLink(final Element parent, final String rel) {
         String ret = null;
@@ -668,6 +671,7 @@ public class Atom10Parser extends BaseWireFeedParser {
      *
      * @param base Base of URI, may end with trailing slash
      * @param append String to append, may begin with slash or ".."
+     * @return the resolved URI
      */
     private static String formURI(String base, String append) {
         base = stripTrailingSlash(base);
@@ -691,6 +695,8 @@ public class Atom10Parser extends BaseWireFeedParser {
 
     /**
      * Strip starting slash from beginning of string.
+     * @param s the string to strip
+     * @return the string stripped
      */
     private static String stripStartingSlash(String s) {
         if (s != null && s.startsWith("/")) {
@@ -701,6 +707,8 @@ public class Atom10Parser extends BaseWireFeedParser {
 
     /**
      * Strip trailing slash from end of string.
+     * @param s the string to trail
+     * @return the string trailed
      */
     private static String stripTrailingSlash(String s) {
         if (s != null && s.endsWith("/")) {

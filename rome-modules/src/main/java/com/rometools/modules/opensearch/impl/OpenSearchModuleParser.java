@@ -197,7 +197,15 @@ public class OpenSearchModuleParser implements ModuleParser {
     }
 
     /**
+     * 
+     */
+    
+    /**
      * Use xml:base attributes at feed and entry level to resolve relative links
+     * @param baseURI the base URI
+     * @param parent the parent Node
+     * @param url the target URL
+     * @return the resolved URI
      */
     private static String resolveURI(final URL baseURI, final Parent parent, String url) {
         url = url.equals(".") || url.equals("./") ? "" : url;
@@ -220,7 +228,11 @@ public class OpenSearchModuleParser implements ModuleParser {
         return url;
     }
 
-    /** Use feed links and/or xml:base attribute to determine baseURI of feed */
+    /**
+     * Use feed links and/or xml:base attribute to determine baseURI of feed
+     * @param root the root Element.
+     * @return the base URI found
+     */
     private static URL findBaseURI(final Element root) {
         URL baseURI = null;
         final List<Element> linksList = root.getChildren("link", OS_NS);

@@ -202,6 +202,9 @@ public class BeanIntrospector {
 
     /**
      * Make first character lower case unless the second character is upper case.
+     * 
+     * @param name the name to decapitalize
+     * @return the name decapitalized
      */
     private static String decapitalize(String name) {
         if (name.isEmpty() || (name.length() > 1 && Character.isUpperCase(name.charAt(1)))) {
