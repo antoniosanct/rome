@@ -20,20 +20,36 @@
 
 package com.rometools.modules.content;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import junit.framework.TestCase;
+import com.rometools.modules.AbstractTestCase;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
 
-public class ContentModuleImplTest extends TestCase {
+/**
+ * Test class for ContentModuleImpl class 
+ *
+ */
+public class ContentModuleImplTest extends AbstractTestCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContentModuleImplTest.class);
 
     private final ContentModuleImpl module = new ContentModuleImpl();
-    public static ArrayList<ContentItem> contentItems = new ArrayList<ContentItem>();
+    
+    /**
+     * List of content items.
+     */
+    public static List<ContentItem> contentItems = new ArrayList<ContentItem>();
 
     static {
         ContentItem item = new ContentItem();
@@ -65,6 +81,10 @@ public class ContentModuleImplTest extends TestCase {
         contentItems.add(item);
     }
 
+    /**
+     * Public constructor
+     * @param testName the test name.
+     */
     public ContentModuleImplTest(final String testName) {
         super(testName);
     }
@@ -78,10 +98,12 @@ public class ContentModuleImplTest extends TestCase {
     protected void tearDown() throws java.lang.Exception {
     }
 
+    /**
+     * Generates a new test suite associated with this test class.
+     * @return A test suite associated with this test class.
+     */
     public static junit.framework.Test suite() {
-        final junit.framework.TestSuite suite = new junit.framework.TestSuite(ContentModuleImplTest.class);
-
-        return suite;
+        return new junit.framework.TestSuite(ContentModuleImplTest.class);
     }
 
     /**
@@ -140,4 +162,22 @@ public class ContentModuleImplTest extends TestCase {
                 & test.getEncodeds().equals(module.getEncodeds()));
     }
 
+    /**
+     * Test for Issue 524
+     * @throws IOException Any I/O exception
+     * @throws FeedException Any feed exception
+     * @throws MalformedURLException  Any malformed URI exception
+     * @throws IllegalArgumentException  Any illegal argument exception.
+     */
+    public void testIssueEncodeds() throws IllegalArgumentException, MalformedURLException, FeedException, IOException {
+    	final SyndFeedInput input = new SyndFeedInput();
+        final SyndFeed feed = input.build(new XmlReader(new File(getTestFile("xml/test-rdf.xml")).toURI().toURL()));
+        final SyndEntry entry = feed.getEntries().get(0);
+    	final List<String> contents = new ArrayList<>();
+    	contents.add("<h1>Welcome to Modules from the ROME Framework!!</h1>");
+    	final ContentModule test = new ContentModuleImpl();
+        test.copyFrom(module);
+        test.setEncodeds(contents);
+    	entry.getModules().add(module);
+    }
 }
