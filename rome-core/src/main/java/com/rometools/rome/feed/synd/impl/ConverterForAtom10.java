@@ -49,10 +49,17 @@ import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.utils.Lists;
 import com.rometools.utils.Strings;
 
+/**
+ * Atom 1.0 Converter class
+ *
+ */
 public class ConverterForAtom10 implements Converter {
 
     private final String type;
 
+    /**
+     * Public constructor.
+     */
     public ConverterForAtom10() {
         this("atom_1.0");
     }
@@ -61,11 +68,17 @@ public class ConverterForAtom10 implements Converter {
         this.type = type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getType() {
         return type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void copyInto(final WireFeed feed, final SyndFeed syndFeed) {
 

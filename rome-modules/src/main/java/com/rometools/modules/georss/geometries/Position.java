@@ -33,6 +33,8 @@ public class Position implements Cloneable, Serializable {
 
     /**
      * Create Position from a pair of coordinate values
+     * @param latitude Sets the latitude
+     * @param longitude Sets the longitude
      */
     public Position(final double latitude, final double longitude) {
         this.latitude = latitude;

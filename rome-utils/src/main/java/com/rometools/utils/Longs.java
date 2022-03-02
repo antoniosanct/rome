@@ -14,6 +14,10 @@
 
 package com.rometools.utils;
 
+/**
+ * A Long util class
+ *
+ */
 public final class Longs {
 
     private Longs() {

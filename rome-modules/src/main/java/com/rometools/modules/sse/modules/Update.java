@@ -20,13 +20,13 @@ import com.rometools.rome.feed.CopyFrom;
 
 /**
  * <pre>
- * <sx:update>
+ * &lt;sx:update&gt;
  * </pre>
  *
  * Element within
  *
  * <pre>
- * <sx:history>
+ * &lt;sx:history&gt;
  * </pre>
  *
  * .
@@ -52,6 +52,8 @@ public class Update extends SSEModule {
      * Provides access to the date-time when the modification took place. If this attribute is
      * omitted the value defaults to the earliest time representable in RFC 822. Either or both of
      * the when or by attributes MUST be present; it is invalid to have neither.
+     * 
+     * @return the when updated date.
      */
     public Date getWhen() {
         return when;

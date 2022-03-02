@@ -32,10 +32,10 @@ import com.rometools.rome.io.SyndFeedOutput;
 /**
  * This is a utiltiy class for grouping and sorting lists of entries based on the SLE.
  *
- * <p>
+
  * Note, this class can <b>ONLY</b> be used on parsed feeds, unless you manually add the appropriate
  * SleEntry objects on the items.
- * </p>
+
  *
  * @see SleEntry
  */
@@ -50,7 +50,8 @@ public final class SleUtility {
 
     /**
      * Groups values by the groups from the SLE.
-     *
+     * 
+     * @param <T> Extendable Class representation.
      * @param values List of Extendable implementations to group.
      * @param groups Group fields (from the SimpleListExtension module)
      * @return Grouped list of entries.
@@ -67,6 +68,7 @@ public final class SleUtility {
     /**
      * Sorts a list of values based on a given sort field using a selection sort.
      *
+     * @param <T> Extendable Class representation.
      * @param values List of values (implements Extendable) to sort.
      * @param sort The sort field to sort on.
      * @param ascending Sort ascending/descending.
@@ -81,6 +83,7 @@ public final class SleUtility {
     /**
      * Sorts and groups a set of entries.
      *
+     * @param <T> Extendable Class representation.
      * @param values List of Extendable implementations.
      * @param groups Group items to group by.
      * @param sort Field to sort on.
@@ -98,6 +101,9 @@ public final class SleUtility {
      * entries with current SleEntry values for sorting and grouping. <b>NB</b>: This basically does
      * this by re-generating the XML for all the entries then re-parsing them into the SLE data
      * structures. It is a very heavy operation and should not be called frequently!
+     * 
+     * @param feed SyndFeed object
+     * @throws FeedException any feed exception.
      */
     public static void initializeForSorting(final SyndFeed feed) throws FeedException {
         // TODO: the null parameter below will break delegating parsers and generators

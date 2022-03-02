@@ -16,6 +16,10 @@ package com.rometools.utils;
 
 import java.util.Locale;
 
+/**
+ * A String util class
+ *
+ */
 public final class Strings {
 
     private Strings() {

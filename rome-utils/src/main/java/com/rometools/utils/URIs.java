@@ -8,6 +8,10 @@ import java.util.Map.Entry;
 
 import lombok.experimental.UtilityClass;
 
+/**
+ * A URI util class
+ *
+ */
 @UtilityClass
 public class URIs {
 
@@ -17,6 +21,12 @@ public class URIs {
         FIXES.put(" ", "%20"); // fix spaces
     }
 
+    /**
+     * Parses a String to a URI object.
+     * @param str a URI in string format.
+     * @return a new URI object, fixed by spaces.
+     * @throws URISyntaxException any URI syntax exception.
+     */
     public URI parse(final String str) throws URISyntaxException {
 
         String fixed = str;

@@ -20,6 +20,8 @@ package com.rometools.rome.feed.synd.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.jdom2.Element;
 
@@ -44,14 +46,20 @@ import com.rometools.rome.feed.synd.SyndLink;
 import com.rometools.rome.feed.synd.SyndLinkImpl;
 import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.rome.feed.synd.SyndPersonImpl;
-import com.rometools.utils.Alternatives;
 import com.rometools.utils.Lists;
 import com.rometools.utils.Strings;
 
+/**
+ * Atom 0.3 Converter class
+ *
+ */
 public class ConverterForAtom03 implements Converter {
 
     private final String type;
 
+    /**
+     * Public constructor.
+     */
     public ConverterForAtom03() {
         this("atom_0.3");
     }
@@ -60,11 +68,17 @@ public class ConverterForAtom03 implements Converter {
         this.type = type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getType() {
         return type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void copyInto(final WireFeed feed, final SyndFeed syndFeed) {
 
@@ -161,6 +175,11 @@ public class ConverterForAtom03 implements Converter {
         return syndLinks;
     }
 
+    /**
+     * Creates a syndication link.
+     * @param link a link to convert.
+     * @return a SyndLink object from the link.
+     */
     public SyndLink createSyndLink(final Link link) {
         final SyndLink syndLink = new SyndLinkImpl();
         syndLink.setRel(link.getRel());
@@ -272,7 +291,8 @@ public class ConverterForAtom03 implements Converter {
 
         Date date = entry.getModified();
         if (date == null) {
-            date = Alternatives.firstNotNull(entry.getIssued(), entry.getCreated());
+            //date = Alternatives.firstNotNull(entry.getIssued(), entry.getCreated());
+        	date = Stream.of(new Date[] {entry.getIssued(), entry.getCreated()}).filter(Objects::nonNull).findFirst().orElse(null);
         }
 
         if (date != null) {
@@ -282,6 +302,12 @@ public class ConverterForAtom03 implements Converter {
         return syndEntry;
     }
 
+    /**
+     * Creates a syndication enclosure from entry and link.
+     * @param entry a Entry object.
+     * @param link a Link object.
+     * @return a SyndEnclosure object from entry and link.
+     */
     public SyndEnclosure createSyndEnclosure(final Entry entry, final Link link) {
         final SyndEnclosure syndEncl = new SyndEnclosureImpl();
         syndEncl.setUrl(link.getHrefResolved());
@@ -290,6 +316,9 @@ public class ConverterForAtom03 implements Converter {
         return syndEncl;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WireFeed createRealFeed(final SyndFeed syndFeed) {
         final Feed aFeed = new Feed(getType());
@@ -515,6 +544,11 @@ public class ConverterForAtom03 implements Converter {
         return aEntry;
     }
 
+    /**
+     * Creates a Atom 0.3 link from a SyndLink object.
+     * @param syndLink a syndication link object.
+     * @return a Atom link.
+     */
     public Link createAtomLink(final SyndLink syndLink) {
         final Link link = new Link();
         link.setRel(syndLink.getRel());
@@ -524,6 +558,11 @@ public class ConverterForAtom03 implements Converter {
         return link;
     }
 
+    /**
+     * Creates a Atom 0.3 Enclosure from a SyndEnclosure object.
+     * @param syndEnclosure a syndication enclosure.
+     * @return a Atom enclosure.
+     */
     public Link createAtomEnclosure(final SyndEnclosure syndEnclosure) {
         final Link link = new Link();
         link.setRel("enclosure");

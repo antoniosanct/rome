@@ -29,6 +29,7 @@ public final class LineString extends AbstractCurve {
 
     /**
      * Construct object from a position list
+     * @param posList Position list.
      */
     public LineString(final PositionList posList) {
         this.posList = posList;

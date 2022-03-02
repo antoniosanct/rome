@@ -20,8 +20,15 @@ import static org.hamcrest.CoreMatchers.nullValue;
 
 import org.junit.Test;
 
+/**
+ * Test case for Longs
+ *
+ */
 public class LongsTest {
 
+	/**
+	 * TestParseDecimal for Longs.
+	 */
     @Test
     public void testParseDecimal() {
 

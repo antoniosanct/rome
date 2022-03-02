@@ -14,14 +14,22 @@
 
 package com.rometools.utils;
 
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
+
+/**
+ * Test case for Strings
+ *
+ */
 public class StringsTest {
 
+	/**
+	 * testIsNull
+	 */
     @Test
     public void testIsNull() {
 
@@ -30,13 +38,16 @@ public class StringsTest {
         final String blankString = " ";
         final String string = "a";
 
-        assertThat(Strings.isNull(nullString), is(true));
-        assertThat(Strings.isNull(emptyString), is(false));
-        assertThat(Strings.isNull(blankString), is(false));
-        assertThat(Strings.isNull(string), is(false));
+        assertThat(Strings.isNull(nullString), Is.is(true));
+        assertThat(Strings.isNull(emptyString), Is.is(false));
+        assertThat(Strings.isNull(blankString), Is.is(false));
+        assertThat(Strings.isNull(string), Is.is(false));
 
     }
 
+    /**
+	 * testIsEmpty
+	 */
     @Test
     public void testIsEmpty() {
 
@@ -45,13 +56,16 @@ public class StringsTest {
         final String blankString = " ";
         final String string = "a";
 
-        assertThat(Strings.isEmpty(nullString), is(true));
-        assertThat(Strings.isEmpty(emptyString), is(true));
-        assertThat(Strings.isEmpty(blankString), is(false));
-        assertThat(Strings.isEmpty(string), is(false));
+        assertThat(Strings.isEmpty(nullString), Is.is(true));
+        assertThat(Strings.isEmpty(emptyString), Is.is(true));
+        assertThat(Strings.isEmpty(blankString), Is.is(false));
+        assertThat(Strings.isEmpty(string), Is.is(false));
 
     }
 
+    /**
+	 * testIsNotEmpty
+	 */
     @Test
     public void testIsNotEmpty() {
 
@@ -60,12 +74,15 @@ public class StringsTest {
         final String blankString = " ";
         final String string = "a";
 
-        assertThat(Strings.isNotEmpty(nullString), is(false));
-        assertThat(Strings.isNotEmpty(emptyString), is(false));
-        assertThat(Strings.isNotEmpty(blankString), is(true));
-        assertThat(Strings.isNotEmpty(string), is(true));
+        assertThat(Strings.isNotEmpty(nullString), Is.is(false));
+        assertThat(Strings.isNotEmpty(emptyString), Is.is(false));
+        assertThat(Strings.isNotEmpty(blankString), Is.is(true));
+        assertThat(Strings.isNotEmpty(string), Is.is(true));
     }
 
+    /**
+	 * testIsBlank
+	 */
     @Test
     public void testIsBlank() {
 
@@ -74,12 +91,15 @@ public class StringsTest {
         final String blankString = " ";
         final String string = "a";
 
-        assertThat(Strings.isBlank(nullString), is(true));
-        assertThat(Strings.isBlank(emptyString), is(true));
-        assertThat(Strings.isBlank(blankString), is(true));
-        assertThat(Strings.isBlank(string), is(false));
+        assertThat(Strings.isBlank(nullString), Is.is(true));
+        assertThat(Strings.isBlank(emptyString), Is.is(true));
+        assertThat(Strings.isBlank(blankString), Is.is(true));
+        assertThat(Strings.isBlank(string), Is.is(false));
     }
 
+    /**
+	 * testTrim
+	 */
     @Test
     public void testTrim() {
 
@@ -88,12 +108,15 @@ public class StringsTest {
         final String blankString = " ";
         final String string = " a ";
 
-        assertThat(Strings.trim(nullString), is(nullValue()));
-        assertThat(Strings.trim(emptyString), is(""));
-        assertThat(Strings.trim(blankString), is(""));
-        assertThat(Strings.trim(string), is("a"));
+        assertThat(Strings.trim(nullString), Is.is(nullValue()));
+        assertThat(Strings.trim(emptyString), Is.is(""));
+        assertThat(Strings.trim(blankString), Is.is(""));
+        assertThat(Strings.trim(string), Is.is("a"));
     }
 
+    /**
+	 * testTrimToEmpty
+	 */
     @Test
     public void testTrimToEmpty() {
 
@@ -102,12 +125,15 @@ public class StringsTest {
         final String blankString = " ";
         final String string = " a ";
 
-        assertThat(Strings.trimToEmpty(nullString), is(""));
-        assertThat(Strings.trimToEmpty(emptyString), is(""));
-        assertThat(Strings.trimToEmpty(blankString), is(""));
-        assertThat(Strings.trimToEmpty(string), is("a"));
+        assertThat(Strings.trimToEmpty(nullString), Is.is(""));
+        assertThat(Strings.trimToEmpty(emptyString), Is.is(""));
+        assertThat(Strings.trimToEmpty(blankString), Is.is(""));
+        assertThat(Strings.trimToEmpty(string), Is.is("a"));
     }
 
+    /**
+	 * testTrimToNull
+	 */
     @Test
     public void testTrimToNull() {
 
@@ -116,12 +142,15 @@ public class StringsTest {
         final String blankString = " ";
         final String string = " a ";
 
-        assertThat(Strings.trimToNull(nullString), is(nullValue()));
-        assertThat(Strings.trimToNull(emptyString), is(nullValue()));
-        assertThat(Strings.trimToNull(blankString), is(nullValue()));
-        assertThat(Strings.trimToNull(string), is("a"));
+        assertThat(Strings.trimToNull(nullString), Is.is(nullValue()));
+        assertThat(Strings.trimToNull(emptyString), Is.is(nullValue()));
+        assertThat(Strings.trimToNull(blankString), Is.is(nullValue()));
+        assertThat(Strings.trimToNull(string), Is.is("a"));
     }
 
+    /**
+	 * testToLowerCase
+	 */
     @Test
     public void testToLowerCase() {
 
@@ -130,10 +159,10 @@ public class StringsTest {
         final String blankString = " ";
         final String string = "A";
 
-        assertThat(Strings.toLowerCase(nullString), is(nullValue()));
-        assertThat(Strings.toLowerCase(emptyString), is(""));
-        assertThat(Strings.toLowerCase(blankString), is(" "));
-        assertThat(Strings.toLowerCase(string), is("a"));
+        assertThat(Strings.toLowerCase(nullString), Is.is(nullValue()));
+        assertThat(Strings.toLowerCase(emptyString), Is.is(""));
+        assertThat(Strings.toLowerCase(blankString), Is.is(" "));
+        assertThat(Strings.toLowerCase(string), Is.is("a"));
     }
 
 }

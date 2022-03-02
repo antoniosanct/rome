@@ -45,6 +45,8 @@ public class MediaModuleImpl extends ModuleImpl implements MediaModule, Serializ
 
     /**
      * constructor that passes values up to ModuleImpl.
+     * @param clazz the MediaModule class representation
+     * @param uri URI reference to MediaModule
      */
     public MediaModuleImpl(final Class<? extends MediaModule> clazz, final String uri) {
         super(clazz, uri);

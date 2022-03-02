@@ -30,6 +30,9 @@ class SortableList<T extends Extendable> extends ArrayList<T> {
 
     /**
      * performs a selection sort on all the beans in the List
+     * @param value the object to sort
+     * @param ascending the flag ascending
+     * @param strategy the ValueStrategy strategy defined.
      */
     public synchronized void sortOnProperty(final Object value, final boolean ascending, final ValueStrategy strategy) {
 

@@ -14,26 +14,33 @@
 
 package com.rometools.utils;
 
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Date;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
+/**
+ * Test case for Dates
+ *
+ */
 public class DatesTest {
 
+	/**
+	 * TestCopy for Dates.
+	 */
     @Test
     public void testCopy() {
 
         final Date date = new Date();
         final Date nullDate = null;
 
-        assertThat(Dates.copy(date), is(notNullValue()));
-        assertThat(Dates.copy(date).getTime(), is(date.getTime()));
-        assertThat(Dates.copy(nullDate), is(nullValue()));
+        assertThat(Dates.copy(date), Is.is(notNullValue()));
+        assertThat(Dates.copy(date).getTime(), Is.is(date.getTime()));
+        assertThat(Dates.copy(nullDate), Is.is(nullValue()));
 
     }
 
