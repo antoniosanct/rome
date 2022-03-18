@@ -21,25 +21,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.sle.SimpleListExtension;
 import com.rometools.modules.sle.SimpleListExtensionImpl;
 import com.rometools.modules.sle.types.Group;
 import com.rometools.modules.sle.types.Sort;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ModuleParser;
+import com.rometools.rome.io.impl.ChildNavigator;
 
-public class ModuleParser implements com.rometools.rome.io.ModuleParser {
+public class SleModuleParser extends ChildNavigator implements ModuleParser {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ModuleParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SleModuleParser.class);
 
-    static final Namespace NS = Namespace.getNamespace("cf", SimpleListExtension.URI);
-    public static final Namespace TEMP = Namespace.getNamespace("rome-sle", "urn:rome:sle");
+    static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("cf", SimpleListExtension.URI);
+    public static final Namespace TEMP = XMLEventFactory.newDefaultFactory().createNamespace("rome-sle", "urn:rome:sle");
 
-    public ModuleParser() {
+    public SleModuleParser() {
         super();
     }
 
@@ -63,37 +67,39 @@ public class ModuleParser implements com.rometools.rome.io.ModuleParser {
      */
     @Override
     public Module parse(final Element element, final Locale locale) {
-        if (element.getChild("treatAs", NS) == null) {
+        if (super.getChild(element, "treatAs", NS) == null) {
             return null;
         }
 
         final SimpleListExtension sle = new SimpleListExtensionImpl();
-        sle.setTreatAs(element.getChildText("treatAs", NS));
+        sle.setTreatAs(super.getChild(element, "treatAs", NS).getTextContent());
 
-        final Element listInfo = element.getChild("listinfo", NS);
+        final Element listInfo = super.getChild(element, "listinfo", NS);
         ArrayList<Object> values = new ArrayList<Object>();
-        for (final Element ge : listInfo.getChildren("group", NS)) {
-            final Namespace ns = ge.getAttribute("ns") == null ? element.getNamespace() : Namespace.getNamespace(ge.getAttributeValue("ns"));
-            final String elementName = ge.getAttributeValue("element");
-            final String label = ge.getAttributeValue("label");
+        for (final Element ge : super.getChildren(listInfo, "group", NS)) {
+        	final String nsUri = ge.getAttribute("ns") == null ? element.getNamespaceURI() : ge.getAttribute("ns");
+            final Namespace ns = XMLEventFactory.newDefaultFactory().createNamespace(nsUri);
+            final String elementName = ge.getAttribute("element");
+            final String label = ge.getAttribute("label");
             values.add(new Group(ns, elementName, label));
         }
 
         sle.setGroupFields(values.toArray(new Group[values.size()]));
         values = values.size() == 0 ? values : new ArrayList<Object>();
 
-        for (final Element se : listInfo.getChildren("sort", NS)) {
-            LOG.debug("Parse cf:sort {}{}", se.getAttributeValue("element"), se.getAttributeValue("data-type"));
-            final Namespace ns = se.getAttributeValue("ns") == null ? element.getNamespace() : Namespace.getNamespace(se.getAttributeValue("ns"));
-            final String elementName = se.getAttributeValue("element");
-            final String label = se.getAttributeValue("label");
-            final String dataType = se.getAttributeValue("data-type");
-            final boolean defaultOrder = se.getAttributeValue("default") == null ? false : Boolean.valueOf(se.getAttributeValue("default")).booleanValue();
+        for (final Element se : super.getChildren(listInfo, "sort", NS)) {
+            LOG.debug("Parse cf:sort {}{}", se.getAttribute("element"), se.getAttribute("data-type"));
+            final String nsUri = se.getAttribute("ns") == null ? element.getNamespaceURI() : se.getAttribute("ns");
+            final Namespace ns = XMLEventFactory.newDefaultFactory().createNamespace(nsUri);
+            final String elementName = se.getAttribute("element");
+            final String label = se.getAttribute("label");
+            final String dataType = se.getAttribute("data-type");
+            final boolean defaultOrder = se.getAttribute("default") == null ? false : Boolean.valueOf(se.getAttribute("default")).booleanValue();
             values.add(new Sort(ns, elementName, dataType, label, defaultOrder));
         }
 
         sle.setSortFields(values.toArray(new Sort[values.size()]));
-        insertValues(sle, element.getChildren());
+        insertValues(sle, super.getChildren(element), element);
 
         return sle;
     }
@@ -106,32 +112,32 @@ public class ModuleParser implements com.rometools.rome.io.ModuleParser {
         }
     }
 
-    public void insertValues(final SimpleListExtension sle, final List<Element> elements) {
+    public void insertValues(final SimpleListExtension sle, final List<Element> elements, final Element parent) {
         for (int i = 0; elements != null && i < elements.size(); i++) {
             final Element e = elements.get(i);
             final Group[] groups = sle.getGroupFields();
 
             for (final Group group2 : groups) {
-                final Element value = e.getChild(group2.getElement(), group2.getNamespace());
+                final Element value = super.getChild(e, group2.getElement(), group2.getNamespace());
 
                 if (value == null) {
                     continue;
                 }
 
-                final Element group = new Element("group", TEMP);
+                final Element group = parent.getOwnerDocument().createElementNS(TEMP.getNamespaceURI(), "group");
                 addNotNullAttribute(group, "element", group2.getElement());
                 addNotNullAttribute(group, "label", group2.getLabel());
-                addNotNullAttribute(group, "value", value.getText());
-                addNotNullAttribute(group, "ns", group2.getNamespace().getURI());
+                addNotNullAttribute(group, "value", value.getTextContent());
+                addNotNullAttribute(group, "ns", group2.getNamespace().getNamespaceURI());
 
-                e.addContent(group);
+                e.appendChild(group);
             }
 
             final Sort[] sorts = sle.getSortFields();
 
             for (final Sort sort2 : sorts) {
                 LOG.debug("Inserting for {} {}", sort2.getElement(), sort2.getDataType());
-                final Element sort = new Element("sort", TEMP);
+                final Element sort = parent.getOwnerDocument().createElementNS(TEMP.getNamespaceURI(), "sort");
                 // this is the default sort order, so I am just going to ignore
                 // the actual values and add a number type. It really shouldn't
                 // work this way. I should be checking to see if any of the elements
@@ -144,16 +150,16 @@ public class ModuleParser implements com.rometools.rome.io.ModuleParser {
                     sort.setAttribute("label", sort2.getLabel());
                     sort.setAttribute("value", Integer.toString(i));
                     sort.setAttribute("data-type", Sort.NUMBER_TYPE);
-                    e.addContent(sort);
+                    e.appendChild(sort);
 
                     continue;
                 }
 
-                final Element value = e.getChild(sort2.getElement(), sort2.getNamespace());
+                final Element value = super.getChild(e, sort2.getElement(), sort2.getNamespace());
                 if (value == null) {
                     LOG.debug("No value for {} : {}", sort2.getElement(), sort2.getNamespace());
                 } else {
-                    LOG.debug("{} value: {}", sort2.getElement(), value.getText());
+                    LOG.debug("{} value: {}", sort2.getElement(), value.getTextContent());
                 }
                 if (value == null) {
                     continue;
@@ -161,11 +167,11 @@ public class ModuleParser implements com.rometools.rome.io.ModuleParser {
 
                 addNotNullAttribute(sort, "label", sort2.getLabel());
                 addNotNullAttribute(sort, "element", sort2.getElement());
-                addNotNullAttribute(sort, "value", value.getText());
+                addNotNullAttribute(sort, "value", value.getTextContent());
                 addNotNullAttribute(sort, "data-type", sort2.getDataType());
-                addNotNullAttribute(sort, "ns", sort2.getNamespace().getURI());
-                e.addContent(sort);
-                LOG.debug("Added {} {} = {}", sort, sort2.getLabel(), value.getText());
+                addNotNullAttribute(sort, "ns", sort2.getNamespace().getNamespaceURI());
+                e.appendChild(sort);
+                LOG.debug("Added {} {} = {}", sort, sort2.getLabel(), value.getTextContent());
             }
         }
     }

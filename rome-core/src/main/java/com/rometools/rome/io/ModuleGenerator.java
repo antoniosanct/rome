@@ -18,8 +18,10 @@ package com.rometools.rome.io;
 
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.module.Module;
 
@@ -32,6 +34,8 @@ import com.rometools.rome.feed.module.Module;
  */
 public interface ModuleGenerator {
 
+	static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
+	
     /**
      * Returns the namespace URI this generator handles.
 
@@ -59,5 +63,5 @@ public interface ModuleGenerator {
      * @param module the module to inject into the XML node (JDOM element).
      * @param element the XML node into which module meta-data will be injected.
      */
-    public void generate(Module module, Element element);
+    public void generate(Module module, Element element) throws DOMException;
 }

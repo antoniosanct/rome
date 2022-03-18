@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rometools.modules.sle.io.LabelNamespaceElement;
-import com.rometools.modules.sle.io.ModuleParser;
+import com.rometools.modules.sle.io.SleModuleParser;
 import com.rometools.modules.sle.types.EntryValue;
 import com.rometools.modules.sle.types.Group;
 import com.rometools.modules.sle.types.Sort;
@@ -120,7 +120,7 @@ public class SleEntryImpl implements SleEntry {
      */
     @Override
     public String getUri() {
-        return ModuleParser.TEMP.getURI();
+        return SleModuleParser.TEMP.getNamespaceURI();
     }
 
     @Override

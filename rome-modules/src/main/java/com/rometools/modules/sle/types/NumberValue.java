@@ -19,7 +19,9 @@ package com.rometools.modules.sle.types;
 
 import java.math.BigDecimal;
 
-import org.jdom2.Namespace;
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
 
 import com.rometools.rome.feed.impl.EqualsBean;
 
@@ -33,7 +35,7 @@ public class NumberValue implements EntryValue {
     private String element;
     private String label;
     private BigDecimal value;
-    private Namespace namespace = Namespace.XML_NAMESPACE;
+    private Namespace namespace = XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI);
 
     public void setElement(final String element) {
         this.element = element;
@@ -68,7 +70,7 @@ public class NumberValue implements EntryValue {
     }
 
     public void setNamespace(final Namespace namespace) {
-        this.namespace = namespace == null ? Namespace.XML_NAMESPACE : namespace;
+        this.namespace = namespace == null ? XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI) : namespace;
     }
 
     @Override

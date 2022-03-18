@@ -23,7 +23,7 @@ public class PaymentTypeEnumeration {
 
     public static final PaymentTypeEnumeration CASH = new PaymentTypeEnumeration("Cash");
     public static final PaymentTypeEnumeration CHECK = new PaymentTypeEnumeration("Check");
-    public static final PaymentTypeEnumeration TRAVELERS_CHECK = new PaymentTypeEnumeration("Traveler�s Check");
+    public static final PaymentTypeEnumeration TRAVELERS_CHECK = new PaymentTypeEnumeration("Traveler's Check");
     public static final PaymentTypeEnumeration VISA = new PaymentTypeEnumeration("Visa");
     public static final PaymentTypeEnumeration MASTERCARD = new PaymentTypeEnumeration("MasterCard");
     public static final PaymentTypeEnumeration AMERICAN_EXPRESS = new PaymentTypeEnumeration("American Express");

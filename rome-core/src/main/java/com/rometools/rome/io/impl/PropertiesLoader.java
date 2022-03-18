@@ -104,10 +104,8 @@ public class PropertiesLoader {
 		while (urls.hasMoreElements()) {
 			final URL url = urls.nextElement();
 			final Properties p = new Properties();
-			try {
-				final InputStream is = url.openStream();
+			try (final InputStream is = url.openStream()){
 				p.load(is);
-				is.close();
 			} catch (final IOException ioex) {
 				final IOException ex = new IOException("could not load ROME extensions plugins file [" + url.toString() + "], " + ioex.getMessage());
 				ex.setStackTrace(ioex.getStackTrace());

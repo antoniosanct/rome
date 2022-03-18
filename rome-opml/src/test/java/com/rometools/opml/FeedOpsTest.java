@@ -20,18 +20,27 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StringWriter;
+
+import javax.xml.XMLConstants;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.jdom2.Document;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import org.w3c.dom.Document;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.WireFeedOutput;
 
 /**
@@ -101,20 +110,19 @@ public abstract class FeedOpsTest extends FeedTest {
     }
 
     /**
-     * testWireFeedJDOMSerialization
+     * testWireFeedW3CSerialization
      * @throws Exception any exception
      */
     // 1.5
-    public void testWireFeedJDOMSerialization() throws Exception {
-        Document inputDoc = getCachedJDomDoc();
+    public void testWireFeedW3CSerialization() throws Exception {
+        Document inputDoc = getCachedDoc();
 
         final WireFeed feed = getCachedWireFeed();
         WireFeedOutput output = new WireFeedOutput();
-        Document outputDoc = output.outputJDom(feed);
+        Document outputDoc = output.outputDom(feed);
 
-        XMLOutputter outputter = new XMLOutputter(Format.getCompactFormat());
-        String inputString = outputter.outputString(inputDoc);
-        String outputString = outputter.outputString(outputDoc);
+        String inputString = this.outputString(inputDoc);
+        String outputString = this.outputString(outputDoc);
 
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
@@ -194,4 +202,20 @@ public abstract class FeedOpsTest extends FeedTest {
         assertTrue(feed1.equals(feed2));
     }
 
+    private String outputString(final Document doc) throws Exception {
+		try {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer t = tf.newTransformer();
+			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			t.setOutputProperty(OutputKeys.METHOD, "xml");
+			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+	        StreamResult result = new StreamResult(new StringWriter());
+	        DOMSource source = new DOMSource(doc);
+	        t.transform(source, result);
+	        return result.getWriter().toString();
+		} catch (TransformerException | TransformerFactoryConfigurationError e) {
+			throw new FeedException("Error outputting feed", e);
+		}
+        
+    }
 }

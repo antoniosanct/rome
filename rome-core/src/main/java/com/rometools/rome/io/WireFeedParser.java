@@ -18,7 +18,7 @@ package com.rometools.rome.io;
 
 import java.util.Locale;
 
-import org.jdom2.Document;
+import org.w3c.dom.Document;
 
 import com.rometools.rome.feed.WireFeed;
 

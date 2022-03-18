@@ -17,6 +17,7 @@
 package com.rometools.modules.cc;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 import com.rometools.modules.cc.types.License;
 import com.rometools.rome.feed.CopyFrom;
@@ -83,11 +84,20 @@ public class CreativeCommonsImpl implements CreativeCommons {
     }
 
     @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(allLicenses);
+		result = prime * result + Arrays.hashCode(licenses);
+		return result;
+	}
+
+    @Override
     public boolean equals(final Object obj) {
         return EqualsBean.beanEquals(CreativeCommonsImpl.class, this, obj);
     }
 
-    @Override
+	@Override
     public License[] getLicenses() {
         return licenses;
     }

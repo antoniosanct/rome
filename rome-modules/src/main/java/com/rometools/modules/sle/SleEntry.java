@@ -17,7 +17,7 @@
  */
 package com.rometools.modules.sle;
 
-import com.rometools.modules.sle.io.ModuleParser;
+import com.rometools.modules.sle.io.SleModuleParser;
 import com.rometools.modules.sle.types.EntryValue;
 import com.rometools.modules.sle.types.Group;
 import com.rometools.modules.sle.types.Sort;
@@ -32,7 +32,7 @@ public interface SleEntry extends Module {
     /**
      * A bogus namespace used for temporarily storing values during parsing.
      */
-    public static final String URI = ModuleParser.TEMP.getURI();
+    public static final String URI = SleModuleParser.TEMP.getNamespaceURI();
 
     /**
      * Returns an EntryValue for the given element name.

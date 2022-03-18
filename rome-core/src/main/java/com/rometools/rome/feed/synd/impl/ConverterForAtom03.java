@@ -23,9 +23,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.jdom2.Element;
-
 import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.atom.Content;
 import com.rometools.rome.feed.atom.Entry;
 import com.rometools.rome.feed.atom.Feed;
@@ -73,7 +72,7 @@ public class ConverterForAtom03 implements Converter {
 
         syndFeed.setModules(ModuleUtils.cloneModules(aFeed.getModules()));
 
-        final List<Element> foreignMarkup = feed.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = feed.getForeignMarkup();
         if (Lists.isNotEmpty(foreignMarkup)) {
             syndFeed.setForeignMarkup(foreignMarkup);
         }
@@ -189,7 +188,7 @@ public class ConverterForAtom03 implements Converter {
 
         syndEntry.setModules(ModuleUtils.cloneModules(entry.getModules()));
 
-        final List<Element> foreignMarkup = entry.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = entry.getForeignMarkup();
         if (Lists.isNotEmpty(foreignMarkup)) {
             syndEntry.setForeignMarkup(foreignMarkup);
         }

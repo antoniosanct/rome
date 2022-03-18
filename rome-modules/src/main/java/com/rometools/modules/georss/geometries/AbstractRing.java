@@ -31,4 +31,14 @@ public abstract class AbstractRing implements Cloneable, Serializable {
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
+    
+    @Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+    
+    @Override
+    public boolean equals(final Object obj) {
+        return obj != null && obj.getClass() == getClass();
+    }
 }

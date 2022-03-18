@@ -26,9 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jdom2.Element;
-
 import com.rometools.rome.feed.CopyFrom;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.impl.CloneableBean;
 import com.rometools.rome.feed.impl.CopyFromHelper;
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -69,7 +68,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
     private List<SyndPerson> authors;
     private List<SyndPerson> contributors;
     private SyndFeed source;
-    private List<Element> foreignMarkup;
+    private List<WireFeedForeignMarkup> foreignMarkup;
 
     // com.rometools.rome.feed.atom.Entry or com.rometools.rome.feed.rss.Item
     private Object wireEntry;
@@ -166,7 +165,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
             return false;
         }
         // can't use foreign markup in equals, due to JDOM equals impl
-        final List<Element> fm = getForeignMarkup();
+        final List<WireFeedForeignMarkup> fm = getForeignMarkup();
         setForeignMarkup(((SyndEntryImpl) other).getForeignMarkup());
         final boolean ret = EqualsBean.beanEquals(beanClass, this, other);
         // restore foreign markup
@@ -627,7 +626,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
      *
      */
     @Override
-    public List<Element> getForeignMarkup() {
+    public List<WireFeedForeignMarkup> getForeignMarkup() {
         return foreignMarkup = Lists.createWhenNull(foreignMarkup);
     }
 
@@ -640,7 +639,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
      *
      */
     @Override
-    public void setForeignMarkup(final List<Element> foreignMarkup) {
+    public void setForeignMarkup(final List<WireFeedForeignMarkup> foreignMarkup) {
         this.foreignMarkup = foreignMarkup;
     }
 

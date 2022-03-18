@@ -19,20 +19,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Attribute;
-import org.jdom2.Content;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.ProcessingInstruction;
-import org.jdom2.filter.ContentFilter;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.module.Extendable;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.WireFeedParser;
 
-public abstract class BaseWireFeedParser implements WireFeedParser {
+/**
+ * Basic WireFeedParser implementation.
+ */
+public abstract class BaseWireFeedParser extends ChildNavigator implements WireFeedParser {
     /**
      * [TYPE].feed.ModuleParser.classes= [className] ...
      *
@@ -91,53 +97,76 @@ public abstract class BaseWireFeedParser implements WireFeedParser {
         return personModuleParsers.parseModules(itemElement, locale);
     }
 
-    protected List<Element> extractForeignMarkup(final Element e, final Extendable ext, final Namespace namespace) {
-
-        final ArrayList<Element> foreignElements = new ArrayList<Element>();
-
-        for (final Element element : e.getChildren()) {
-            if (!namespace.equals(element.getNamespace()) && ext.getModule(element.getNamespaceURI()) == null) {
+    protected List<WireFeedForeignMarkup> extractForeignMarkup(final Element e, final Extendable ext, final Namespace namespace) {
+        final List<WireFeedForeignMarkup> foreignElements = new ArrayList<WireFeedForeignMarkup>(1);
+        final List<Element> childs = super.getChildren(e);
+        for (Element c : childs) {
+        	if (null != c.getNamespaceURI() &&
+        			!namespace.getNamespaceURI().equals(c.getNamespaceURI()) &&
+        			ext.getModule(c.getNamespaceURI()) == null) {
                 // if element not in the RSS namespace and elem was not handled by a module save it
                 // as foreign markup but we can't detach it while we're iterating
-                foreignElements.add(element.clone());
-            }
-        }
-
-        // now we can detach the foreign markup elements
-        for (final Element foreignElement : foreignElements) {
-            foreignElement.detach();
+                foreignElements.add(new WireFeedForeignMarkup((Element) e.getOwnerDocument().importNode(c, false)));
+        	}
         }
 
         return foreignElements;
 
     }
 
-    protected Attribute getAttribute(final Element e, final String attributeName) {
-        Attribute attribute = e.getAttribute(attributeName);
+    protected Attr getAttribute(final Element e, final String attributeName) {
+        Attr attribute = e.getAttributeNode(attributeName);
         if (attribute == null) {
-            attribute = e.getAttribute(attributeName, namespace);
+            attribute = e.getAttributeNodeNS(namespace.getNamespaceURI(), attributeName);
         }
         return attribute;
     }
 
     protected String getAttributeValue(final Element e, final String attributeName) {
-        final Attribute attr = getAttribute(e, attributeName);
-        if (attr != null) {
-            return attr.getValue();
-        } else {
-            return null;
+    	String value = null;
+        final Attr attr = getAttribute(e, attributeName);
+        if (null != attr) {
+            value = attr.getValue();
         }
+        return value;
     }
 
     protected String getStyleSheet(final Document doc) {
         String styleSheet = null;
-        for (final Content c : doc.getContent(new ContentFilter(ContentFilter.PI))) {
-            final ProcessingInstruction pi = (ProcessingInstruction) c;
-            if ("text/xsl".equals(pi.getPseudoAttributeValue("type"))) {
-                styleSheet = pi.getPseudoAttributeValue("href");
-                break;
-            }
+        NodeList childs = doc.getChildNodes();
+        boolean found = false;
+        for (int i = 0; !found && i < childs.getLength(); i++) {
+        	if (childs.item(i).getNodeType() == Node.PROCESSING_INSTRUCTION_NODE &&
+        		childs.item(i).getTextContent().indexOf("text/xsl") >= 0) {
+        			int begin = childs.item(i).getTextContent().indexOf("href");
+        			styleSheet = childs.item(i).getTextContent().substring(begin+5).replaceAll("\"", "");
+        			found = true;
+        		}
         }
         return styleSheet;
     }
+
+    protected static Namespace createNamespace(final String prefix, final String namespaceURI) {
+    	return XMLEventFactory.newDefaultFactory().createNamespace(prefix, namespaceURI);
+    }
+    
+    protected static Namespace createNamespace(final String namespaceURI) {
+    	return XMLEventFactory.newDefaultFactory().createNamespace(namespaceURI);
+    }
+    
+	protected List<Namespace> getAdditionalNamespaces(final Element element) {
+		List<Namespace> namespaces = new ArrayList<>(1);
+		NamedNodeMap attributes = element.getAttributes();
+	    if (attributes != null) {
+	        for (int i = 0; i < attributes.getLength(); i++) {
+	            Node node = attributes.item(i);
+	            if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
+	                namespaces.add(createNamespace(node.getTextContent()));
+	            }
+	        }
+	    }
+	    return namespaces;
+	    
+	}
+	
 }

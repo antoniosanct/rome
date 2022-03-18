@@ -22,8 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.opml.feed.opml.Attribute;
 import com.rometools.opml.feed.opml.Opml;
@@ -45,21 +45,21 @@ public class OPML20Parser extends OPML10Parser {
     }
 
     /**
-     * Inspects an XML Document (JDOM) to check if it can parse it.
+     * Inspects an XML Document (W3C) to check if it can parse it.
      * <p>
      * It checks if the given document if the type of feeds the parser understands.
      * <p>
      *
-     * @param document XML Document (JDOM) to check if it can be parsed by this parser.
+     * @param document XML Document (W3C) to check if it can be parsed by this parser.
      * @return <b>true</b> if the parser know how to parser this feed, <b>false</b> otherwise.
      */
     @Override
     public boolean isMyType(final Document document) {
-        final Element e = document.getRootElement();
+        final Element e = document.getDocumentElement();
 
-        if (e.getName().equals("opml")
-                && (e.getChild("head") != null && e.getChild("head").getChild("docs") != null || e.getAttributeValue("version") != null
-                        && e.getAttributeValue("version").equals("2.0") || e.getChild("head") != null && e.getChild("head").getChild("ownerId") != null)) {
+        if (e.getNodeName().equals("opml")
+                && (super.getChild(e, "head") != null && super.getChild(super.getChild(e, "head"), "docs") != null || e.getAttribute("version") != null
+                        && e.getAttribute("version").equals("2.0") || super.getChild(e, "head") != null && super.getChild(super.getChild(e, "head"), "ownerId") != null)) {
             return true;
         }
 
@@ -67,25 +67,29 @@ public class OPML20Parser extends OPML10Parser {
     }
 
     /**
-     * Parses an XML document (JDOM Document) into a feed bean.
+     * Parses an XML document (W3C Document) into a feed bean.
      * <p>
      *
-     * @param document XML document (JDOM) to parse.
+     * @param document XML document (W3C) to parse.
      * @param validate indicates if the feed should be strictly validated (NOT YET IMPLEMENTED).
      * @return the resulting feed bean.
      * @throws IllegalArgumentException thrown if the parser cannot handle the given feed type.
-     * @throws FeedException thrown if a feed bean cannot be created out of the XML document (JDOM).
+     * @throws FeedException thrown if a feed bean cannot be created out of the XML document (W3C).
      */
     @Override
     public WireFeed parse(final Document document, final boolean validate, final Locale locale) throws IllegalArgumentException, FeedException {
         Opml opml;
         opml = (Opml) super.parse(document, validate, locale);
 
-        final Element head = document.getRootElement().getChild("head");
+        final Element head = super.getChild(document.getDocumentElement(), "head");
 
         if (head != null) {
-            opml.setOwnerId(head.getChildTextTrim("ownerId"));
-            opml.setDocs(head.getChildTextTrim("docs"));
+        	if (super.getChild(head, "ownerId") != null) {
+        		opml.setOwnerId(super.getChild(head, "ownerId").getTextContent());
+        	}
+        	if (super.getChild(head, "docs") != null) {
+        		opml.setDocs(super.getChild(head, "docs").getTextContent());
+        	}
 
             if (opml.getDocs() == null) {
                 opml.setDocs("http://www.opml.org/spec2");

@@ -17,7 +17,9 @@
  */
 package com.rometools.modules.sle.types;
 
-import org.jdom2.Namespace;
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
 
 import com.rometools.rome.feed.impl.EqualsBean;
 
@@ -31,7 +33,7 @@ public class StringValue implements EntryValue {
     private String element;
     private String label;
     private String value;
-    private Namespace namespace = Namespace.XML_NAMESPACE;
+    private Namespace namespace = XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI);
 
     public void setValue(final String value) {
         this.value = value;
@@ -66,7 +68,7 @@ public class StringValue implements EntryValue {
     }
 
     public void setNamespace(final Namespace namespace) {
-        this.namespace = namespace == null ? Namespace.XML_NAMESPACE : namespace;
+        this.namespace = namespace == null ? XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI) : namespace;
     }
 
     @Override

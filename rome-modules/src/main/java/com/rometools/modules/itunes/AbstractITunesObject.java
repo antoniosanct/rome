@@ -248,7 +248,7 @@ public abstract class AbstractITunesObject implements ITunes, java.lang.Cloneabl
         sb.append(" Keywords: ");
 
         if (getKeywords() != null) {
-            for (int i = 0; i < keywords.length; i++) {
+            for (int i = 0; i < getKeywords().length; i++) {
                 sb.append("'" + getKeywords()[i] + "'");
             }
         }

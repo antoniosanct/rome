@@ -18,8 +18,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.thr.ThreadingModule;
 import com.rometools.rome.feed.module.Module;
@@ -30,7 +32,7 @@ import com.rometools.rome.io.ModuleGenerator;
  */
 public class ThreadingModuleGenerator implements ModuleGenerator {
 
-    private static final Namespace NAMESPACE = Namespace.getNamespace("thr", ThreadingModule.URI);
+    private static final Namespace NAMESPACE = XMLEventFactory.newDefaultFactory().createNamespace("thr", ThreadingModule.URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {
@@ -53,7 +55,7 @@ public class ThreadingModuleGenerator implements ModuleGenerator {
     public void generate(Module module, Element element) {
         if (module != null && module instanceof ThreadingModule) {
             ThreadingModule threadedModule = (ThreadingModule) module;
-            Element inReplyTo = new Element("in-reply-to", NAMESPACE);
+            Element inReplyTo = element.getOwnerDocument().createElementNS(NAMESPACE.getNamespaceURI(), "in-reply-to");
 
             if (threadedModule.getHref() != null) {
                 inReplyTo.setAttribute("href", threadedModule.getHref());
@@ -68,7 +70,7 @@ public class ThreadingModuleGenerator implements ModuleGenerator {
                 inReplyTo.setAttribute("source", threadedModule.getSource());
             }
 
-            element.addContent(inReplyTo);
+            element.appendChild(inReplyTo);
         }
     }
 }

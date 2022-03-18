@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Locale;
 
-import org.jdom2.JDOMException;
 import org.junit.Test;
 
 import com.rometools.rome.feed.atom.Entry;
@@ -18,7 +17,7 @@ import com.rometools.rome.io.FeedException;
 public class Atom10ParserTest {
 
     @Test
-    public void testParseEntryCatchingXxe() throws IllegalArgumentException, JDOMException, IOException, FeedException {
+    public void testParseEntryCatchingXxe() throws IllegalArgumentException, IOException, FeedException {
 
         // @formatter:off
         final String content = join("",

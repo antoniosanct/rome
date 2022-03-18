@@ -18,7 +18,7 @@ package com.rometools.rome.io.impl;
 
 import java.util.Locale;
 
-import org.jdom2.Element;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.rss.Item;
 
@@ -42,19 +42,19 @@ public class RSS093Parser extends RSS092Parser {
 
         final Item item = super.parseItem(rssRoot, eItem, locale);
 
-        final Element pubDate = eItem.getChild("pubDate", getRSSNamespace());
+        final Element pubDate = super.getChild(eItem, "pubDate");
         if (pubDate != null) {
-            item.setPubDate(DateParser.parseDate(pubDate.getText(), locale));
+            item.setPubDate(DateParser.parseDate(pubDate.getTextContent(), locale));
         }
 
-        final Element expirationDate = eItem.getChild("expirationDate", getRSSNamespace());
+        final Element expirationDate = super.getChild(eItem, "expirationDate");
         if (expirationDate != null) {
-            item.setExpirationDate(DateParser.parseDate(expirationDate.getText(), locale));
+            item.setExpirationDate(DateParser.parseDate(expirationDate.getTextContent(), locale));
         }
 
-        final Element description = eItem.getChild("description", getRSSNamespace());
+        final Element description = super.getChild(eItem, "description");
         if (description != null) {
-            final String type = description.getAttributeValue("type");
+            final String type = ((Element) description).getAttribute("type");
             if (type != null) {
                 item.getDescription().setType(type);
             }

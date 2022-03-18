@@ -25,11 +25,6 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            org.jdom2,
-                            org.jdom2.filter,
-                            org.jdom2.input,
-                            org.jdom2.input.sax,
-                            org.jdom2.output,
                             org.slf4j,
                             org.w3c.dom,
                             org.xml.sax
@@ -53,9 +48,6 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <manifestEntries>
-                            <Automatic-Module-Name>com.rometools.rome</Automatic-Module-Name>
-                        </manifestEntries>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
@@ -63,6 +55,10 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+			    <groupId>org.jacoco</groupId>
+			    <artifactId>jacoco-maven-plugin</artifactId>
+			</plugin>
         </plugins>
     </build>
 
@@ -71,11 +67,6 @@
         <dependency>
             <groupId>com.rometools</groupId>
             <artifactId>rome-utils</artifactId>
-        </dependency>
-        <!-- JDOM -->
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom2</artifactId>
         </dependency>
         <!-- Test dependencies -->
         <dependency>

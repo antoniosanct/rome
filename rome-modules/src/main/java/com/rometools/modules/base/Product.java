@@ -153,7 +153,7 @@ public interface Product extends GlobalInterface {
     /**
      * Additional instructions to explain the item;s delivery process.
      *
-     * @return Additional instructions to explain the item�s delivery process.
+     * @return Additional instructions to explain the item;s delivery process.
      */
     public String getDeliveryNotes();
 

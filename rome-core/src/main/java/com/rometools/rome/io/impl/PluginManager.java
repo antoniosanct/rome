@@ -30,7 +30,7 @@ import com.rometools.rome.io.DelegatingModuleParser;
 import com.rometools.rome.io.WireFeedGenerator;
 import com.rometools.rome.io.WireFeedParser;
 
-public abstract class PluginManager<T> {
+public abstract class PluginManager<T> extends ChildNavigator {
 
     private final String[] propertyValues;
     private final List<String> keys;

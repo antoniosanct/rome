@@ -22,8 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.georss.geometries.AbstractGeometry;
 import com.rometools.modules.georss.geometries.AbstractRing;
@@ -46,18 +47,20 @@ public class GMLGenerator implements ModuleGenerator {
 
     static {
         final Set<Namespace> nss = new HashSet<Namespace>();
+        nss.add(GeoRSSModule.SIMPLE_NS);
         nss.add(GeoRSSModule.GML_NS);
         NAMESPACES = Collections.unmodifiableSet(nss);
     }
 
-    private Element createPosListElement(final PositionList posList) {
-        final Element posElement = new Element("posList", GeoRSSModule.GML_NS);
+    private Element createPosListElement(final PositionList posList, final Element parent) {
+        final Element posElement = parent.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "posList");
         final StringBuffer sb = new StringBuffer();
         for (int i = 0; i < posList.size(); ++i) {
             sb.append(posList.getLatitude(i)).append(" ").append(posList.getLongitude(i)).append(" ");
         }
 
-        posElement.addContent(sb.toString());
+        posElement.setTextContent(sb.toString());
+        posElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
         return posElement;
     }
 
@@ -89,14 +92,15 @@ public class GMLGenerator implements ModuleGenerator {
         // this is not necessary, it is done to avoid the namespace definition
         // in every item.
         Element root = element;
-        while (root.getParent() != null && root.getParent() instanceof Element) {
-            root = (Element) element.getParent();
+        while (root.getParentNode() != null && root.getParentNode() instanceof Element) {
+            root = (Element) element.getParentNode();
         }
-        root.addNamespaceDeclaration(GeoRSSModule.SIMPLE_NS);
-        root.addNamespaceDeclaration(GeoRSSModule.GML_NS);
+//        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + GeoRSSModule.SIMPLE_NS.getPrefix(), GeoRSSModule.SIMPLE_NS.getNamespaceURI());
+//        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + GeoRSSModule.GML_NS.getPrefix(), GeoRSSModule.GML_NS.getNamespaceURI());
 
-        final Element whereElement = new Element("where", GeoRSSModule.SIMPLE_NS);
-        element.addContent(whereElement);
+        final Element whereElement = element.getOwnerDocument().createElementNS(GeoRSSModule.SIMPLE_NS.getNamespaceURI(), "where");
+        whereElement.setPrefix(GeoRSSModule.SIMPLE_NS.getPrefix());
+        element.appendChild(whereElement);
 
         final GeoRSSModule geoRSSModule = (GeoRSSModule) module;
         final AbstractGeometry geometry = geoRSSModule.getGeometry();
@@ -104,30 +108,37 @@ public class GMLGenerator implements ModuleGenerator {
         if (geometry instanceof Point) {
             final Position pos = ((Point) geometry).getPosition();
 
-            final Element pointElement = new Element("Point", GeoRSSModule.GML_NS);
-            whereElement.addContent(pointElement);
+            final Element pointElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "Point");
+            pointElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+            whereElement.appendChild(pointElement);
 
-            final Element posElement = new Element("pos", GeoRSSModule.GML_NS);
-            posElement.addContent(String.valueOf(pos.getLatitude()) + " " + String.valueOf(pos.getLongitude()));
-            pointElement.addContent(posElement);
+            final Element posElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "pos");
+            posElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+            posElement.setTextContent(String.valueOf(pos.getLatitude()) + " " + String.valueOf(pos.getLongitude()));
+            pointElement.appendChild(posElement);
         }
 
         else if (geometry instanceof LineString) {
             final PositionList posList = ((LineString) geometry).getPositionList();
 
-            final Element lineElement = new Element("LineString", GeoRSSModule.GML_NS);
-            lineElement.addContent(createPosListElement(posList));
-            whereElement.addContent(lineElement);
+            final Element lineElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "LineString");
+            lineElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+            lineElement.appendChild(createPosListElement(posList, element));
+            whereElement.appendChild(lineElement);
         } else if (geometry instanceof Polygon) {
-            final Element polygonElement = new Element("Polygon", GeoRSSModule.GML_NS);
+            final Element polygonElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "Polygon");
+            polygonElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
             {
                 final AbstractRing ring = ((Polygon) geometry).getExterior();
                 if (ring instanceof LinearRing) {
-                    final Element exteriorElement = new Element("exterior", GeoRSSModule.GML_NS);
-                    polygonElement.addContent(exteriorElement);
-                    final Element ringElement = new Element("LinearRing", GeoRSSModule.GML_NS);
-                    exteriorElement.addContent(ringElement);
-                    ringElement.addContent(createPosListElement(((LinearRing) ring).getPositionList()));
+                    final Element exteriorElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "exterior");
+                    exteriorElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+                    polygonElement.appendChild(exteriorElement);
+                    final Element ringElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "LinearRing");
+                    ringElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+                    ringElement.appendChild(createPosListElement(((LinearRing) ring).getPositionList(), element));
+                    exteriorElement.appendChild(ringElement);
+                    
 
                 } else {
                     System.err.println("GeoRSS GML format can't handle rings of type: " + ring.getClass().getName());
@@ -138,29 +149,34 @@ public class GMLGenerator implements ModuleGenerator {
             while (it.hasNext()) {
                 final AbstractRing ring = it.next();
                 if (ring instanceof LinearRing) {
-                    final Element interiorElement = new Element("interior", GeoRSSModule.GML_NS);
-                    polygonElement.addContent(interiorElement);
-                    final Element ringElement = new Element("LinearRing", GeoRSSModule.GML_NS);
-                    interiorElement.addContent(ringElement);
-                    ringElement.addContent(createPosListElement(((LinearRing) ring).getPositionList()));
+                    final Element interiorElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "interior");
+                    interiorElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+                    polygonElement.appendChild(interiorElement);
+                    final Element ringElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "LinearRing");
+                    ringElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+                    ringElement.appendChild(createPosListElement(((LinearRing) ring).getPositionList(), element));
+                    interiorElement.appendChild(ringElement);
 
                 } else {
                     System.err.println("GeoRSS GML format can't handle rings of type: " + ring.getClass().getName());
                 }
             }
-            whereElement.addContent(polygonElement);
+            whereElement.appendChild(polygonElement);
         } else if (geometry instanceof Envelope) {
             final Envelope envelope = (Envelope) geometry;
-            final Element envelopeElement = new Element("Envelope", GeoRSSModule.GML_NS);
-            whereElement.addContent(envelopeElement);
+            final Element envelopeElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "Envelope");
+            envelopeElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+            whereElement.appendChild(envelopeElement);
 
-            final Element lowerElement = new Element("lowerCorner", GeoRSSModule.GML_NS);
-            lowerElement.addContent(String.valueOf(envelope.getMinLatitude()) + " " + String.valueOf(envelope.getMinLongitude()));
-            envelopeElement.addContent(lowerElement);
+            final Element lowerElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "lowerCorner");
+            lowerElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+            lowerElement.setTextContent(String.valueOf(envelope.getMinLatitude()) + " " + String.valueOf(envelope.getMinLongitude()));
+            envelopeElement.appendChild(lowerElement);
 
-            final Element upperElement = new Element("upperCorner", GeoRSSModule.GML_NS);
-            upperElement.addContent(String.valueOf(envelope.getMaxLatitude()) + " " + String.valueOf(envelope.getMaxLongitude()));
-            envelopeElement.addContent(upperElement);
+            final Element upperElement = element.getOwnerDocument().createElementNS(GeoRSSModule.GML_NS.getNamespaceURI(), "upperCorner");
+            upperElement.setPrefix(GeoRSSModule.GML_NS.getPrefix());
+            upperElement.setTextContent(String.valueOf(envelope.getMaxLatitude()) + " " + String.valueOf(envelope.getMaxLongitude()));
+            envelopeElement.appendChild(upperElement);
 
         } else {
             System.err.println("GeoRSS GML format can't handle geometries of type: " + geometry.getClass().getName());

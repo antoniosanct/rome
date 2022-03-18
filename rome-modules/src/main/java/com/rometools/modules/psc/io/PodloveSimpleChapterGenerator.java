@@ -16,24 +16,27 @@
  */
 package com.rometools.modules.psc.io;
 
-import com.rometools.modules.psc.modules.PodloveSimpleChapterModule;
-import com.rometools.modules.psc.types.SimpleChapter;
-import com.rometools.rome.feed.module.Module;
-import com.rometools.rome.io.ModuleGenerator;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
+
+import com.rometools.modules.psc.modules.PodloveSimpleChapterModule;
+import com.rometools.modules.psc.types.SimpleChapter;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ModuleGenerator;
 
 /**
  * The ModuleGenerator implementation for the Podlove Simple Chapter plug in.
  */
 public class PodloveSimpleChapterGenerator implements ModuleGenerator {
 
-    private static final Namespace NS = Namespace.getNamespace(PodloveSimpleChapterAttribute.PREFIX, PodloveSimpleChapterModule.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(PodloveSimpleChapterAttribute.PREFIX, PodloveSimpleChapterModule.URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {
@@ -61,20 +64,20 @@ public class PodloveSimpleChapterGenerator implements ModuleGenerator {
     }
 
     private void generateChapters(final List<SimpleChapter> chapters, final Element parent) {
-        final Element cs = new Element(PodloveSimpleChapterAttribute.CHAPTERS, NS);
-
+        final Element cs = parent.getOwnerDocument().createElementNS(NS.getNamespaceURI(), PodloveSimpleChapterAttribute.CHAPTERS);
+        cs.setPrefix(NS.getPrefix());
         cs.setAttribute(PodloveSimpleChapterAttribute.VERSION, PodloveSimpleChapterModule.VERSION);
 
         for (SimpleChapter c : chapters) {
-            cs.addContent(generateChapter(c));
+            cs.appendChild(generateChapter(c, parent));
         }
 
-        parent.addContent(cs);
+        parent.appendChild(cs);
     }
 
-    private Element generateChapter(final SimpleChapter c) {
-        final Element e = new Element(PodloveSimpleChapterAttribute.CHAPTER, NS);
-
+    private Element generateChapter(final SimpleChapter c, final Element parent) {
+        final Element e = parent.getOwnerDocument().createElementNS(NS.getNamespaceURI(), PodloveSimpleChapterAttribute.CHAPTER);
+        e.setPrefix(NS.getPrefix());
         addNotNullAttribute(e, PodloveSimpleChapterAttribute.START, c.getStart());
         addNotNullAttribute(e, PodloveSimpleChapterAttribute.TITLE, c.getTitle());
         addNotNullAttribute(e, PodloveSimpleChapterAttribute.HREF, c.getHref());

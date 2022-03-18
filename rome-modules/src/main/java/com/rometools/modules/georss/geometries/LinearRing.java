@@ -15,6 +15,8 @@
 
 package com.rometools.modules.georss.geometries;
 
+import java.util.Objects;
+
 /**
  * Linear boundary object constructed by linear interpolation between points. Start and end point
  * should be identical.
@@ -41,6 +43,11 @@ public final class LinearRing extends AbstractRing {
     }
 
     @Override
+	public int hashCode() {
+		return Objects.hash(posList);
+	}
+
+    @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
@@ -51,7 +58,7 @@ public final class LinearRing extends AbstractRing {
         return getPositionList().equals(((LinearRing) obj).getPositionList());
     }
 
-    /**
+	/**
      * Get the position list
      *
      * @return the positionlist

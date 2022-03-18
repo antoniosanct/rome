@@ -17,7 +17,9 @@ package com.rometools.modules.base;
 
 import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1377,11 +1379,50 @@ public class GoogleBaseImpl implements GoogleBase {
     }
 
     @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(actors);
+		result = prime * result + Arrays.hashCode(agents);
+		result = prime * result + Arrays.hashCode(artists);
+		result = prime * result + Arrays.hashCode(authors);
+		result = prime * result + Arrays.hashCode(color);
+		result = prime * result + Arrays.hashCode(ethnicities);
+		result = prime * result + Arrays.hashCode(format);
+		result = prime * result + Arrays.hashCode(imageLinks);
+		result = prime * result + Arrays.hashCode(interestedIn);
+		result = prime * result + Arrays.hashCode(jobFunctions);
+		result = prime * result + Arrays.hashCode(jobIndustries);
+		result = prime * result + Arrays.hashCode(jobTypes);
+		result = prime * result + Arrays.hashCode(labels);
+		result = prime * result + Arrays.hashCode(licenses);
+		result = prime * result + Arrays.hashCode(paymentAccepted);
+		result = prime * result + Arrays.hashCode(productTypes);
+		result = prime * result + Arrays.hashCode(programmingLanguages);
+		result = prime * result + Arrays.hashCode(propertyTypes);
+		result = prime * result + Arrays.hashCode(relatedLinks);
+		result = prime * result + Arrays.hashCode(shipping);
+		result = prime * result + Arrays.hashCode(squareFootages);
+		result = prime * result + Arrays.hashCode(subjectAreas);
+		result = prime * result + Arrays.hashCode(subjects);
+		result = prime * result + Objects.hash(SexualOrientation, age, apparelType, area, bathrooms, bedrooms, brand,
+				condition, courseDateRange, courseNumber, courseTimes, currency, deliveryNotes, deliveryRadius,
+				education, employer, eventDateRange, expirationDate, expirationDateTime, fromLocation, gender, hoaDues,
+				id, immigrationStatus, isbn, listingType, location, make, manufacturer, manufacturerId, maritalStatus,
+				megapixels, memory, mileage, model, modelNumber, nameOfItemBeingReviewed, newsSource, occupation,
+				operatingSystems, pages, paymentNotes, pickup, price, priceType, processorSpeed, publicationName,
+				publicationVolume, publishDate, quantity, rating, reviewType, reviewerType, salary, salaryType,
+				schoolDistrict, serviceType, size, taxPercent, taxRegion, toLocation, travelDateRange, university, upc,
+				urlOfItemBeingReviewed, vehicleType, vin, weight, year);
+		return result;
+	}
+
+    @Override
     public boolean equals(final Object obj) {
         return EqualsBean.beanEquals(this.getClass(), this, obj);
     }
 
-    private Object arrayCopy(final Object[] source) {
+	private Object arrayCopy(final Object[] source) {
         if (source == null) {
             return null;
         }

@@ -21,11 +21,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Image;
@@ -43,9 +45,9 @@ public class RSS090Parser extends BaseWireFeedParser {
     private static final String RSS_URI = "http://my.netscape.com/rdf/simple/0.9/";
     private static final String CONTENT_URI = "http://purl.org/rss/1.0/modules/content/";
 
-    private static final Namespace RDF_NS = Namespace.getNamespace(RDF_URI);
-    private static final Namespace RSS_NS = Namespace.getNamespace(RSS_URI);
-    private static final Namespace CONTENT_NS = Namespace.getNamespace(CONTENT_URI);
+    private static final Namespace RDF_NS = BaseWireFeedParser.createNamespace(RDF_URI);
+    private static final Namespace RSS_NS = BaseWireFeedParser.createNamespace(RSS_URI);
+    private static final Namespace CONTENT_NS = BaseWireFeedParser.createNamespace(CONTENT_URI);
 
     /**
      * Public constructor.
@@ -64,14 +66,14 @@ public class RSS090Parser extends BaseWireFeedParser {
     @Override
     public boolean isMyType(final Document document) {
 
-        final Element rssRoot = document.getRootElement();
-        final Namespace defaultNS = rssRoot.getNamespace();
-        final List<Namespace> additionalNSs = rssRoot.getAdditionalNamespaces();
+        final Element rssRoot = document.getDocumentElement();
+        final String defaultNS = rssRoot.getNamespaceURI();
+        final List<Namespace> additionalNSs = super.getAdditionalNamespaces(rssRoot);
 
         boolean myType = false;
-        if (defaultNS != null && defaultNS.equals(getRDFNamespace()) && additionalNSs != null) {
+        if (defaultNS != null && defaultNS.equals(getRDFNamespace().getNamespaceURI()) && additionalNSs != null) {
             for (final Namespace namespace : additionalNSs) {
-                if (getRSSNamespace().equals(namespace)) {
+                if (getRSSNamespace().getNamespaceURI().equals(namespace.getNamespaceURI())) {
                     myType = true;
                     break;
                 }
@@ -91,7 +93,7 @@ public class RSS090Parser extends BaseWireFeedParser {
             validateFeed(document);
         }
 
-        final Element rssRoot = document.getRootElement();
+        final Element rssRoot = document.getDocumentElement();
         return parseChannel(rssRoot, locale);
     }
 
@@ -150,59 +152,59 @@ public class RSS090Parser extends BaseWireFeedParser {
     protected WireFeed parseChannel(final Element rssRoot, final Locale locale) {
 
         final Channel channel = new Channel(getType());
-        channel.setStyleSheet(getStyleSheet(rssRoot.getDocument()));
+        channel.setStyleSheet(getStyleSheet(rssRoot.getOwnerDocument()));
 
-        final Element eChannel = rssRoot.getChild("channel", getRSSNamespace());
-
-        final Element title = eChannel.getChild("title", getRSSNamespace());
-        if (title != null) {
-            channel.setTitle(title.getText());
+        final Element eChannel = super.getChild(rssRoot, "channel", getRSSNamespace());
+        if (null != eChannel) {
+	        final Element title = super.getChild(eChannel, "title", getRSSNamespace());
+	        if (title != null) {
+	            channel.setTitle(title.getTextContent());
+	        }
+	
+	        final Element link = super.getChild(eChannel, "link", getRSSNamespace());
+	        if (link != null) {
+	            channel.setLink(link.getTextContent());
+	        }
+	
+	        final Element description = super.getChild(eChannel, "description", getRSSNamespace());
+	        if (description != null) {
+	            channel.setDescription(description.getTextContent());
+	        }
+	
+	        channel.setImage(parseImage(rssRoot));
+	
+	        channel.setTextInput(parseTextInput(rssRoot));
+	
+	        // Unfortunately Microsoft's SSE extension has a special case of effectively putting the
+	        // sharing channel module inside the RSS tag and not inside the channel itself. So we also
+	        // need to look for channel modules from the root RSS element.
+	        final List<Module> allFeedModules = new ArrayList<Module>();
+	        final List<Module> rootModules = parseFeedModules(rssRoot, locale);
+	        final List<Module> channelModules = parseFeedModules(eChannel, locale);
+	
+	        if (rootModules != null) {
+	            allFeedModules.addAll(rootModules);
+	        }
+	
+	        if (channelModules != null) {
+	            allFeedModules.addAll(channelModules);
+	        }
+	
+	        channel.setModules(allFeedModules);
+	        channel.setItems(parseItems(rssRoot, locale));
+	
+	        final List<WireFeedForeignMarkup> foreignMarkup = extractForeignMarkup(eChannel, channel, getRSSNamespace());
+	        if (!foreignMarkup.isEmpty()) {
+	            channel.setForeignMarkup(foreignMarkup);
+	        }
         }
-
-        final Element link = eChannel.getChild("link", getRSSNamespace());
-        if (link != null) {
-            channel.setLink(link.getText());
-        }
-
-        final Element description = eChannel.getChild("description", getRSSNamespace());
-        if (description != null) {
-            channel.setDescription(description.getText());
-        }
-
-        channel.setImage(parseImage(rssRoot));
-
-        channel.setTextInput(parseTextInput(rssRoot));
-
-        // Unfortunately Microsoft's SSE extension has a special case of effectively putting the
-        // sharing channel module inside the RSS tag and not inside the channel itself. So we also
-        // need to look for channel modules from the root RSS element.
-        final List<Module> allFeedModules = new ArrayList<Module>();
-        final List<Module> rootModules = parseFeedModules(rssRoot, locale);
-        final List<Module> channelModules = parseFeedModules(eChannel, locale);
-
-        if (rootModules != null) {
-            allFeedModules.addAll(rootModules);
-        }
-
-        if (channelModules != null) {
-            allFeedModules.addAll(channelModules);
-        }
-
-        channel.setModules(allFeedModules);
-        channel.setItems(parseItems(rssRoot, locale));
-
-        final List<Element> foreignMarkup = extractForeignMarkup(eChannel, channel, getRSSNamespace());
-        if (!foreignMarkup.isEmpty()) {
-            channel.setForeignMarkup(foreignMarkup);
-        }
-
         return channel;
 
     }
 
     /**
      * This method exists because RSS0.90 and RSS1.0 have the 'item' elements under the root
-     * elemment. And RSS0.91, RSS0.02, RSS0.93, RSS0.94 and RSS2.0 have the item elements under the
+     * element. And RSS0.91, RSS0.02, RSS0.93, RSS0.94 and RSS2.0 have the item elements under the
      * 'channel' element.
      * 
      * @param rssRoot the root element of the RSS document to parse.
@@ -210,7 +212,7 @@ public class RSS090Parser extends BaseWireFeedParser {
      * 
      */
     protected List<Element> getItems(final Element rssRoot) {
-        return rssRoot.getChildren("item", getRSSNamespace());
+    	return super.getChildren(rssRoot, "item", getRSSNamespace());
     }
 
     /**
@@ -222,7 +224,7 @@ public class RSS090Parser extends BaseWireFeedParser {
      * @return the selected element.
      */
     protected Element getImage(final Element rssRoot) {
-        return rssRoot.getChild("image", getRSSNamespace());
+        return super.getChild(rssRoot, "image", getRSSNamespace());
     }
 
     /**
@@ -234,7 +236,7 @@ public class RSS090Parser extends BaseWireFeedParser {
      * @return the selected element.
      */
     protected Element getTextInput(final Element rssRoot) {
-        return rssRoot.getChild("textinput", getRSSNamespace());
+        return super.getChild(rssRoot, "textinput", getRSSNamespace());
     }
 
     /**
@@ -252,22 +254,21 @@ public class RSS090Parser extends BaseWireFeedParser {
 
         final Element eImage = getImage(rssRoot);
         if (eImage != null) {
-
             image = new Image();
 
-            final Element title = eImage.getChild("title", getRSSNamespace());
+            final Element title = super.getChild(eImage, "title", getRSSNamespace());
             if (title != null) {
-                image.setTitle(title.getText());
+                image.setTitle(title.getTextContent());
             }
 
-            final Element url = eImage.getChild("url", getRSSNamespace());
+            final Element url = super.getChild(eImage, "url", getRSSNamespace());
             if (url != null) {
-                image.setUrl(url.getText());
+                image.setUrl(url.getTextContent());
             }
 
-            final Element link = eImage.getChild("link", getRSSNamespace());
+            final Element link = super.getChild(eImage, "link", getRSSNamespace());
             if (link != null) {
-                image.setLink(link.getText());
+                image.setLink(link.getTextContent());
             }
 
         }
@@ -290,8 +291,9 @@ public class RSS090Parser extends BaseWireFeedParser {
      */
     protected List<Item> parseItems(final Element rssRoot, final Locale locale) {
         final List<Item> items = new ArrayList<Item>();
-        for (final Element item : getItems(rssRoot)) {
-            items.add(parseItem(rssRoot, item, locale));
+        final List<Element> eItems = getItems(rssRoot);
+        for (Element e : eItems) {
+    		items.add(parseItem(rssRoot, e, locale));
         }
         return items;
     }
@@ -311,28 +313,28 @@ public class RSS090Parser extends BaseWireFeedParser {
 
         final Item item = new Item();
 
-        final Element title = eItem.getChild("title", getRSSNamespace());
+        final Element title = super.getChild(eItem, "title", getRSSNamespace());
         if (title != null) {
-            item.setTitle(title.getText());
+            item.setTitle(title.getTextContent());
         }
 
-        final Element link = eItem.getChild("link", getRSSNamespace());
+        final Element link = super.getChild(eItem, "link", getRSSNamespace());
         if (link != null) {
-            item.setLink(link.getText());
-            item.setUri(link.getText());
+            item.setLink(link.getTextContent());
+            item.setUri(link.getTextContent());
         }
 
         item.setModules(parseItemModules(eItem, locale));
 
-        final List<Element> foreignMarkup = extractForeignMarkup(eItem, item, getRSSNamespace());
+        final List<WireFeedForeignMarkup> foreignMarkup = extractForeignMarkup(eItem, item, getRSSNamespace());
         // content:encoded elements are treated special, without a module, they have to be removed
         // from the foreign markup to avoid duplication in case of read/write. Note that this fix
         // will break if a content module is used
-        final Iterator<Element> iterator = foreignMarkup.iterator();
+        final Iterator<WireFeedForeignMarkup> iterator = foreignMarkup.iterator();
         while (iterator.hasNext()) {
-            final Element element = iterator.next();
-            final Namespace eNamespace = element.getNamespace();
-            final String eName = element.getName();
+            final WireFeedForeignMarkup wffm = iterator.next();
+            final Namespace eNamespace = super.createNamespace(wffm.getElement().getNamespaceURI());
+            final String eName = wffm.getElement().getNodeName();
             if (getContentNamespace().equals(eNamespace) && eName.equals("encoded")) {
                 iterator.remove();
             }
@@ -360,27 +362,26 @@ public class RSS090Parser extends BaseWireFeedParser {
 
         final Element eTextInput = getTextInput(rssRoot);
         if (eTextInput != null) {
-
             textInput = new TextInput();
 
-            final Element title = eTextInput.getChild("title", getRSSNamespace());
+            final Element title = super.getChild(eTextInput, "title", getRSSNamespace());
             if (title != null) {
-                textInput.setTitle(title.getText());
+                textInput.setTitle(title.getTextContent());
             }
 
-            final Element description = eTextInput.getChild("description", getRSSNamespace());
+            final Element description = super.getChild(eTextInput, "description", getRSSNamespace());
             if (description != null) {
-                textInput.setDescription(description.getText());
+                textInput.setDescription(description.getTextContent());
             }
 
-            final Element name = eTextInput.getChild("name", getRSSNamespace());
+            final Element name = super.getChild(eTextInput, "name", getRSSNamespace());
             if (name != null) {
-                textInput.setName(name.getText());
+                textInput.setName(name.getTextContent());
             }
 
-            final Element link = eTextInput.getChild("link", getRSSNamespace());
+            final Element link = super.getChild(eTextInput, "link", getRSSNamespace());
             if (link != null) {
-                textInput.setLink(link.getText());
+                textInput.setLink(link.getTextContent());
             }
 
         }

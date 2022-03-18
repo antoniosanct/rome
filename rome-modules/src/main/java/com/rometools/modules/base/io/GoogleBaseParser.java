@@ -18,6 +18,7 @@ package com.rometools.modules.base.io;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,10 +27,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.base.GoogleBase;
 import com.rometools.modules.base.GoogleBaseImpl;
@@ -47,16 +50,16 @@ import com.rometools.rome.feed.impl.BeanIntrospector;
 import com.rometools.rome.feed.impl.PropertyDescriptor;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleParser;
+import com.rometools.rome.io.impl.ChildNavigator;
 
-public class GoogleBaseParser implements ModuleParser {
+public class GoogleBaseParser extends ChildNavigator implements ModuleParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleBaseParser.class);
 
     public static final char[] INTEGER_CHARS = "-1234567890".toCharArray();
     public static final char[] FLOAT_CHARS = "-1234567890.".toCharArray();
-    public static final SimpleDateFormat SHORT_DT_FMT = new SimpleDateFormat("yyyy-MM-dd");
-    public static final SimpleDateFormat LONG_DT_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    static final Namespace NS = Namespace.getNamespace(GoogleBase.URI);
+    
+    static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(GoogleBase.URI);
     static final Properties PROPS2TAGS = new Properties();
     static List<PropertyDescriptor> pds = null;
 
@@ -97,20 +100,20 @@ public class GoogleBaseParser implements ModuleParser {
             throw new RuntimeException("Exception building tag to property mapping. ", e);
         }
 
-        final List<Element> children = element.getChildren();
+        final List<Element> children = super.getChildren(element);
         final Iterator<Element> it = children.iterator();
 
         while (it.hasNext()) {
             final Element child = it.next();
 
-            if (child.getNamespace().equals(GoogleBaseParser.NS)) {
-                final PropertyDescriptor pd = tag2pd.get(child.getName());
+            if (GoogleBaseParser.NS.getNamespaceURI().equals(child.getNamespaceURI())) {
+                final PropertyDescriptor pd = tag2pd.get(child.getLocalName());
 
                 if (pd != null) {
                     try {
                         handleTag(child, pd, module);
                     } catch (final Exception e) {
-                        LOG.warn("Unable to handle tag: " + child.getName(), e);
+                        LOG.warn("Unable to handle tag: " + child.getLocalName(), e);
                     }
                 }
             }
@@ -139,57 +142,59 @@ public class GoogleBaseParser implements ModuleParser {
     }
 
     private void handleTag(final Element tag, final PropertyDescriptor pd, final GoogleBase module) throws Exception {
-        Object tagValue = null;
+    	final DateFormat SHORT_DT_FMT = new SimpleDateFormat("yyyy-MM-dd");
+        final DateFormat LONG_DT_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    	Object tagValue = null;
 
         if (pd.getPropertyType() == Integer.class || pd.getPropertyType().getComponentType() == Integer.class) {
-            tagValue = Integer.valueOf(GoogleBaseParser.stripNonValidCharacters(GoogleBaseParser.INTEGER_CHARS, tag.getText()));
+            tagValue = Integer.valueOf(GoogleBaseParser.stripNonValidCharacters(GoogleBaseParser.INTEGER_CHARS, tag.getTextContent()));
         } else if (pd.getPropertyType() == Float.class || pd.getPropertyType().getComponentType() == Float.class) {
-            tagValue = Float.valueOf(GoogleBaseParser.stripNonValidCharacters(GoogleBaseParser.FLOAT_CHARS, tag.getText()));
+            tagValue = Float.valueOf(GoogleBaseParser.stripNonValidCharacters(GoogleBaseParser.FLOAT_CHARS, tag.getTextContent()));
         } else if (pd.getPropertyType() == String.class || pd.getPropertyType().getComponentType() == String.class) {
-            tagValue = tag.getText();
+            tagValue = tag.getTextContent();
         } else if (pd.getPropertyType() == URL.class || pd.getPropertyType().getComponentType() == URL.class) {
-            tagValue = new URL(tag.getText().trim());
+            tagValue = new URL(tag.getTextContent().trim());
         } else if (pd.getPropertyType() == Boolean.class || pd.getPropertyType().getComponentType() == Boolean.class) {
-            tagValue = Boolean.valueOf(tag.getText().trim());
+            tagValue = Boolean.valueOf(tag.getTextContent().trim());
         } else if (pd.getPropertyType() == Date.class || pd.getPropertyType().getComponentType() == Date.class) {
-            final String text = tag.getText().trim();
+            final String text = tag.getTextContent().trim();
 
             if (text.length() > 10) {
-                tagValue = GoogleBaseParser.LONG_DT_FMT.parse(text);
+                tagValue = LONG_DT_FMT.parse(text);
             } else {
-                tagValue = GoogleBaseParser.SHORT_DT_FMT.parse(text);
+                tagValue = SHORT_DT_FMT.parse(text);
             }
         } else if (pd.getPropertyType() == IntUnit.class || pd.getPropertyType().getComponentType() == IntUnit.class) {
-            tagValue = new IntUnit(tag.getText());
+            tagValue = new IntUnit(tag.getTextContent());
         } else if (pd.getPropertyType() == FloatUnit.class || pd.getPropertyType().getComponentType() == FloatUnit.class) {
-            tagValue = new FloatUnit(tag.getText());
+            tagValue = new FloatUnit(tag.getTextContent());
         } else if (pd.getPropertyType() == DateTimeRange.class || pd.getPropertyType().getComponentType() == DateTimeRange.class) {
-            tagValue =
-                    new DateTimeRange(LONG_DT_FMT.parse(tag.getChild("start", GoogleBaseParser.NS).getText().trim()), LONG_DT_FMT.parse(tag
-                            .getChild("end", GoogleBaseParser.NS).getText().trim()));
+            tagValue = new DateTimeRange(
+            		LONG_DT_FMT.parse(super.getChild(tag, "start", GoogleBaseParser.NS).getTextContent().trim()), 
+            		LONG_DT_FMT.parse(super.getChild(tag, "end", GoogleBaseParser.NS).getTextContent().trim()));
         } else if (pd.getPropertyType() == ShippingType.class || pd.getPropertyType().getComponentType() == ShippingType.class) {
-            final FloatUnit price = new FloatUnit(tag.getChild("price", GoogleBaseParser.NS).getText().trim());
+            final FloatUnit price = new FloatUnit(super.getChild(tag, "price", GoogleBaseParser.NS).getTextContent().trim());
             ShippingType.ServiceEnumeration service =
-                    ShippingType.ServiceEnumeration.findByValue(tag.getChild("service", GoogleBaseParser.NS).getText().trim());
+                    ShippingType.ServiceEnumeration.findByValue(super.getChild(tag, "service", GoogleBaseParser.NS).getTextContent().trim());
 
             if (service == null) {
                 service = ShippingType.ServiceEnumeration.STANDARD;
             }
 
-            final String country = tag.getChild("country", GoogleBaseParser.NS).getText().trim();
+            final String country = super.getChild(tag, "country", GoogleBaseParser.NS).getTextContent().trim();
             tagValue = new ShippingType(price, service, country);
         } else if (pd.getPropertyType() == PaymentTypeEnumeration.class || pd.getPropertyType().getComponentType() == PaymentTypeEnumeration.class) {
-            tagValue = PaymentTypeEnumeration.findByValue(tag.getText().trim());
+            tagValue = PaymentTypeEnumeration.findByValue(tag.getTextContent().trim());
         } else if (pd.getPropertyType() == PriceTypeEnumeration.class || pd.getPropertyType().getComponentType() == PriceTypeEnumeration.class) {
-            tagValue = PriceTypeEnumeration.findByValue(tag.getText().trim());
+            tagValue = PriceTypeEnumeration.findByValue(tag.getTextContent().trim());
         } else if (pd.getPropertyType() == CurrencyEnumeration.class || pd.getPropertyType().getComponentType() == CurrencyEnumeration.class) {
-            tagValue = CurrencyEnumeration.findByValue(tag.getText().trim());
+            tagValue = CurrencyEnumeration.findByValue(tag.getTextContent().trim());
         } else if (pd.getPropertyType() == GenderEnumeration.class || pd.getPropertyType().getComponentType() == GenderEnumeration.class) {
-            tagValue = GenderEnumeration.findByValue(tag.getText().trim());
+            tagValue = GenderEnumeration.findByValue(tag.getTextContent().trim());
         } else if (pd.getPropertyType() == YearType.class || pd.getPropertyType().getComponentType() == YearType.class) {
-            tagValue = new YearType(tag.getText().trim());
+            tagValue = new YearType(tag.getTextContent().trim());
         } else if (pd.getPropertyType() == Size.class || pd.getPropertyType().getComponentType() == Size.class) {
-            tagValue = new Size(tag.getText().trim());
+            tagValue = new Size(tag.getTextContent().trim());
         }
 
         if (!pd.getPropertyType().isArray()) {

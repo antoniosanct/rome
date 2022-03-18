@@ -15,22 +15,25 @@
  */
 package com.rometools.modules.fyyd.io;
 
-import com.rometools.modules.fyyd.modules.FyydModule;
-import com.rometools.rome.feed.module.Module;
-import com.rometools.rome.io.ModuleGenerator;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
+
+import com.rometools.modules.fyyd.modules.FyydModule;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ModuleGenerator;
 
 /**
  * The ModuleGenerator implementation for the Fyyd module.
  */
 public class FyydGenerator implements ModuleGenerator {
 
-    private static final Namespace NS = Namespace.getNamespace(FyydElement.PREFIX, FyydModule.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(FyydElement.PREFIX, FyydModule.URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {
@@ -59,9 +62,10 @@ public class FyydGenerator implements ModuleGenerator {
     }
 
     private void generateVerify(String verify, Element parent) {
-        final Element child = new Element(FyydElement.VERIFY, NS);
-        child.setText(verify);
-        parent.addContent(child);
+        final Element child = parent.getOwnerDocument().createElementNS(NS.getNamespaceURI(), FyydElement.VERIFY);
+        child.setPrefix(NS.getPrefix());
+        child.setTextContent(verify);
+        parent.appendChild(child);
     }
 
 }

@@ -45,12 +45,12 @@ public class XmlReaderTest {
     private static final String XML2 = "xml-prolog";
     private static final String XML1 = "xml";
 
-    public static void main(final String[] args) throws Exception {
-        final XmlReaderTest test = new XmlReaderTest();
-        test.testRawBom();
-        test.testRawNoBom();
-        test.testHttp();
-    }
+//    public static void main(final String[] args) throws Exception {
+//        final XmlReaderTest test = new XmlReaderTest();
+//        test.testRawBom();
+//        test.testRawNoBom();
+//        test.testHttp();
+//    }
 
     protected void testRawNoBomValid(final String encoding) throws Exception {
         checkEncoding(XML1, encoding, "UTF-8");
@@ -80,9 +80,9 @@ public class XmlReaderTest {
     protected void testRawNoBomInvalid(final String encoding) throws Exception {
         InputStream is = null;
         XmlReader xmlReader = null;
+        is = getXmlStream("no-bom", XML3, encoding, encoding);
         try {
-            is = getXmlStream("no-bom", XML3, encoding, encoding);
-            xmlReader = new XmlReader(is, false);
+        	xmlReader = new XmlReader(is, false);
             fail("It should have failed");
         } catch (final IOException ex) {
             assertTrue(ex.getMessage().indexOf("Invalid encoding,") > -1);

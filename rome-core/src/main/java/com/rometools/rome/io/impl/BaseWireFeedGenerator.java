@@ -20,14 +20,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.Parent;
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.WireFeedGenerator;
 
-public abstract class BaseWireFeedGenerator implements WireFeedGenerator {
+public abstract class BaseWireFeedGenerator extends ChildNavigator implements WireFeedGenerator {
 
     /**
      * [TYPE].feed.ModuleParser.classes= [className] ...
@@ -85,30 +91,28 @@ public abstract class BaseWireFeedGenerator implements WireFeedGenerator {
 
     protected void generateModuleNamespaceDefs(final Element root) {
         for (final Namespace allModuleNamespace : allModuleNamespaces) {
-            root.addNamespaceDeclaration(allModuleNamespace);
+        	root.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, 
+        			String.join(":", XMLConstants.XMLNS_ATTRIBUTE, allModuleNamespace.getPrefix()),
+        			allModuleNamespace.getNamespaceURI());
         }
     }
 
-    protected void generateFeedModules(final List<Module> modules, final Element feed) {
+    protected void generateFeedModules(final List<Module> modules, final Element feed) throws DOMException {
         feedModuleGenerators.generateModules(modules, feed);
     }
 
-    public void generateItemModules(final List<Module> modules, final Element item) {
+    public void generateItemModules(final List<Module> modules, final Element item) throws DOMException {
         itemModuleGenerators.generateModules(modules, item);
     }
 
-    public void generatePersonModules(final List<Module> modules, final Element person) {
+    public void generatePersonModules(final List<Module> modules, final Element person) throws DOMException {
         personModuleGenerators.generateModules(modules, person);
     }
 
-    protected void generateForeignMarkup(final Element element, final List<Element> foreignElements) {
+    protected void generateForeignMarkup(final Element element, final List<WireFeedForeignMarkup> foreignElements, final Element parent) {
         if (foreignElements != null) {
-            for (final Element foreignElement : foreignElements) {
-                final Parent parent = foreignElement.getParent();
-                if (parent != null) {
-                    parent.removeContent(foreignElement);
-                }
-                element.addContent(foreignElement);
+            for (final WireFeedForeignMarkup foreignElement : foreignElements) {
+                element.appendChild(element.getOwnerDocument().importNode(foreignElement.getElement(), true));
             }
         }
     }
@@ -125,37 +129,45 @@ public abstract class BaseWireFeedGenerator implements WireFeedGenerator {
      * 
      * @param root the root element.
      */
-    protected static void purgeUnusedNamespaceDeclarations(final Element root) {
+    protected void purgeUnusedNamespaceDeclarations(final Element root) {
 
         final Set<String> usedPrefixes = new HashSet<String>();
         collectUsedPrefixes(root, usedPrefixes);
 
-        final List<Namespace> list = root.getAdditionalNamespaces();
-        final List<Namespace> additionalNamespaces = new ArrayList<Namespace>();
-        additionalNamespaces.addAll(list); // the duplication will prevent a
-        // ConcurrentModificationException
-        // below
+        final NamedNodeMap list = root.getAttributes();
+        final List<Namespace> additionalNamespaces = new ArrayList<>(1);
+        for (int i = 0; i < list.getLength(); i++) {
+        	// The duplication will prevent a ConcurrentModificationException
+        	// below
+        	Attr a = (Attr) list.item(i);
+        	if (a.getValue().indexOf("http") >= 0) {
+        		final String name = null == a.getLocalName() ? a.getName() : a.getLocalName();
+        		Namespace n = XMLEventFactory.newDefaultFactory()
+        			.createNamespace(name, a.getValue());
+        		additionalNamespaces.add(n);
+        	}
+        }
 
         for (final Namespace ns : additionalNamespaces) {
             final String prefix = ns.getPrefix();
             if (prefix != null && prefix.length() > 0 && !usedPrefixes.contains(prefix)) {
-                root.removeNamespaceDeclaration(ns);
+                root.removeAttribute(String.join(":", XMLConstants.XMLNS_ATTRIBUTE, prefix));
             }
         }
 
     }
+    
+    private void collectUsedPrefixes(final Element el, final Set<String> collector) {
 
-    private static void collectUsedPrefixes(final Element el, final Set<String> collector) {
-
-        final String prefix = el.getNamespacePrefix();
+        final String prefix = el.getPrefix();
         if (prefix != null && prefix.length() > 0 && !collector.contains(prefix)) {
             collector.add(prefix);
         }
 
-        final List<Element> kids = el.getChildren();
-        for (final Element kid : kids) {
+        final List<Element> kids = super.getChildren(el);
+        for (Element k : kids) {
             // recursion- worth it
-            collectUsedPrefixes(kid, collector);
+    		collectUsedPrefixes(k, collector);
         }
 
     }

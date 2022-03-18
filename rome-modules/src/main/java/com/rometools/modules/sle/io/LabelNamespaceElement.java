@@ -14,13 +14,9 @@
  */
 package com.rometools.modules.sle.io;
 
-import org.jdom2.Namespace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.xml.stream.events.Namespace;
 
 public class LabelNamespaceElement {
-
-    private static final Logger LOG = LoggerFactory.getLogger(LabelNamespaceElement.class);
 
     private String element;
     private String label;
@@ -66,15 +62,13 @@ public class LabelNamespaceElement {
         }
         final LabelNamespaceElement other = (LabelNamespaceElement) obj;
         if (element == null ? other.element != null : !element.equals(other.element)) {
-            LOG.debug("E {} != {}", element, other.element);
             return false;
         }
         if (label == null ? other.label != null : !label.equals(other.label)) {
-            LOG.debug("L");
             return false;
         }
-        if (namespace != other.namespace && (namespace == null || !namespace.equals(other.namespace))) {
-            LOG.debug("N");
+        if (namespace != other.namespace && 
+        		(namespace == null || !namespace.getNamespaceURI().equals(other.namespace.getNamespaceURI()))) {
             return false;
         }
 

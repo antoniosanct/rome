@@ -23,10 +23,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.photocast.PhotocastModule;
 import com.rometools.modules.photocast.PhotocastModuleImpl;
@@ -34,71 +36,73 @@ import com.rometools.modules.photocast.types.Metadata;
 import com.rometools.modules.photocast.types.PhotoDate;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleParser;
+import com.rometools.rome.io.impl.ChildNavigator;
 
-public class Parser implements ModuleParser {
+public class Parser extends ChildNavigator implements ModuleParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(Parser.class);
 
-    private static final Namespace NS = Namespace.getNamespace(PhotocastModule.URI);
-    // 2005-11-29T04:36:06
-    static final DateFormat PHOTO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    // 2006-01-11 16:42:26 -0800
-    static final DateFormat CROP_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(PhotocastModule.URI);
+    
 
     public Parser() {
     }
 
     @Override
     public Module parse(final Element element, final Locale locale) {
-        if (element.getName().equals("channel") || element.getName().equals("feed")) {
+    	// 2005-11-29T04:36:06
+        final DateFormat PHOTO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        // 2006-01-11 16:42:26 -0800
+        final DateFormat CROP_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        if (element.getLocalName().equals("channel") || element.getLocalName().equals("feed")) {
             return new PhotocastModuleImpl();
-        } else if (element.getChild("metadata", Parser.NS) == null && element.getChild("image", Parser.NS) == null) {
+        } else if (super.getChild(element, "metadata", Parser.NS) == null && super.getChild(element, "image", Parser.NS) == null) {
             return null;
         }
         final PhotocastModule pm = new PhotocastModuleImpl();
-        final List<Element> children = element.getChildren();
+        final List<Element> children = super.getChildren(element);
         final Iterator<Element> it = children.iterator();
         while (it.hasNext()) {
             final Element e = it.next();
-            if (!e.getNamespace().equals(Parser.NS)) {
+            if (!Parser.NS.getNamespaceURI().equals(e.getNamespaceURI())) {
                 continue;
             }
-            if (e.getName().equals("photoDate")) {
+            if (e.getLocalName().equals("photoDate")) {
                 try {
-                    pm.setPhotoDate(Parser.PHOTO_DATE_FORMAT.parse(e.getText()));
+                    pm.setPhotoDate(PHOTO_DATE_FORMAT.parse(e.getTextContent()));
                 } catch (final Exception ex) {
-                    LOG.warn("Unable to parse photoDate: " + e.getText(), ex);
+                    LOG.warn("Unable to parse photoDate: " + e.getTextContent(), ex);
                 }
-            } else if (e.getName().equals("cropDate")) {
+            } else if (e.getLocalName().equals("cropDate")) {
                 try {
-                    pm.setCropDate(Parser.CROP_DATE_FORMAT.parse(e.getText()));
+                    pm.setCropDate(CROP_DATE_FORMAT.parse(e.getTextContent()));
                 } catch (final Exception ex) {
-                    LOG.warn("Unable to parse cropDate: " + e.getText(), ex);
+                    LOG.warn("Unable to parse cropDate: " + e.getTextContent(), ex);
                 }
-            } else if (e.getName().equals("thumbnail")) {
+            } else if (e.getLocalName().equals("thumbnail")) {
                 try {
-                    pm.setThumbnailUrl(new URL(e.getText()));
+                    pm.setThumbnailUrl(new URL(e.getTextContent()));
                 } catch (final Exception ex) {
-                    LOG.warn("Unable to parse thumnail: " + e.getText(), ex);
+                    LOG.warn("Unable to parse thumnail: " + e.getTextContent(), ex);
                 }
-            } else if (e.getName().equals("image")) {
+            } else if (e.getLocalName().equals("image")) {
                 try {
-                    pm.setImageUrl(new URL(e.getText()));
+                    pm.setImageUrl(new URL(e.getTextContent()));
                 } catch (final Exception ex) {
-                    LOG.warn("Unable to parse image: " + e.getText(), ex);
+                    LOG.warn("Unable to parse image: " + e.getTextContent(), ex);
                 }
-            } else if (e.getName().equals("metadata")) {
+            } else if (e.getLocalName().equals("metadata")) {
                 String comments = "";
                 PhotoDate photoDate = null;
-                if (e.getChildText("PhotoDate") != null) {
+                if (super.getChild(e, "PhotoDate") != null) {
                     try {
-                        photoDate = new PhotoDate(Double.parseDouble(e.getChildText("PhotoDate")));
+                        photoDate = new PhotoDate(Double.parseDouble(super.getChild(e, "PhotoDate").getTextContent()));
                     } catch (final Exception ex) {
-                        LOG.warn("Unable to parse PhotoDate: " + e.getText(), ex);
+                        LOG.warn("Unable to parse PhotoDate: " + e.getTextContent(), ex);
                     }
                 }
-                if (e.getChildText("Comments") != null) {
-                    comments = e.getChildText("Comments");
+                if (super.getChild(e, "Comments") != null) {
+                    comments = super.getChild(e, "Comments").getTextContent();
                 }
                 pm.setMetadata(new Metadata(photoDate, comments));
             }

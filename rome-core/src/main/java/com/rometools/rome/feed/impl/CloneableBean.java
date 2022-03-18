@@ -130,18 +130,36 @@ public class CloneableBean {
             } else if (isBasicType(vClass)) {
                 // NOTHING SPECIAL TO DO HERE, THEY ARE INMUTABLE
             } else if (value instanceof Cloneable) {
-                final Method cloneMethod = vClass.getMethod("clone", NO_PARAMS_DEF);
-                if (Modifier.isPublic(cloneMethod.getModifiers())) {
-                    value = (T) cloneMethod.invoke(value, NO_PARAMS);
-                } else {
-                    throw new CloneNotSupportedException("Cannot clone a " + value.getClass() + " object, clone() is not public");
-                }
+//            	boolean found = false;
+//            	final Method[] methods = vClass.getMethods();
+//            	for (int i = 0; !found && i < methods.length; i++) {
+//            		if (methods[i].getName().indexOf("cloneNode") >= 0) {
+//            			found = true;
+//            			final Class<?>[] booleanClass = new Class[] { boolean.class };
+//            			final Object[] booleanParam = new Object[] { true };
+//            			value = executeCloneMethod(value, "cloneNode", booleanClass, booleanParam, vClass);
+//            		}
+//            	}
+//            	if (!found) {
+            		value = executeCloneMethod(value, "clone", NO_PARAMS_DEF, NO_PARAMS, vClass);
+//            	}
             } else {
                 throw new CloneNotSupportedException("Cannot clone a " + vClass.getName() + " object");
             }
         }
         return value;
     }
+
+	private static <T> T executeCloneMethod(T value, final String method, final Class<?>[] paramsDef, final Object[] params, final Class<?> vClass) throws NoSuchMethodException,
+			IllegalAccessException, InvocationTargetException, CloneNotSupportedException {
+		final Method cloneMethod = vClass.getMethod(method, paramsDef);
+		if (Modifier.isPublic(cloneMethod.getModifiers())) {
+		    value = (T) cloneMethod.invoke(value, params);
+		} else {
+		    throw new CloneNotSupportedException("Cannot clone a " + value.getClass() + " object, clone() is not public");
+		}
+		return value;
+	}
 
     private static <T> T cloneArray(final T array) throws Exception {
         final Class<?> elementClass = array.getClass().getComponentType();
@@ -178,6 +196,7 @@ public class CloneableBean {
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				LOG.error("Error", e);
+				collection = new ArrayList<E>();
 			}
         }
         return collection;
