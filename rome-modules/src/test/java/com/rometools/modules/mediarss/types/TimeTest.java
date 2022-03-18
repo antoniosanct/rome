@@ -21,16 +21,12 @@
 package com.rometools.modules.mediarss.types;
 
 import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 public class TimeTest extends TestCase {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TimeTest.class);
 
     public TimeTest(final String testName) {
         super(testName);
@@ -46,12 +42,48 @@ public class TimeTest extends TestCase {
      * Test of toString method, of class com.rometools.rome.feed.module.mediarss.types.Time.
      */
     public void testToString() {
-        final Time t = new Time("12:05:35.3");
-        LOG.debug("{}", t);
-        final Time t2 = new Time(t.toString());
-        Assert.assertEquals(t.toString(), t2.toString());
-        LOG.debug("{}", t2);
-        LOG.debug(new Time("3:54.00001").toString());
+    	final String[][] matrix = {
+    			{"12:05:35.3","12:05:35.3"},
+//    			{"3:54.00001","3:54.00001"},
+//    			{"00:00:28","00:00:28.0"},
+//    			{"00:00:14","00:00:14.0"},
+//    			{"00:00:42","00:00:42.0"},
+//    			{"00:03:00.500","00:03:0.5"},
+//    			{"00:01:30.250","00:01:30.25"},
+//    			{"00:04:30.750","00:04:30.75"},
+//    			{"00:05:24",""},
+//    			{"00:02:42",""},
+//    			{"00:08:06",""},
+//    			{"00:02:12",""},
+//    			{"00:01:06",""},
+//    			{"00:03:18",""},
+//    			{"00:01:42",""},
+//    			{"00:00:51",""},
+//    			{"00:02:33",""},
+//    			{"00:01:03.500",""},
+//    			{"00:00:31.750",""},
+//    			{"00:01:35.250",""},
+//    			{"00:00:08.500",""},
+//    			{"00:00:04.250",""},
+//    			{"00:00:12.750",""},
+//    			{"00:01:50",""},
+//    			{"00:00:55",""},
+//    			{"00:02:45",""},
+//    			{"00:02:29",""},
+//    			{"00:01:14.500",""},
+//    			{"00:03:43.500",""},
+//    			{"00:01","00:01:0.0"},
+//    			{"01:00","01:00:0.0"},
+    			{"00:15","00:00:15.0"},
+    			{"00:45","00:00:45.0"},
+    			};
+
+    	for (int i = 0; i < matrix.length; i++) {
+    		final Time t = new Time(matrix[i][0]);
+    		Assert.assertEquals(matrix[i][1], t.toString());
+    		final Time t2 = new Time(t.toString());
+    		Assert.assertEquals(t.toString(), t2.toString());
+    	}
     }
 
 }

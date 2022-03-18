@@ -16,14 +16,17 @@
 package com.rometools.modules.base.io;
 
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.base.CustomTag;
 import com.rometools.modules.base.CustomTagImpl;
@@ -58,6 +61,8 @@ public class CustomTagGenerator implements ModuleGenerator {
 
     @Override
     public void generate(final Module module, final Element element) {
+    	final DateFormat SHORT_DT_FMT = new SimpleDateFormat("yyyy-MM-dd");
+        final DateFormat LONG_DT_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         if (!(module instanceof CustomTags)) {
             return;
         }
@@ -70,60 +75,60 @@ public class CustomTagGenerator implements ModuleGenerator {
 
             if (tag.getValue() instanceof DateTimeRange) {
                 final DateTimeRange dtr = (DateTimeRange) tag.getValue();
-                final Element newTag = new Element(tag.getName(), CustomTagParser.NS);
+                final Element newTag = element.getOwnerDocument().createElementNS(CustomTagParser.NS.getNamespaceURI(), tag.getName());
                 newTag.setAttribute("type", "dateTimeRange");
-                newTag.addContent(generateSimpleElement("start", GoogleBaseParser.LONG_DT_FMT.format(dtr.getStart())));
-                newTag.addContent(generateSimpleElement("end", GoogleBaseParser.LONG_DT_FMT.format(dtr.getEnd())));
-                element.addContent(newTag);
+                newTag.appendChild(generateSimpleElement("start", LONG_DT_FMT.format(dtr.getStart()), element));
+                newTag.appendChild(generateSimpleElement("end", LONG_DT_FMT.format(dtr.getEnd()), element));
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof ShortDate) {
                 final ShortDate sd = (ShortDate) tag.getValue();
-                final Element newTag = generateSimpleElement(tag.getName(), GoogleBaseParser.SHORT_DT_FMT.format(sd));
+                final Element newTag = generateSimpleElement(tag.getName(), SHORT_DT_FMT.format(sd), element);
                 newTag.setAttribute("type", "date");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof Date) {
                 final Date d = (Date) tag.getValue();
-                final Element newTag = generateSimpleElement(tag.getName(), GoogleBaseParser.SHORT_DT_FMT.format(d));
+                final Element newTag = generateSimpleElement(tag.getName(), SHORT_DT_FMT.format(d), element);
                 newTag.setAttribute("type", "dateTime");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof Integer) {
-                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString());
+                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString(), element);
                 newTag.setAttribute("type", "int");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof IntUnit) {
-                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString());
+                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString(), element);
                 newTag.setAttribute("type", "intUnit");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof Float) {
-                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString());
+                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString(), element);
                 newTag.setAttribute("type", "float");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof FloatUnit) {
-                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString());
+                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString(), element);
                 newTag.setAttribute("type", "floatUnit");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof String) {
-                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString());
+                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString(), element);
                 newTag.setAttribute("type", "string");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof URL) {
-                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString());
+                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString(), element);
                 newTag.setAttribute("type", "url");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof Boolean) {
-                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString());
+                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString(), element);
                 newTag.setAttribute("type", "boolean");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             } else if (tag.getValue() instanceof CustomTagImpl.Location) {
-                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString());
+                final Element newTag = generateSimpleElement(tag.getName(), tag.getValue().toString(), element);
                 newTag.setAttribute("type", "location");
-                element.addContent(newTag);
+                element.appendChild(newTag);
             }
         }
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, CustomTagParser.NS);
-        element.addContent(value);
+    protected Element generateSimpleElement(final String name, final String value, final Element parent) {
+        final Element element = parent.getOwnerDocument().createElementNS(CustomTagParser.NS.getNamespaceURI(), name);
+        element.setTextContent(value);
 
         return element;
     }

@@ -22,8 +22,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.jdom2.Element;
-
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.impl.CloneableBean;
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
@@ -59,7 +58,7 @@ public class Item implements Cloneable, Serializable, Extendable {
     private Date pubDate;
     private Date expirationDate;
     private List<Module> modules;
-    private List<Element> foreignMarkup;
+    private List<WireFeedForeignMarkup> foreignMarkup;
 
     /**
      * Empty public constructor.
@@ -94,7 +93,7 @@ public class Item implements Cloneable, Serializable, Extendable {
             return false;
         }
         // can't use foreign markup in equals, due to JDOM equals impl
-        final List<Element> fm = getForeignMarkup();
+        final List<WireFeedForeignMarkup> fm = getForeignMarkup();
         setForeignMarkup(((Item) other).getForeignMarkup());
         final boolean ret = EqualsBean.beanEquals(this.getClass(), this, other);
         // restore foreign markup
@@ -458,7 +457,7 @@ public class Item implements Cloneable, Serializable, Extendable {
      * @return Opaque object to discourage use
      *
      */
-    public List<Element> getForeignMarkup() {
+    public List<WireFeedForeignMarkup> getForeignMarkup() {
         return foreignMarkup = Lists.createWhenNull(foreignMarkup);
     }
 
@@ -469,7 +468,7 @@ public class Item implements Cloneable, Serializable, Extendable {
      * @param foreignMarkup Opaque object to discourage use
      *
      */
-    public void setForeignMarkup(final List<Element> foreignMarkup) {
+    public void setForeignMarkup(final List<WireFeedForeignMarkup> foreignMarkup) {
         this.foreignMarkup = foreignMarkup;
     }
 

@@ -15,13 +15,16 @@
  */
 package com.rometools.modules.yahooweather.io;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.yahooweather.YWeatherModule;
 import com.rometools.modules.yahooweather.YWeatherModuleImpl;
@@ -33,16 +36,18 @@ import com.rometools.rome.io.ModuleGenerator;
  * The ModuleGenerator implementation for the Yahoo Weather plug in.
  */
 public class WeatherModuleGenerator implements ModuleGenerator {
-    private static final Namespace NS = Namespace.getNamespace("yweather", YWeatherModule.URI);
-    private static final SimpleDateFormat TIME_ONLY = new SimpleDateFormat("h:mm a", Locale.US);
-    private static final SimpleDateFormat LONG_DATE = new SimpleDateFormat("EEE, d MMM yyyy h:mm a zzz", Locale.US);
-    private static final SimpleDateFormat SHORT_DATE = new SimpleDateFormat("d MMM yyyy", Locale.US);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("yweather", YWeatherModule.URI);
+    
 
     public WeatherModuleGenerator() {
     }
 
     @Override
     public void generate(final Module module, final Element element) {
+    	final DateFormat TIME_ONLY = new SimpleDateFormat("h:mm a", Locale.US);
+        final DateFormat LONG_DATE = new SimpleDateFormat("EEE, d MMM yyyy h:mm a zzz", Locale.US);
+        final DateFormat SHORT_DATE = new SimpleDateFormat("d MMM yyyy", Locale.US);
+        
         if (!(module instanceof YWeatherModuleImpl)) {
             return;
         }
@@ -50,7 +55,7 @@ public class WeatherModuleGenerator implements ModuleGenerator {
         final YWeatherModuleImpl weather = (YWeatherModuleImpl) module;
 
         if (weather.getAstronomy() != null) {
-            final Element astro = new Element("astronomy", WeatherModuleGenerator.NS);
+            final Element astro = element.getOwnerDocument().createElementNS(WeatherModuleGenerator.NS.getNamespaceURI(), "astronomy");
 
             if (weather.getAstronomy().getSunrise() != null) {
                 astro.setAttribute("sunrise", TIME_ONLY.format(weather.getAstronomy().getSunrise()).toLowerCase());
@@ -59,12 +64,12 @@ public class WeatherModuleGenerator implements ModuleGenerator {
             if (weather.getAstronomy().getSunrise() != null) {
                 astro.setAttribute("sunset", TIME_ONLY.format(weather.getAstronomy().getSunset()).toLowerCase());
             }
-
-            element.addContent(astro);
+            astro.setPrefix(WeatherModuleGenerator.NS.getPrefix());
+            element.appendChild(astro);
         }
 
         if (weather.getAtmosphere() != null) {
-            final Element atmos = new Element("atmosphere", WeatherModuleGenerator.NS);
+            final Element atmos = element.getOwnerDocument().createElementNS(WeatherModuleGenerator.NS.getNamespaceURI(), "atmosphere");
             atmos.setAttribute("humidity", Integer.toString(weather.getAtmosphere().getHumidity()));
             atmos.setAttribute("visibility", Integer.toString((int) (weather.getAtmosphere().getVisibility() * 100d)));
             atmos.setAttribute("pressure", Double.toString(weather.getAtmosphere().getPressure()));
@@ -72,12 +77,12 @@ public class WeatherModuleGenerator implements ModuleGenerator {
             if (weather.getAtmosphere().getChange() != null) {
                 atmos.setAttribute("rising", Integer.toString(weather.getAtmosphere().getChange().getCode()));
             }
-
-            element.addContent(atmos);
+            atmos.setPrefix(WeatherModuleGenerator.NS.getPrefix());
+            element.appendChild(atmos);
         }
 
         if (weather.getCondition() != null) {
-            final Element condition = new Element("condition", WeatherModuleGenerator.NS);
+            final Element condition = element.getOwnerDocument().createElementNS(WeatherModuleGenerator.NS.getNamespaceURI(), "condition");
 
             if (weather.getCondition().getText() != null) {
                 condition.setAttribute("text", weather.getCondition().getText());
@@ -92,11 +97,12 @@ public class WeatherModuleGenerator implements ModuleGenerator {
             }
 
             condition.setAttribute("temp", Integer.toString(weather.getCondition().getTemperature()));
-            element.addContent(condition);
+            condition.setPrefix(WeatherModuleGenerator.NS.getPrefix());
+            element.appendChild(condition);
         }
 
         if (weather.getLocation() != null) {
-            final Element location = new Element("location", WeatherModuleGenerator.NS);
+            final Element location = element.getOwnerDocument().createElementNS(WeatherModuleGenerator.NS.getNamespaceURI(), "location");
 
             if (weather.getLocation().getCity() != null) {
                 location.setAttribute("city", weather.getLocation().getCity());
@@ -109,12 +115,12 @@ public class WeatherModuleGenerator implements ModuleGenerator {
             if (weather.getLocation().getCountry() != null) {
                 location.setAttribute("country", weather.getLocation().getCountry());
             }
-
-            element.addContent(location);
+            location.setPrefix(WeatherModuleGenerator.NS.getPrefix());
+            element.appendChild(location);
         }
 
         if (weather.getUnits() != null) {
-            final Element units = new Element("units", WeatherModuleGenerator.NS);
+            final Element units = element.getOwnerDocument().createElementNS(WeatherModuleGenerator.NS.getNamespaceURI(), "units");
 
             if (weather.getUnits().getDistance() != null) {
                 units.setAttribute("distance", weather.getUnits().getDistance());
@@ -131,21 +137,22 @@ public class WeatherModuleGenerator implements ModuleGenerator {
             if (weather.getUnits().getTemperature() != null) {
                 units.setAttribute("temperature", weather.getUnits().getTemperature());
             }
-
-            element.addContent(units);
+            units.setPrefix(WeatherModuleGenerator.NS.getPrefix());
+            element.appendChild(units);
         }
 
         if (weather.getWind() != null) {
-            final Element wind = new Element("wind", WeatherModuleGenerator.NS);
+            final Element wind = element.getOwnerDocument().createElementNS(WeatherModuleGenerator.NS.getNamespaceURI(), "wind");
             wind.setAttribute("chill", Integer.toString(weather.getWind().getChill()));
             wind.setAttribute("direction", Integer.toString(weather.getWind().getDirection()));
             wind.setAttribute("speed", Integer.toString(weather.getWind().getSpeed()));
-            element.addContent(wind);
+            wind.setPrefix(WeatherModuleGenerator.NS.getPrefix());
+            element.appendChild(wind);
         }
 
         if (weather.getForecasts() != null) {
             for (int i = 0; i < weather.getForecasts().length; i++) {
-                final Element forecast = new Element("forecast", WeatherModuleGenerator.NS);
+                final Element forecast = element.getOwnerDocument().createElementNS(WeatherModuleGenerator.NS.getNamespaceURI(), "forecast");
                 final Forecast f = weather.getForecasts()[i];
 
                 if (f.getCode() != null) {
@@ -166,16 +173,10 @@ public class WeatherModuleGenerator implements ModuleGenerator {
 
                 forecast.setAttribute("high", Integer.toString(f.getHigh()));
                 forecast.setAttribute("low", Integer.toString(f.getLow()));
-                element.addContent(forecast);
+                forecast.setPrefix(WeatherModuleGenerator.NS.getPrefix());
+                element.appendChild(forecast);
             }
         }
-    }
-
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, WeatherModuleGenerator.NS);
-        element.addContent(value);
-
-        return element;
     }
 
     @Override

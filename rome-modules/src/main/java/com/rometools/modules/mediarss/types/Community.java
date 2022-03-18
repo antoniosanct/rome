@@ -20,6 +20,7 @@
 package com.rometools.modules.mediarss.types;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -60,50 +61,22 @@ public class Community implements Serializable {
         return "Community [starRating=" + starRating + ", statistics=" + statistics + ", tags=" + tags + "]";
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (starRating == null ? 0 : starRating.hashCode());
-        result = prime * result + (statistics == null ? 0 : statistics.hashCode());
-        result = prime * result + (tags == null ? 0 : tags.hashCode());
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(starRating, statistics, tags);
+	}
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Community other = (Community) obj;
-        if (starRating == null) {
-            if (other.starRating != null) {
-                return false;
-            }
-        } else if (!starRating.equals(other.starRating)) {
-            return false;
-        }
-        if (statistics == null) {
-            if (other.statistics != null) {
-                return false;
-            }
-        } else if (!statistics.equals(other.statistics)) {
-            return false;
-        }
-        if (tags == null) {
-            if (other.tags != null) {
-                return false;
-            }
-        } else if (!tags.equals(other.tags)) {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Community other = (Community) obj;
+		return Objects.equals(starRating, other.starRating) && Objects.equals(statistics, other.statistics)
+				&& Objects.equals(tags, other.tags);
+	}
     //CHECKSTYLE:ON
 }

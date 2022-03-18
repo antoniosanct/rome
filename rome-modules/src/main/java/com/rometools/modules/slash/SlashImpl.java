@@ -16,6 +16,9 @@
 
 package com.rometools.modules.slash;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import com.rometools.rome.feed.CopyFrom;
 import com.rometools.rome.feed.impl.EqualsBean;
 
@@ -107,9 +110,17 @@ public class SlashImpl implements Slash {
         return Slash.class;
     }
 
-    @Override
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(hitParade);
+		result = prime * result + Objects.hash(comments, department, section);
+		return result;
+	}
+
+	@Override
     public boolean equals(final Object obj) {
         return EqualsBean.beanEquals(this.getClass(), this, obj);
     }
-
 }

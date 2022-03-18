@@ -21,8 +21,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-import org.jdom2.Element;
-
 import com.rometools.rome.feed.impl.CloneableBean;
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
@@ -49,7 +47,7 @@ public abstract class WireFeed implements Cloneable, Serializable, Extendable {
     private String encoding;
     private String styleSheet;
     private List<Module> modules;
-    private List<Element> foreignMarkup;
+    private List<WireFeedForeignMarkup> foreignMarkup;
 
     /**
      * Default constructor, for bean cloning purposes only.
@@ -99,7 +97,7 @@ public abstract class WireFeed implements Cloneable, Serializable, Extendable {
         }
 
         // can't use foreign markup in equals, due to JDOM equals impl
-        final List<Element> fm = getForeignMarkup();
+        final List<WireFeedForeignMarkup> fm = getForeignMarkup();
         setForeignMarkup(((WireFeed) other).getForeignMarkup());
         final boolean ret = EqualsBean.beanEquals(this.getClass(), this, other);
         // restore foreign markup
@@ -226,7 +224,7 @@ public abstract class WireFeed implements Cloneable, Serializable, Extendable {
      * @return Opaque object to discourage use
      *
      */
-    public List<Element> getForeignMarkup() {
+    public List<WireFeedForeignMarkup> getForeignMarkup() {
         return foreignMarkup = Lists.createWhenNull(foreignMarkup);
     }
 
@@ -237,7 +235,7 @@ public abstract class WireFeed implements Cloneable, Serializable, Extendable {
      * @param foreignMarkup Opaque object to discourage use
      *
      */
-    public void setForeignMarkup(final List<Element> foreignMarkup) {
+    public void setForeignMarkup(final List<WireFeedForeignMarkup> foreignMarkup) {
         this.foreignMarkup = foreignMarkup;
     }
 

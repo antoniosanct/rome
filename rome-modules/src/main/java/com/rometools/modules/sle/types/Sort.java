@@ -19,7 +19,9 @@ package com.rometools.modules.sle.types;
 
 import java.io.Serializable;
 
-import org.jdom2.Namespace;
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
 
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
@@ -87,7 +89,7 @@ public class Sort implements Serializable, Cloneable {
      * DataType value for Number information.
      */
     public static final String NUMBER_TYPE = "number";
-    private Namespace namespace = Namespace.XML_NAMESPACE;
+    private Namespace namespace = XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI);
     private final String dataType;
     private final String element;
     private final String label;
@@ -102,7 +104,7 @@ public class Sort implements Serializable, Cloneable {
      */
     public Sort(final Namespace namespace, final String element, final String dataType, final String label, final boolean defaultOrder) {
         super();
-        this.namespace = namespace == null ? Namespace.XML_NAMESPACE : namespace;
+        this.namespace = namespace == null ? XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI) : namespace;
         this.element = element;
         this.dataType = dataType;
         this.label = label;

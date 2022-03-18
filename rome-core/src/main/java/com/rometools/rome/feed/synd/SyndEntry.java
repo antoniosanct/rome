@@ -19,9 +19,8 @@ package com.rometools.rome.feed.synd;
 import java.util.Date;
 import java.util.List;
 
-import org.jdom2.Element;
-
 import com.rometools.rome.feed.CopyFrom;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.module.Extendable;
 import com.rometools.rome.feed.module.Module;
 
@@ -351,7 +350,7 @@ public interface SyndEntry extends Cloneable, CopyFrom, Extendable {
      * @return Opaque object to discourage use
      *
      */
-    public List<Element> getForeignMarkup();
+    public List<WireFeedForeignMarkup> getForeignMarkup();
 
     /**
      * Sets foreign markup found at channel level.
@@ -359,7 +358,7 @@ public interface SyndEntry extends Cloneable, CopyFrom, Extendable {
      * @param foreignMarkup Opaque object to discourage use
      *
      */
-    public void setForeignMarkup(List<Element> foreignMarkup);
+    public void setForeignMarkup(List<WireFeedForeignMarkup> foreignMarkup);
 
     /**
      * URL of a page for comments relating to the item.

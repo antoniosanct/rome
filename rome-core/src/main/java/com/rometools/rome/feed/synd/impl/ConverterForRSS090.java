@@ -19,9 +19,8 @@ package com.rometools.rome.feed.synd.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom2.Element;
-
 import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.module.impl.ModuleUtils;
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Image;
@@ -57,7 +56,7 @@ public class ConverterForRSS090 implements Converter {
 
         syndFeed.setModules(ModuleUtils.cloneModules(feed.getModules()));
 
-        final List<Element> foreignMarkup = feed.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = feed.getForeignMarkup();
         if (!foreignMarkup.isEmpty()) {
             syndFeed.setForeignMarkup(foreignMarkup);
         }
@@ -111,7 +110,7 @@ public class ConverterForRSS090 implements Converter {
 
         syndEntry.setModules(ModuleUtils.cloneModules(item.getModules()));
 
-        final List<Element> foreignMarkup = item.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = item.getForeignMarkup();
         if (!foreignMarkup.isEmpty()) {
             syndEntry.setForeignMarkup(foreignMarkup);
         }
@@ -167,7 +166,7 @@ public class ConverterForRSS090 implements Converter {
             channel.setItems(createRSSItems(sEntries));
         }
 
-        final List<Element> foreignMarkup = syndFeed.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = syndFeed.getForeignMarkup();
         if (!foreignMarkup.isEmpty()) {
             channel.setForeignMarkup(foreignMarkup);
         }
@@ -203,7 +202,7 @@ public class ConverterForRSS090 implements Converter {
 
         item.setLink(sEntry.getLink());
 
-        final List<Element> foreignMarkup = sEntry.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = sEntry.getForeignMarkup();
         if (!foreignMarkup.isEmpty()) {
             item.setForeignMarkup(foreignMarkup);
         }

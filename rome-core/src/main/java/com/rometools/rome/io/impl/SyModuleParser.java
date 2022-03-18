@@ -18,23 +18,24 @@ package com.rometools.rome.io.impl;
 
 import java.util.Locale;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.module.SyModule;
 import com.rometools.rome.feed.module.SyModuleImpl;
 import com.rometools.rome.io.ModuleParser;
 
-public class SyModuleParser implements ModuleParser {
+public class SyModuleParser extends ChildNavigator implements ModuleParser {
 
     @Override
     public String getNamespaceUri() {
         return SyModule.URI;
     }
 
-    private Namespace getDCNamespace() {
-        return Namespace.getNamespace(SyModule.URI);
+    private Namespace getSynNamespace() {
+        return BaseWireFeedParser.createNamespace(SyModule.URI);
     }
 
     @Override
@@ -44,22 +45,22 @@ public class SyModuleParser implements ModuleParser {
 
         final SyModule sm = new SyModuleImpl();
 
-        final Element updatePeriod = syndRoot.getChild("updatePeriod", getDCNamespace());
+        final Element updatePeriod = super.getChild(syndRoot, "updatePeriod", getSynNamespace());
         if (updatePeriod != null) {
             foundSomething = true;
-            sm.setUpdatePeriod(updatePeriod.getText().trim());
+            sm.setUpdatePeriod(updatePeriod.getTextContent().trim());
         }
 
-        final Element updateFrequency = syndRoot.getChild("updateFrequency", getDCNamespace());
+        final Element updateFrequency = super.getChild(syndRoot, "updateFrequency", getSynNamespace());
         if (updateFrequency != null) {
             foundSomething = true;
-            sm.setUpdateFrequency(Integer.parseInt(updateFrequency.getText().trim()));
+            sm.setUpdateFrequency(Integer.parseInt(updateFrequency.getTextContent().trim()));
         }
 
-        final Element updateBase = syndRoot.getChild("updateBase", getDCNamespace());
+        final Element updateBase = super.getChild(syndRoot, "updateBase", getSynNamespace());
         if (updateBase != null) {
             foundSomething = true;
-            sm.setUpdateBase(DateParser.parseDate(updateBase.getText(), locale));
+            sm.setUpdateBase(DateParser.parseDate(updateBase.getTextContent(), locale));
         }
 
         if (foundSomething) {

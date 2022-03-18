@@ -15,6 +15,20 @@
  */
 package com.rometools.rome.unittest.issues;
 
+import java.io.Reader;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.commons.io.output.NullWriter;
+import org.xml.sax.InputSource;
+
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.unittest.FeedTest;
 
@@ -29,8 +43,8 @@ public class Issue137Test extends FeedTest {
 
     public void testDescription() throws Exception {
         final SyndFeed feed = this.getCachedSyndFeed();
-        assertEquals("<img src=\"http://www.moe.gov.sg/media/spotlight/assets_c/2009/09/spotlight-single-session-thumb-120x80-282.jpg\""
-                + " alt=\"Teacher and his students tossing frisbees into the air\" /><p>MOE will be <a href\n"
+        assertEquals("<img alt=\"Teacher and his students tossing frisbees into the air\""
+                + " src=\"http://www.moe.gov.sg/media/spotlight/assets_c/2009/09/spotlight-single-session-thumb-120x80-282.jpg\"/><p>MOE will be <a href\n"
                 + "=\"http://www.moe.gov.sg/media/press/2009/09/moe-to-build-new-primary-schoo.php\">building 11 new primary\n"
                 + " schools and upgrading another 28 existing schools from November 2009</a>. This is the first phase of\n"
                 + " MOE's plans to enhance primary school infrastructure to facilitate the transition of all primary schools\n"
@@ -49,4 +63,24 @@ public class Issue137Test extends FeedTest {
                 + " MOE Work Plan Seminar on 17 Sep 09 by the Minister for Education, Dr Ng Eng Hen.</p>", feed.getEntries().get(2).getDescription().getValue());
     }
 
+    public void testXmlParseWithDOM() throws Exception {
+        Reader r = getFeedReader();
+    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    	dbf.setNamespaceAware(true);
+    	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+    	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+    	//FIXME invalid tests
+//    	dbf.setFeature("http://apache.org/xml/features/continue-after-fatal-error", true);
+    	DocumentBuilder db = dbf.newDocumentBuilder();
+    	TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer t = tf.newTransformer();
+		tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		t.setOutputProperty(OutputKeys.METHOD, "xml");
+    	t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        StreamResult result = new StreamResult(new NullWriter());
+        DOMSource source = new DOMSource(db.parse(new InputSource(r)));
+        t.transform(source, result);
+    }
+    
 }

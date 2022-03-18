@@ -16,6 +16,7 @@
 package com.rometools.modules.georss.geometries;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A two dimensional position represented by latitude and longitude decimal degrees in WGS84
@@ -45,6 +46,11 @@ public class Position implements Cloneable, Serializable {
     }
 
     @Override
+	public int hashCode() {
+		return Objects.hash(latitude, longitude);
+	}
+
+    @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
@@ -57,7 +63,7 @@ public class Position implements Cloneable, Serializable {
         return p.latitude == latitude && p.longitude == longitude;
     }
 
-    /**
+	/**
      * @return latitude
      */
     public double getLatitude() {

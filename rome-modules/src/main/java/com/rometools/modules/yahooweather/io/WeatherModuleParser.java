@@ -21,10 +21,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.yahooweather.YWeatherModule;
 import com.rometools.modules.yahooweather.YWeatherModuleImpl;
@@ -38,13 +40,14 @@ import com.rometools.modules.yahooweather.types.Units;
 import com.rometools.modules.yahooweather.types.Wind;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleParser;
+import com.rometools.rome.io.impl.ChildNavigator;
 
 /**
  * ModuleParser implementation for Slash RSS.
  */
-public class WeatherModuleParser implements ModuleParser {
+public class WeatherModuleParser extends ChildNavigator implements ModuleParser {
     private static final Logger LOG = LoggerFactory.getLogger(WeatherModuleParser.class);
-    private static final Namespace NS = Namespace.getNamespace(YWeatherModule.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(YWeatherModule.URI);
 
     @Override
     public String getNamespaceUri() {
@@ -54,67 +57,67 @@ public class WeatherModuleParser implements ModuleParser {
     @Override
     public Module parse(final Element element, final Locale locale) {
         final YWeatherModuleImpl module = new YWeatherModuleImpl();
-        final Element location = element.getChild("location", WeatherModuleParser.NS);
+        final Element location = super.getChild(element, "location", WeatherModuleParser.NS);
 
         if (location != null) {
-            final Location l = new Location(location.getAttributeValue("city"), location.getAttributeValue("region"), location.getAttributeValue("country"));
+            final Location l = new Location(location.getAttribute("city"), location.getAttribute("region"), location.getAttribute("country"));
             module.setLocation(l);
         }
 
-        final Element units = element.getChild("units", WeatherModuleParser.NS);
+        final Element units = super.getChild(element, "units", WeatherModuleParser.NS);
 
         if (units != null) {
-            final Units u = new Units(units.getAttributeValue("temperature"), units.getAttributeValue("distance"), units.getAttributeValue("pressure"),
-                    units.getAttributeValue("speed"));
+            final Units u = new Units(units.getAttribute("temperature"), units.getAttribute("distance"), units.getAttribute("pressure"),
+                    units.getAttribute("speed"));
             module.setUnits(u);
         }
 
-        final Element wind = element.getChild("wind", WeatherModuleParser.NS);
+        final Element wind = super.getChild(element, "wind", WeatherModuleParser.NS);
 
         if (wind != null) {
             try {
-                final Wind w = new Wind(Integer.parseInt(wind.getAttributeValue("chill")), Integer.parseInt(wind.getAttributeValue("direction")),
-                        Integer.parseInt(wind.getAttributeValue("speed")));
+                final Wind w = new Wind(Integer.parseInt(wind.getAttribute("chill")), Integer.parseInt(wind.getAttribute("direction")),
+                        Integer.parseInt(wind.getAttribute("speed")));
                 module.setWind(w);
             } catch (final NumberFormatException nfe) {
                 LOG.warn("NumberFormatException processing <wind> tag.", nfe);
             }
         }
 
-        final Element atmosphere = element.getChild("atmosphere", WeatherModuleParser.NS);
+        final Element atmosphere = super.getChild(element, "atmosphere", WeatherModuleParser.NS);
 
         if (atmosphere != null) {
             try {
-                final Atmosphere a = new Atmosphere(Integer.parseInt(atmosphere.getAttributeValue("humidity")), Double.parseDouble(atmosphere
-                        .getAttributeValue("visibility")) / 100, Double.parseDouble(atmosphere.getAttributeValue("pressure")),
-                        Atmosphere.PressureChange.fromCode(Integer.parseInt(atmosphere.getAttributeValue("rising"))));
+                final Atmosphere a = new Atmosphere(Integer.parseInt(atmosphere.getAttribute("humidity")), Double.parseDouble(atmosphere
+                        .getAttribute("visibility")) / 100, Double.parseDouble(atmosphere.getAttribute("pressure")),
+                        Atmosphere.PressureChange.fromCode(Integer.parseInt(atmosphere.getAttribute("rising"))));
                 module.setAtmosphere(a);
             } catch (final NumberFormatException nfe) {
                 LOG.warn("NumberFormatException processing <atmosphere> tag.", nfe);
             }
         }
 
-        final Element astronomy = element.getChild("astronomy", WeatherModuleParser.NS);
+        final Element astronomy = super.getChild(element, "astronomy", WeatherModuleParser.NS);
 
         if (astronomy != null) {
             try {
                 final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", locale);
-                final Astronomy a = new Astronomy(timeFormat.parse(astronomy.getAttributeValue("sunrise").replaceAll("am", "AM").replaceAll("pm", "PM")),
-                        timeFormat.parse(astronomy.getAttributeValue("sunset").replaceAll("am", "AM").replaceAll("pm", "PM")));
+                final Astronomy a = new Astronomy(timeFormat.parse(astronomy.getAttribute("sunrise").replaceAll("am", "AM").replaceAll("pm", "PM")),
+                        timeFormat.parse(astronomy.getAttribute("sunset").replaceAll("am", "AM").replaceAll("pm", "PM")));
                 module.setAstronomy(a);
             } catch (final ParseException pe) {
                 LOG.warn("ParseException processing <astronomy> tag.", pe);
             }
         }
 
-        final Element condition = element.getChild("condition", WeatherModuleParser.NS);
+        final Element condition = super.getChild(element, "condition", WeatherModuleParser.NS);
 
         if (condition != null) {
             try {
                 final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy h:mm a zzz", locale);
-                final Condition c = new Condition(condition.getAttributeValue("text"), ConditionCode.fromCode(Integer.parseInt(condition
-                        .getAttributeValue("code"))), Integer.parseInt(condition.getAttributeValue("temp")), dateFormat.parse(condition
-                        .getAttributeValue("date").replaceAll("pm", "PM").replaceAll("am", "AM")));
+                final Condition c = new Condition(condition.getAttribute("text"), ConditionCode.fromCode(Integer.parseInt(condition
+                        .getAttribute("code"))), Integer.parseInt(condition.getAttribute("temp")), dateFormat.parse(condition
+                        .getAttribute("date").replaceAll("pm", "PM").replaceAll("am", "AM")));
                 module.setCondition(c);
             } catch (final NumberFormatException nfe) {
                 LOG.warn("NumberFormatException processing <condition> tag.", nfe);
@@ -123,7 +126,7 @@ public class WeatherModuleParser implements ModuleParser {
             }
         }
 
-        final List<Element> forecasts = element.getChildren("forecast", WeatherModuleParser.NS);
+        final List<Element> forecasts = super.getChildren(element, "forecast", WeatherModuleParser.NS);
 
         if (forecasts != null) {
             final Forecast[] f = new Forecast[forecasts.size()];
@@ -134,9 +137,9 @@ public class WeatherModuleParser implements ModuleParser {
                 final Element forecast = it.next();
 
                 try {
-                    f[i] = new Forecast(forecast.getAttributeValue("day"), dateFormat.parse(forecast.getAttributeValue("date")), Integer.parseInt(forecast
-                            .getAttributeValue("low")), Integer.parseInt(forecast.getAttributeValue("high")), forecast.getAttributeValue("text"),
-                            ConditionCode.fromCode(Integer.parseInt(forecast.getAttributeValue("code"))));
+                    f[i] = new Forecast(forecast.getAttribute("day"), dateFormat.parse(forecast.getAttribute("date")), Integer.parseInt(forecast
+                            .getAttribute("low")), Integer.parseInt(forecast.getAttribute("high")), forecast.getAttribute("text"),
+                            ConditionCode.fromCode(Integer.parseInt(forecast.getAttribute("code"))));
                 } catch (final NumberFormatException nfe) {
                     LOG.warn("NumberFormatException processing <forecast> tag.", nfe);
                 } catch (final ParseException pe) {

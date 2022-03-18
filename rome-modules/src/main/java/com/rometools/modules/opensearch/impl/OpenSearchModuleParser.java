@@ -22,21 +22,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Attribute;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.Parent;
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.opensearch.OpenSearchModule;
 import com.rometools.modules.opensearch.entity.OSQuery;
 import com.rometools.rome.feed.atom.Link;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleParser;
+import com.rometools.rome.io.impl.ChildNavigator;
 
-public class OpenSearchModuleParser implements ModuleParser {
+public class OpenSearchModuleParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace OS_NS = Namespace.getNamespace("opensearch", OpenSearchModule.URI);
-
+    private static final Namespace OS_NS = XMLEventFactory.newDefaultFactory().createNamespace("opensearch", OpenSearchModule.URI);
+    
     @Override
     public String getNamespaceUri() {
         return OpenSearchModule.URI;
@@ -50,11 +53,11 @@ public class OpenSearchModuleParser implements ModuleParser {
         boolean foundSomething = false;
         final OpenSearchModule osm = new OpenSearchModuleImpl();
 
-        Element e = dcRoot.getChild("totalResults", OS_NS);
+        Element e = super.getChild(dcRoot, "totalResults", OS_NS);
 
         if (e != null) {
             try {
-                osm.setTotalResults(Integer.parseInt(e.getText()));
+                osm.setTotalResults(Integer.parseInt(e.getTextContent()));
                 foundSomething = true;
             } catch (final NumberFormatException ex) {
                 // Ignore setting the field and post a warning
@@ -62,10 +65,10 @@ public class OpenSearchModuleParser implements ModuleParser {
             }
         }
 
-        e = dcRoot.getChild("itemsPerPage", OS_NS);
+        e = super.getChild(dcRoot, "itemsPerPage", OS_NS);
         if (e != null) {
             try {
-                osm.setItemsPerPage(Integer.parseInt(e.getText()));
+                osm.setItemsPerPage(Integer.parseInt(e.getTextContent()));
                 foundSomething = true;
             } catch (final NumberFormatException ex) {
                 // Ignore setting the field and post a warning
@@ -73,10 +76,10 @@ public class OpenSearchModuleParser implements ModuleParser {
             }
         }
 
-        e = dcRoot.getChild("startIndex", OS_NS);
+        e = super.getChild(dcRoot, "startIndex", OS_NS);
         if (e != null) {
             try {
-                osm.setStartIndex(Integer.parseInt(e.getText()));
+                osm.setStartIndex(Integer.parseInt(e.getTextContent()));
                 foundSomething = true;
             } catch (final NumberFormatException ex) {
                 // Ignore setting the field and post a warning
@@ -84,7 +87,7 @@ public class OpenSearchModuleParser implements ModuleParser {
             }
         }
 
-        final List<Element> queries = dcRoot.getChildren("Query", OS_NS);
+        final List<Element> queries = super.getChildren(dcRoot, "Query", OS_NS);
 
         if (queries != null && !queries.isEmpty()) {
 
@@ -99,7 +102,7 @@ public class OpenSearchModuleParser implements ModuleParser {
             osm.setQueries(osqList);
         }
 
-        e = dcRoot.getChild("link", OS_NS);
+        e = super.getChild(dcRoot, "link", OS_NS);
 
         if (e != null) {
             osm.setLink(parseLink(e, baseURI));
@@ -112,16 +115,16 @@ public class OpenSearchModuleParser implements ModuleParser {
 
         final OSQuery query = new OSQuery();
 
-        String att = e.getAttributeValue("role");
+        String att = e.getAttribute("role");
         query.setRole(att);
 
-        att = e.getAttributeValue("osd");
+        att = e.getAttribute("osd");
         query.setOsd(att);
 
-        att = e.getAttributeValue("searchTerms");
+        att = e.getAttribute("searchTerms");
         query.setSearchTerms(att);
 
-        att = e.getAttributeValue("title");
+        att = e.getAttribute("title");
         query.setTitle(att);
 
         try {
@@ -129,13 +132,13 @@ public class OpenSearchModuleParser implements ModuleParser {
             // someones mistake should not cause the parser to fail, since these
             // are only optional attributes
 
-            att = e.getAttributeValue("totalResults");
-            if (att != null) {
+            att = e.getAttribute("totalResults");
+            if (null != att && !"".equals(att)) {
                 query.setTotalResults(Integer.parseInt(att));
             }
 
-            att = e.getAttributeValue("startPage");
-            if (att != null) {
+            att = e.getAttribute("startPage");
+            if (null != att && !"".equals(att)) {
                 query.setStartPage(Integer.parseInt(att));
             }
 
@@ -150,21 +153,21 @@ public class OpenSearchModuleParser implements ModuleParser {
 
         final Link link = new Link();
 
-        String att = e.getAttributeValue("rel");// getAtomNamespace()); DONT
+        String att = e.getAttribute("rel");// getAtomNamespace()); DONT
         // KNOW WHY DOESN'T WORK
 
         if (att != null) {
             link.setRel(att);
         }
 
-        att = e.getAttributeValue("type");// getAtomNamespace()); DONT KNOW WHY
+        att = e.getAttribute("type");// getAtomNamespace()); DONT KNOW WHY
         // DOESN'T WORK
 
         if (att != null) {
             link.setType(att);
         }
 
-        att = e.getAttributeValue("href");// getAtomNamespace()); DONT KNOW WHY
+        att = e.getAttribute("href");// getAtomNamespace()); DONT KNOW WHY
         // DOESN'T WORK
 
         if (att != null) {
@@ -176,14 +179,14 @@ public class OpenSearchModuleParser implements ModuleParser {
             }
         }
 
-        att = e.getAttributeValue("hreflang");// getAtomNamespace()); DONT KNOW
+        att = e.getAttribute("hreflang");// getAtomNamespace()); DONT KNOW
         // WHY DOESN'T WORK
 
         if (att != null) {
             link.setHreflang(att);
         }
 
-        att = e.getAttributeValue("length");// getAtomNamespace()); DONT KNOW
+        att = e.getAttribute("length");// getAtomNamespace()); DONT KNOW
         // WHY DOESN'T WORK
 
         return link;
@@ -199,15 +202,16 @@ public class OpenSearchModuleParser implements ModuleParser {
     /**
      * Use xml:base attributes at feed and entry level to resolve relative links
      */
-    private static String resolveURI(final URL baseURI, final Parent parent, String url) {
+    private static String resolveURI(final URL baseURI, final Element parent, String url) {
         url = url.equals(".") || url.equals("./") ? "" : url;
-        if (isRelativeURI(url) && parent != null && parent instanceof Element) {
-            final Attribute baseAtt = ((Element) parent).getAttribute("base", Namespace.XML_NAMESPACE);
+        if (isRelativeURI(url) && parent != null && parent instanceof Element
+        		&& parent.getParentNode() instanceof Element) {
+            final Attr baseAtt = ((Element) parent).getAttributeNodeNS(XMLConstants.XML_NS_URI, "base");
             String xmlBase = baseAtt == null ? "" : baseAtt.getValue();
             if (!isRelativeURI(xmlBase) && !xmlBase.endsWith("/")) {
                 xmlBase = xmlBase.substring(0, xmlBase.lastIndexOf("/") + 1);
             }
-            return resolveURI(baseURI, parent.getParent(), xmlBase + url);
+            return resolveURI(baseURI, (Element) parent.getParentNode(), xmlBase + url);
         } else if (isRelativeURI(url) && parent == null) {
             return baseURI + url;
         } else if (baseURI != null && url.startsWith("/")) {
@@ -221,17 +225,18 @@ public class OpenSearchModuleParser implements ModuleParser {
     }
 
     /** Use feed links and/or xml:base attribute to determine baseURI of feed */
-    private static URL findBaseURI(final Element root) {
+    private URL findBaseURI(final Element root) {
         URL baseURI = null;
-        final List<Element> linksList = root.getChildren("link", OS_NS);
+        final List<Element> linksList = super.getChildren(root, "link", OS_NS);
         if (linksList != null) {
             for (final Element element : linksList) {
                 final Element link = element;
-                if (!root.equals(link.getParent())) {
+                if (!root.equals(link.getParentNode())) {
                     break;
                 }
-                String href = link.getAttribute("href").getValue();
-                if (link.getAttribute("rel", OS_NS) == null || link.getAttribute("rel", OS_NS).getValue().equals("alternate")) {
+                String href = link.getAttribute("href");
+                if (link.getAttributeNodeNS(OS_NS.getNamespaceURI(), "rel") == null ||
+                		link.getAttributeNodeNS(OS_NS.getNamespaceURI(), "rel").getValue().equals("alternate")) {
                     href = resolveURI(null, link, href);
                     try {
                         baseURI = new URL(href);

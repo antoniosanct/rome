@@ -19,7 +19,7 @@ package com.rometools.modules.sle.types;
 
 import java.io.Serializable;
 
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
 
 /**
  * An interface that parents data types for sorting and grouping.

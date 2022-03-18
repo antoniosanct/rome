@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.io;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -27,16 +26,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.jdom2.input.DOMBuilder;
-import org.jdom2.input.JDOMParseException;
-import org.jdom2.input.sax.XMLReaders;
-import org.xml.sax.EntityResolver;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
-import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.impl.ConfigurableClassLoader;
@@ -53,9 +48,6 @@ import com.rometools.rome.io.impl.XmlFixerReader;
  * The WireFeedInput useds liberal parsers.
  */
 public class WireFeedInput {
-
-    private static final InputSource EMPTY_INPUTSOURCE = new InputSource(new ByteArrayInputStream(new byte[0]));
-    private static final EntityResolver RESOLVER = new EmptyEntityResolver();
 
     private static Map<ClassLoader, FeedParsers> clMap = new WeakHashMap<ClassLoader, FeedParsers>();
 
@@ -74,16 +66,6 @@ public class WireFeedInput {
                 clMap.put(classLoader, parsers);
             }
             return parsers;
-        }
-    }
-
-    private static class EmptyEntityResolver implements EntityResolver {
-        @Override
-        public InputSource resolveEntity(final String publicId, final String systemId) {
-            if (systemId != null && systemId.endsWith(".dtd")) {
-                return EMPTY_INPUTSOURCE;
-            }
-            return null;
         }
     }
 
@@ -118,7 +100,7 @@ public class WireFeedInput {
      *
      */
     public WireFeedInput(final boolean validate, final Locale locale) {
-        this.validate = false; // TODO FIX THIS THINGY
+        this.validate = false; // FIXME FIX THIS THINGY
         xmlHealerOn = true;
         this.locale = locale;
     }
@@ -198,13 +180,13 @@ public class WireFeedInput {
      *
      */
     public WireFeed build(final File file) throws FileNotFoundException, IOException, IllegalArgumentException, FeedException {
-        WireFeed feed;
-        Reader reader = new FileReader(file);
+    	WireFeed feed;
+    	Reader reader = new FileReader(file);
         try {
             if (xmlHealerOn) {
                 reader = new XmlFixerReader(reader);
             }
-            feed = this.build(reader);
+            feed = this.build(new InputSource(reader));
         } finally {
             reader.close();
         }
@@ -212,35 +194,35 @@ public class WireFeedInput {
     }
 
     /**
-     * Builds an WireFeed (RSS or Atom) from an Reader.
+     * Builds an WireFeed (RSS or Atom) from a reader.
 
      * NOTE: This method delages to the 'AsbtractFeed WireFeedInput#build(org.jdom2.Document)'.
 
      *
-     * @param reader Reader to read to create the WireFeed.
-     * @return the WireFeed read from the Reader.
+     * @param reader Java Reader object to create the WireFeed.
+     * @return the WireFeed read from the Reader object.
+     * @throws FileNotFoundException thrown if the Reader object could not be found.
+     * @throws IOException thrown if there is problem reading the Reader object.
      * @throws IllegalArgumentException thrown if feed type could not be understood by any of the
      *             underlying parsers.
      * @throws FeedException if the feed could not be parsed
      *
      */
-    public WireFeed build(Reader reader) throws IllegalArgumentException, FeedException {
-        final SAXBuilder saxBuilder = createSAXBuilder();
+    public WireFeed build(final Reader reader) throws FileNotFoundException, IOException, IllegalArgumentException, FeedException {
+    	WireFeed feed;
+    	Reader newReader = reader;
         try {
             if (xmlHealerOn) {
-                reader = new XmlFixerReader(reader);
+            	newReader = new XmlFixerReader(reader);
             }
-            final Document document = saxBuilder.build(reader);
-            return this.build(document);
-        } catch (final JDOMParseException ex) {
-            throw new ParsingFeedException("Invalid XML: " + ex.getMessage(), ex);
-        } catch (final IllegalArgumentException ex) {
-            throw ex;
-        } catch (final Exception ex) {
-            throw new ParsingFeedException("Invalid XML", ex);
+            feed = this.build(new InputSource(newReader));
+        } finally {
+        	newReader.close();
+        	reader.close();
         }
+        return feed;
     }
-
+    
     /**
      * Builds an WireFeed (RSS or Atom) from an W3C SAX InputSource.
 
@@ -254,44 +236,21 @@ public class WireFeedInput {
      * @throws FeedException if the feed could not be parsed
      *
      */
-    public WireFeed build(final InputSource is) throws IllegalArgumentException, FeedException {
-        final SAXBuilder saxBuilder = createSAXBuilder();
+    WireFeed build(final InputSource is) throws IllegalArgumentException, FeedException {
         try {
-            final Document document = saxBuilder.build(is);
-            return this.build(document);
-        } catch (final JDOMParseException ex) {
-            throw new ParsingFeedException("Invalid XML: " + ex.getMessage(), ex);
-        } catch (final IllegalArgumentException ex) {
-            throw ex;
+        	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        	dbf.setNamespaceAware(true);
+        	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        	DocumentBuilder db = dbf.newDocumentBuilder();
+        	db.setErrorHandler(new DefaultHandler());
+			return this.build(db.parse(is));
         } catch (final Exception ex) {
-            throw new ParsingFeedException("Invalid XML", ex);
+            throw new FeedException("Invalid XML", ex);
         }
     }
 
-    /**
-     * Builds an WireFeed (RSS or Atom) from an W3C DOM document.
-
-     * NOTE: This method delages to the 'AsbtractFeed WireFeedInput#build(org.jdom2.Document)'.
-
-     *
-     * @param document W3C DOM document to read to create the WireFeed.
-     * @return the WireFeed read from the W3C DOM document.
-     * @throws IllegalArgumentException thrown if feed type could not be understood by any of the
-     *             underlying parsers.
-     * @throws FeedException if the feed could not be parsed
-     *
-     */
-    public WireFeed build(final org.w3c.dom.Document document) throws IllegalArgumentException, FeedException {
-        final DOMBuilder domBuilder = new DOMBuilder();
-        try {
-            final Document jdomDoc = domBuilder.build(document);
-            return this.build(jdomDoc);
-        } catch (final IllegalArgumentException ex) {
-            throw ex;
-        } catch (final Exception ex) {
-            throw new ParsingFeedException("Invalid XML", ex);
-        }
-    }
 
     /**
      * Builds an WireFeed (RSS or Atom) from an JDOM document.
@@ -314,71 +273,5 @@ public class WireFeedInput {
         return parser.parse(document, validate, locale);
     }
 
-    /**
-     * Creates and sets up a org.jdom2.input.SAXBuilder for parsing.
-     *
-     * @return a new org.jdom2.input.SAXBuilder object
-     */
-    protected SAXBuilder createSAXBuilder() {
-        SAXBuilder saxBuilder;
-        if (validate) {
-            saxBuilder = new SAXBuilder(XMLReaders.DTDVALIDATING);
-        } else {
-            saxBuilder = new SAXBuilder(XMLReaders.NONVALIDATING);
-        }
-        saxBuilder.setEntityResolver(RESOLVER);
-
-        //
-        // This code is needed to fix the security problem outlined in
-        // http://www.securityfocus.com/archive/1/297714
-        //
-        // Unfortunately there isn't an easy way to check if an XML parser
-        // supports a particular feature, so
-        // we need to set it and catch the exception if it fails. We also need
-        // to subclass the JDom SAXBuilder
-        // class in order to get access to the underlying SAX parser - otherwise
-        // the features don't get set until
-        // we are already building the document, by which time it's too late to
-        // fix the problem.
-        //
-        // Crimson is one parser which is known not to support these features.
-        try {
-            
-            final XMLReader parser = saxBuilder.createParser();
-            
-            setFeature(saxBuilder, parser, "http://xml.org/sax/features/external-general-entities", false);
-            setFeature(saxBuilder, parser, "http://xml.org/sax/features/external-parameter-entities", false);
-            setFeature(saxBuilder, parser, "http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-
-            if(!allowDoctypes) {
-                setFeature(saxBuilder, parser, "http://apache.org/xml/features/disallow-doctype-decl", true);
-            }
-
-        } catch (final JDOMException e) {
-            throw new IllegalStateException("JDOM could not create a SAX parser", e);
-        }
-        
-        saxBuilder.setExpandEntities(false);
-
-        return saxBuilder;
-
-    }
-    
-    private void setFeature(SAXBuilder saxBuilder, XMLReader parser, String feature, boolean value) {
-        if (isFeatureSupported(parser, feature, value)) {
-            saxBuilder.setFeature(feature, value);
-        }
-    }
-
-    private boolean isFeatureSupported(XMLReader parser, String feature, boolean value) {
-        try {
-            parser.setFeature(feature, value);
-            return true;
-        } catch (final SAXNotRecognizedException e) {
-            return false;
-        } catch (final SAXNotSupportedException e) {
-            return false;
-        }
-    }
 
 }

@@ -19,17 +19,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import junit.framework.TestCase;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.input.sax.XMLReaders;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.impl.ConfigurableClassLoader;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.WireFeedInput;
+
+import junit.framework.TestCase;
 
 /**
  * Abstract feed test class.
@@ -38,7 +40,7 @@ public abstract class FeedTest extends TestCase {
     
     private final String feedFileName;
     private final boolean allowDoctypes;
-    private Document jDomDoc = null;
+    private Document w3cDoc = null;
     private WireFeed wireFeed = null;
     private SyndFeed syndFeed = null;
 
@@ -64,9 +66,14 @@ public abstract class FeedTest extends TestCase {
         return new InputStreamReader(resource);
     }
 
-    protected Document getJDomDoc() throws Exception {
-        final SAXBuilder saxBuilder = new SAXBuilder(XMLReaders.NONVALIDATING);
-        return saxBuilder.build(getFeedReader());
+    protected Document getW3CDoc() throws Exception {
+    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    	dbf.setNamespaceAware(true);
+    	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+    	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+    	DocumentBuilder db = dbf.newDocumentBuilder();
+    	return db.parse(new InputSource(getFeedReader()));
     }
 
     protected WireFeed getWireFeed() throws Exception {
@@ -82,11 +89,11 @@ public abstract class FeedTest extends TestCase {
         return in.build(getFeedReader());
     }
 
-    protected Document getCachedJDomDoc() throws Exception {
-        if (jDomDoc == null) {
-            jDomDoc = getJDomDoc();
+    protected Document getCachedW3CDoc() throws Exception {
+        if (w3cDoc == null) {
+        	w3cDoc = getW3CDoc();
         }
-        return jDomDoc;
+        return w3cDoc;
     }
 
     protected WireFeed getCachedWireFeed() throws Exception {

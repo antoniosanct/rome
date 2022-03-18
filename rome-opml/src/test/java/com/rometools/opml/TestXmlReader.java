@@ -41,12 +41,12 @@ public class TestXmlReader extends TestCase {
 	 * @param args arguments
 	 * @throws Exception any exceptions
 	 */
-    public static void main(final String[] args) throws Exception {
-        final TestXmlReader test = new TestXmlReader();
-        test.testRawBom();
-        test.testRawNoBom();
-        test.testHttp();
-    }
+//    public static void main(final String[] args) throws Exception {
+//        final TestXmlReader test = new TestXmlReader();
+//        test.testRawBom();
+//        test.testRawNoBom();
+//        test.testHttp();
+//    }
 
     protected void _testRawNoBomValid(final String encoding) throws Exception {
 

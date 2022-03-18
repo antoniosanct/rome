@@ -38,7 +38,14 @@ public abstract class AbstractGeometry implements Cloneable, Serializable {
     }
 
     @Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+    
+    @Override
     public boolean equals(final Object obj) {
         return obj != null && obj.getClass() == getClass();
     }
+    
+    
 }

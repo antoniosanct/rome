@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Locale;
 
-import org.jdom2.Document;
+import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -131,9 +131,11 @@ public class SyndFeedInput {
      * @throws IllegalArgumentException thrown if feed type could not be understood by any of the
      *             underlying parsers.
      * @throws FeedException if the feed could not be parsed
+     * @throws IOException 
+     * @throws  
      *
      */
-    public SyndFeed build(final Reader reader) throws IllegalArgumentException, FeedException {
+    public SyndFeed build(final Reader reader) throws IllegalArgumentException, FeedException, IOException {
         return new SyndFeedImpl(feedInput.build(reader), preserveWireFeed);
     }
 
@@ -149,20 +151,6 @@ public class SyndFeedInput {
      */
     public SyndFeed build(final InputSource is) throws IllegalArgumentException, FeedException {
         return new SyndFeedImpl(feedInput.build(is), preserveWireFeed);
-    }
-
-    /**
-     * Builds SyndFeedImpl from an W3C DOM document.
-     *
-     * @param document W3C DOM document to read to create the SyndFeedImpl.
-     * @return the SyndFeedImpl read from the W3C DOM document.
-     * @throws IllegalArgumentException thrown if feed type could not be understood by any of the
-     *             underlying parsers.
-     * @throws FeedException if the feed could not be parsed
-     *
-     */
-    public SyndFeed build(final org.w3c.dom.Document document) throws IllegalArgumentException, FeedException {
-        return new SyndFeedImpl(feedInput.build(document), preserveWireFeed);
     }
 
     /**

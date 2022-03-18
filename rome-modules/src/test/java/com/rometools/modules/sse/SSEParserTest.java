@@ -27,11 +27,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Attribute;
-import org.jdom2.Content;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.NodeList;
 
 import com.rometools.modules.AbstractTestCase;
 import com.rometools.modules.sse.modules.Conflict;
@@ -53,6 +56,11 @@ import junit.framework.TestSuite;
  * Test to verify correctness of SSE subproject.
  */
 public class SSEParserTest extends AbstractTestCase {
+	
+	/**
+	 * Public constructor
+	 * @param testName the test name.
+	 */
     public SSEParserTest(final String testName) {
         super(testName);
     }
@@ -65,6 +73,10 @@ public class SSEParserTest extends AbstractTestCase {
     protected void tearDown() throws Exception {
     }
 
+    /**
+     * A standard test suite.
+     * @return a test suite
+     */
     public static Test suite() {
         return new TestSuite(SSEParserTest.class);
     }
@@ -76,18 +88,27 @@ public class SSEParserTest extends AbstractTestCase {
         assertEquals("Namespace", SSEModule.SSE_SCHEMA_URI, new SSE091Generator().getNamespaceUri());
     }
 
+    /**
+     * A xtestParseGenerateV5 test
+     * @throws Exception any exception
+     */
     public void xtestParseGenerateV5() throws Exception {
         final URL feedURL = new File(getTestFile("xml/v/v5.xml")).toURI().toURL();
         // parse the document for comparison
-        final SAXBuilder builder = new SAXBuilder();
-        final Document directlyBuilt = builder.build(feedURL);
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    	dbf.setNamespaceAware(true);
+    	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+    	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+    	DocumentBuilder db = dbf.newDocumentBuilder();
+    	final Document directlyBuilt = db.parse(feedURL.openConnection().getInputStream());
 
         // generate the feed back into a document
         final SyndFeedInput input = new SyndFeedInput();
         final SyndFeed inputFeed = input.build(new XmlReader(feedURL));
 
         final SyndFeedOutput output = new SyndFeedOutput();
-        final Document parsedAndGenerated = output.outputJDom(inputFeed);
+        final Document parsedAndGenerated = output.outputDom(inputFeed);
 
         // XMLOutputter outputter = new XMLOutputter();
         // outputter.setFormat(Format.getPrettyFormat());
@@ -101,7 +122,7 @@ public class SSEParserTest extends AbstractTestCase {
 
     // TODO: probably should rip this out and use xunit instead
     private void assertDocumentsEqual(final Document one, final Document two) {
-        assertEqualElements(one.getRootElement(), two.getRootElement());
+        assertEqualElements(one.getDocumentElement(), two.getDocumentElement());
     }
 
     private void assertEqualElements(final Element one, final Element two) {
@@ -131,8 +152,8 @@ public class SSEParserTest extends AbstractTestCase {
     }
 
     private boolean equalAttributes(final Element one, final Element two, final boolean doAssert) {
-        final List<Attribute> attrs1 = one.getAttributes();
-        final List<Attribute> attrs2 = two.getAttributes();
+        final NamedNodeMap attrs1 = one.getAttributes();
+        final NamedNodeMap attrs2 = two.getAttributes();
 
         boolean equal = nullEqual(attrs1, attrs2);
         if (doAssert) {
@@ -144,15 +165,15 @@ public class SSEParserTest extends AbstractTestCase {
         }
 
         if (equal) {
-            for (final Object element : attrs1) {
+            for (int i = 0; i < attrs1.getLength(); i++) {
                 // compare the attributes in an order insensitive way
-                final Attribute a1 = (Attribute) element;
-                final Attribute a2 = findAttribute(a1.getName(), attrs2);
+                final Attr a1 = (Attr) attrs1.item(i);
+                final Attr a2 = findAttribute(a1.getName(), attrs2);
 
                 equal = a2 != null;
                 if (!equal) {
                     if (doAssert) {
-                        assertNotNull("no matching attribute for: " + one.getName() + "." + a1.getName() + "=" + a1.getValue(), a2);
+                        assertNotNull("no matching attribute for: " + one.getLocalName() + "." + a1.getName() + "=" + a1.getValue(), a2);
                     }
                     break;
                 }
@@ -174,15 +195,16 @@ public class SSEParserTest extends AbstractTestCase {
                         av2 = DateParser.parseRFC822((String) av2, Locale.US);
                     }
 
-                    assertTrue("unequal attributes:" + one.getName() + "." + a1.getName() + ": " + av1 + " != " + av2, av1.equals(av2));
+                    assertTrue("unequal attributes:" + one.getLocalName() + "." + a1.getName() + ": " + av1 + " != " + av2, av1.equals(av2));
                 }
             }
         }
         return equal;
     }
 
-    private Attribute findAttribute(final String name, final List<Attribute> attrs) {
-        for (final Attribute a : attrs) {
+    private Attr findAttribute(final String name, final NamedNodeMap attrs) {
+        for (int i = 0; i < attrs.getLength(); i++) {
+        	Attr a = (Attr) attrs.item(i);
             if (a.getName().equalsIgnoreCase(name)) {
                 return a;
             }
@@ -191,8 +213,8 @@ public class SSEParserTest extends AbstractTestCase {
     }
 
     private void asserEqualContent(final Element one, final Element two) {
-        final List<Content> oneContent = one.getContent();
-        final List<Content> twoContent = two.getContent();
+        final NodeList oneContent = one.getChildNodes();
+        final NodeList twoContent = two.getChildNodes();
         if (bothNull(oneContent, twoContent)) {
             return;
         }
@@ -201,19 +223,21 @@ public class SSEParserTest extends AbstractTestCase {
         assertEqualAttributes(one, two);
 
         // scan through the content to make sure each element is equal
-        for (final Object content1 : oneContent) {
+        for (int i = 0; i < oneContent.getLength(); i++) {
+        	Element content1 = (Element) oneContent.item(i);
             if (content1 instanceof Element) {
                 final Element e1 = (Element) content1;
 
                 boolean foundEqual = false;
                 final ArrayList<String> messages = new ArrayList<String>();
-                for (final Object o : twoContent) {
+                for (int j = 0; j < twoContent.getLength(); j++) {
+                	Element o = (Element) twoContent.item(j);
                     if (o instanceof Element) {
                         final Element e2 = (Element) o;
 
                         try {
                             // have to check all elements to be order insensitive
-                            if (e1.getName().equals(e2.getName()) && equalAttributes(e1, e2, false)) {
+                            if (e1.getLocalName().equals(e2.getLocalName()) && equalAttributes(e1, e2, false)) {
                                 assertEqualElements(e1, e2);
                                 foundEqual = true;
                                 messages.clear();
@@ -226,7 +250,7 @@ public class SSEParserTest extends AbstractTestCase {
                 }
 
                 // look for the content in the other tree
-                assertTrue("could not find matching element for: " + one.getName(), foundEqual);
+                assertTrue("could not find matching element for: " + one.getLocalName(), foundEqual);
             }
         }
     }
@@ -234,7 +258,7 @@ public class SSEParserTest extends AbstractTestCase {
     /**
      * Assure v5 file parsed correctly.
      *
-     * @throws Exception
+     * @throws Exception any exception
      */
     public void xtestV5() throws Exception {
         final File feed = new File(getTestFile("xml/v/v5.xml"));

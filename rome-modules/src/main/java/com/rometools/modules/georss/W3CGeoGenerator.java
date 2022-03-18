@@ -20,8 +20,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.georss.geometries.AbstractGeometry;
 import com.rometools.modules.georss.geometries.Point;
@@ -76,15 +77,16 @@ public class W3CGeoGenerator implements ModuleGenerator {
         // this is not necessary, it is done to avoid the namespace definition
         // in every item.
         Element root = element;
-        while (root.getParent() != null && root.getParent() instanceof Element) {
-            root = (Element) element.getParent();
+        while (root.getParentNode() != null && root.getParentNode() instanceof Element) {
+            root = (Element) element.getParentNode();
         }
-        root.addNamespaceDeclaration(GeoRSSModule.W3CGEO_NS);
+        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + GeoRSSModule.W3CGEO_NS.getPrefix(), GeoRSSModule.W3CGEO_NS.getNamespaceURI());
 
         Element pointElement = element;
         if (!isShort) {
-            pointElement = new Element("Point", GeoRSSModule.W3CGEO_NS);
-            element.addContent(pointElement);
+            pointElement = root.getOwnerDocument().createElementNS(GeoRSSModule.W3CGEO_NS.getNamespaceURI(), "Point");
+            pointElement.setPrefix(GeoRSSModule.W3CGEO_NS.getPrefix());
+            element.appendChild(pointElement);
         }
 
         final GeoRSSModule geoRSSModule = (GeoRSSModule) module;
@@ -93,12 +95,14 @@ public class W3CGeoGenerator implements ModuleGenerator {
         if (geometry instanceof Point) {
             final Position pos = ((Point) geometry).getPosition();
 
-            final Element latElement = new Element("lat", GeoRSSModule.W3CGEO_NS);
-            latElement.addContent(String.valueOf(pos.getLatitude()));
-            pointElement.addContent(latElement);
-            final Element lngElement = new Element("long", GeoRSSModule.W3CGEO_NS);
-            lngElement.addContent(String.valueOf(pos.getLongitude()));
-            pointElement.addContent(lngElement);
+            final Element latElement = root.getOwnerDocument().createElementNS(GeoRSSModule.W3CGEO_NS.getNamespaceURI(), "lat");
+            latElement.setPrefix(GeoRSSModule.W3CGEO_NS.getPrefix());
+            latElement.setTextContent(String.valueOf(pos.getLatitude()));
+            pointElement.appendChild(latElement);
+            final Element lngElement = root.getOwnerDocument().createElementNS(GeoRSSModule.W3CGEO_NS.getNamespaceURI(), "long");
+            lngElement.setPrefix(GeoRSSModule.W3CGEO_NS.getPrefix());
+            lngElement.setTextContent(String.valueOf(pos.getLongitude()));
+            pointElement.appendChild(lngElement);
         } else {
             System.err.println("W3C Geo format can't handle geometries of type: " + geometry.getClass().getName());
         }

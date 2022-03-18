@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.jdom2.Document;
+import org.w3c.dom.Document;
 
 import com.rometools.rome.feed.synd.SyndFeed;
 
@@ -163,24 +163,9 @@ public class SyndFeedOutput {
      * @throws FeedException thrown if the W3C DOM document for the feed could not be created.
      *
      */
-    public org.w3c.dom.Document outputW3CDom(final SyndFeed feed) throws FeedException {
-        return feedOutput.outputW3CDom(feed.createWireFeed());
+    public Document outputDom(final SyndFeed feed) throws FeedException {
+        return feedOutput.outputDom(feed.createWireFeed());
     }
 
-    /**
-     * Creates a JDOM document for the given SyndFeedImpl.
-
-     * This method does not use the feed encoding property.
-
-     *
-     * @param feed Abstract feed to create JDOM document from. The type of the SyndFeedImpl must
-     *            match the type given to the FeedOuptut constructor.
-     * @return the JDOM document for the given SyndFeedImpl.
-     * @throws FeedException thrown if the JDOM document for the feed could not be created.
-     *
-     */
-    public Document outputJDom(final SyndFeed feed) throws FeedException {
-        return feedOutput.outputJDom(feed.createWireFeed());
-    }
 
 }

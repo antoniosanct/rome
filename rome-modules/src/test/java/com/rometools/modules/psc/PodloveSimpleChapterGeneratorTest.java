@@ -52,7 +52,7 @@ public class PodloveSimpleChapterGeneratorTest extends AbstractTestCase {
 
         assertTrue(xml.contains("xmlns:psc=\"http://podlove.org/simple-chapters\""));
         assertTrue(xml.contains("<psc:chapters version=\"1.2\">"));
-        assertTrue(xml.contains("<psc:chapter start=\"00:00:00.000\" title=\"Lorem Ipsum\" href=\"http://example.org\" image=\"http://example.org/cover\" />"));
+        assertTrue(xml.contains("<psc:chapter href=\"http://example.org\" image=\"http://example.org/cover\" start=\"00:00:00.000\" title=\"Lorem Ipsum\"/>"));
     }
 
     public void testGenerateAtom() throws Exception {
@@ -72,7 +72,7 @@ public class PodloveSimpleChapterGeneratorTest extends AbstractTestCase {
 
         assertTrue(xml.contains("xmlns:psc=\"http://podlove.org/simple-chapters\""));
         assertTrue(xml.contains("<psc:chapters version=\"1.2\">"));
-        assertTrue(xml.contains("<psc:chapter start=\"00:00:00.000\" title=\"Lorem Ipsum\" href=\"http://example.org\" image=\"http://example.org/cover\" />"));
+        assertTrue(xml.contains("<psc:chapter href=\"http://example.org\" image=\"http://example.org/cover\" start=\"00:00:00.000\" title=\"Lorem Ipsum\"/>"));
     }
 
     public void testGetNamespaceUri() {

@@ -17,6 +17,7 @@ package com.rometools.modules.base;
 
 import java.net.URL;
 import java.util.Date;
+import java.util.Objects;
 
 import com.rometools.modules.base.types.DateTimeRange;
 import com.rometools.modules.base.types.FloatUnit;
@@ -126,6 +127,11 @@ public class CustomTagImpl implements CustomTag {
     }
 
     @Override
+	public int hashCode() {
+		return Objects.hash(name, value);
+	}
+
+    @Override
     public boolean equals(final Object o) {
         if (o instanceof CustomTag) {
             final CustomTag tag = (CustomTag) o;
@@ -136,7 +142,7 @@ public class CustomTagImpl implements CustomTag {
         return false;
     }
 
-    @Override
+	@Override
     public Object clone() throws CloneNotSupportedException {
         final CustomTagImpl cti = new CustomTagImpl(name, "");
         cti.value = value;
@@ -169,7 +175,12 @@ public class CustomTagImpl implements CustomTag {
             return value;
         }
 
-        @Override
+		@Override
+		public int hashCode() {
+			return Objects.hash(value);
+		}
+
+		@Override
         public boolean equals(final Object o) {
             if (o instanceof Location && ((Location) o).value.equals(value)) {
                 return true;
@@ -177,5 +188,6 @@ public class CustomTagImpl implements CustomTag {
                 return false;
             }
         }
+        
     }
 }

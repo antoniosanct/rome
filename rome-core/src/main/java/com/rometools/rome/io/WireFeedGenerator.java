@@ -16,7 +16,7 @@
  */
 package com.rometools.rome.io;
 
-import org.jdom2.Document;
+import org.w3c.dom.Document;
 
 import com.rometools.rome.feed.WireFeed;
 

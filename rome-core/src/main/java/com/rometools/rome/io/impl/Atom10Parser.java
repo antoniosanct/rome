@@ -18,22 +18,35 @@ package com.rometools.rome.io.impl;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
-import org.jdom2.Parent;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.XMLOutputter;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.events.Namespace;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.atom.Category;
 import com.rometools.rome.feed.atom.Content;
 import com.rometools.rome.feed.atom.Entry;
@@ -53,7 +66,7 @@ import com.rometools.utils.Lists;
 public class Atom10Parser extends BaseWireFeedParser {
 
     private static final String ATOM_10_URI = "http://www.w3.org/2005/Atom";
-    private static final Namespace ATOM_10_NS = Namespace.getNamespace(ATOM_10_URI);
+    private static final Namespace ATOM_10_NS = BaseWireFeedParser.createNamespace(ATOM_10_URI);
 
     private static boolean resolveURIs = false;
 
@@ -93,9 +106,9 @@ public class Atom10Parser extends BaseWireFeedParser {
      */
     @Override
     public boolean isMyType(final Document document) {
-        final Element rssRoot = document.getRootElement();
-        final Namespace defaultNS = rssRoot.getNamespace();
-        return defaultNS != null && defaultNS.equals(getAtomNamespace());
+        final Element rssRoot = document.getDocumentElement();
+        final Namespace defaultNS = BaseWireFeedParser.createNamespace(rssRoot.getNamespaceURI());
+        return defaultNS != null && defaultNS.getNamespaceURI() != null && getAtomNamespace().getNamespaceURI().equals(defaultNS.getNamespaceURI());
     }
 
     /**
@@ -106,7 +119,7 @@ public class Atom10Parser extends BaseWireFeedParser {
         if (validate) {
             validateFeed(document);
         }
-        final Element rssRoot = document.getRootElement();
+        final Element rssRoot = document.getDocumentElement();
         return parseFeed(rssRoot, locale);
     }
 
@@ -126,81 +139,84 @@ public class Atom10Parser extends BaseWireFeedParser {
         }
 
         final Feed feed = parseFeedMetadata(baseURI, eFeed, locale);
-        feed.setStyleSheet(getStyleSheet(eFeed.getDocument()));
+        feed.setStyleSheet(getStyleSheet(eFeed.getOwnerDocument()));
 
-        final String xmlBase = eFeed.getAttributeValue("base", Namespace.XML_NAMESPACE);
+        final String xmlBase = eFeed.getAttributeNS(XMLConstants.XML_NS_URI, "base");
         if (xmlBase != null) {
             feed.setXmlBase(xmlBase);
         }
 
         feed.setModules(parseFeedModules(eFeed, locale));
 
-        final List<Element> eList = eFeed.getChildren("entry", getAtomNamespace());
-        if (!eList.isEmpty()) {
+        final List<Element> eList = super.getChildren(eFeed, "entry");
+        if (null != eList) {
             feed.setEntries(parseEntries(feed, baseURI, eList, locale));
         }
 
-        final List<Element> foreignMarkup = extractForeignMarkup(eFeed, feed, getAtomNamespace());
+        final List<WireFeedForeignMarkup> foreignMarkup = extractForeignMarkup(eFeed, feed, getAtomNamespace());
         if (!foreignMarkup.isEmpty()) {
             feed.setForeignMarkup(foreignMarkup);
         }
         return feed;
     }
 
-    private Feed parseFeedMetadata(final String baseURI, final Element eFeed, final Locale locale) {
+    private Feed parseFeedMetadata(final String baseURI, final Element eFeed, final Locale locale) throws FeedException {
 
-        final com.rometools.rome.feed.atom.Feed feed = new com.rometools.rome.feed.atom.Feed(getType());
+        final Feed feed = new Feed(getType());
 
-        final Element title = eFeed.getChild("title", getAtomNamespace());
+        final Element title = super.getChild(eFeed, "title");
         if (title != null) {
             final Content c = new Content();
             c.setValue(parseTextConstructToString(title));
-            c.setType(getAttributeValue(title, "type"));
+            c.setType(title.getAttribute("type"));
             feed.setTitleEx(c);
         }
 
-        final List<Element> links = eFeed.getChildren("link", getAtomNamespace());
-        feed.setAlternateLinks(parseAlternateLinks(feed, null, baseURI, links));
-        feed.setOtherLinks(parseOtherLinks(feed, null, baseURI, links));
+        final List<Element> links = super.getChildren(eFeed, "link");
+        if (null != links) {
+        	feed.setAlternateLinks(parseAlternateLinks(feed, null, baseURI, links));
+        	feed.setOtherLinks(parseOtherLinks(feed, null, baseURI, links));
+        }
 
-        final List<Element> categories = eFeed.getChildren("category", getAtomNamespace());
-        feed.setCategories(parseCategories(baseURI, categories));
+        final List<Element> categories = super.getChildren(eFeed, "category");
+        if (null != categories) {
+        	feed.setCategories(parseCategories(baseURI, categories));
+        }
 
-        final List<Element> authors = eFeed.getChildren("author", getAtomNamespace());
-        if (!authors.isEmpty()) {
+        final List<Element> authors = super.getChildren(eFeed, "author");
+        if (null != authors) {
             feed.setAuthors(parsePersons(baseURI, authors, locale));
         }
 
-        final List<Element> contributors = eFeed.getChildren("contributor", getAtomNamespace());
-        if (!contributors.isEmpty()) {
+        final List<Element> contributors = super.getChildren(eFeed, "contributor");
+        if (null != contributors) {
             feed.setContributors(parsePersons(baseURI, contributors, locale));
         }
 
-        final Element subtitle = eFeed.getChild("subtitle", getAtomNamespace());
+        final Element subtitle = super.getChild(eFeed, "subtitle");
         if (subtitle != null) {
             final Content content = new Content();
             content.setValue(parseTextConstructToString(subtitle));
-            content.setType(getAttributeValue(subtitle, "type"));
+            content.setType(subtitle.getAttribute("type"));
             feed.setSubtitle(content);
         }
 
-        final Element id = eFeed.getChild("id", getAtomNamespace());
+        final Element id = super.getChild(eFeed, "id");
         if (id != null) {
-            feed.setId(id.getText());
+            feed.setId(id.getTextContent());
         }
 
-        final Element generator = eFeed.getChild("generator", getAtomNamespace());
+        final Element generator = super.getChild(eFeed, "generator");
         if (generator != null) {
-
             final Generator gen = new Generator();
-            gen.setValue(generator.getText());
+            gen.setValue(generator.getTextContent());
 
-            final String uri = getAttributeValue(generator, "uri");
+            final String uri = generator.getAttribute("uri");
             if (uri != null) {
                 gen.setUrl(uri);
             }
 
-            final String version = getAttributeValue(generator, "version");
+            final String version = generator.getAttribute("version");
             if (version != null) {
                 gen.setVersion(version);
             }
@@ -209,24 +225,24 @@ public class Atom10Parser extends BaseWireFeedParser {
 
         }
 
-        final Element rights = eFeed.getChild("rights", getAtomNamespace());
+        final Element rights = super.getChild(eFeed, "rights");
         if (rights != null) {
             feed.setRights(parseTextConstructToString(rights));
         }
 
-        final Element icon = eFeed.getChild("icon", getAtomNamespace());
+        final Element icon = super.getChild(eFeed, "icon");
         if (icon != null) {
-            feed.setIcon(icon.getText());
+            feed.setIcon(icon.getTextContent());
         }
 
-        final Element logo = eFeed.getChild("logo", getAtomNamespace());
+        final Element logo = super.getChild(eFeed, "logo");
         if (logo != null) {
-            feed.setLogo(logo.getText());
+            feed.setLogo(logo.getTextContent());
         }
 
-        final Element updated = eFeed.getChild("updated", getAtomNamespace());
+        final Element updated = super.getChild(eFeed, "updated");
         if (updated != null) {
-            feed.setUpdated(DateParser.parseDate(updated.getText(), locale));
+            feed.setUpdated(DateParser.parseDate(updated.getTextContent(), locale));
         }
 
         return feed;
@@ -281,8 +297,8 @@ public class Atom10Parser extends BaseWireFeedParser {
     private List<Link> parseAlternateLinks(final Feed feed, final Entry entry, final String baseURI, final List<Element> eLinks) {
 
         final List<Link> links = new ArrayList<Link>();
-        for (final Element eLink : eLinks) {
-            final Link link = parseLink(feed, entry, baseURI, eLink);
+        for (Element l : eLinks) {
+            final Link link = parseLink(feed, entry, baseURI, l);
             if (link.getRel() == null || "".equals(link.getRel().trim()) || "alternate".equals(link.getRel())) {
                 links.add(link);
             }
@@ -295,8 +311,8 @@ public class Atom10Parser extends BaseWireFeedParser {
     private List<Link> parseOtherLinks(final Feed feed, final Entry entry, final String baseURI, final List<Element> eLinks) {
 
         final List<Link> links = new ArrayList<Link>();
-        for (final Element eLink : eLinks) {
-            final Link link = parseLink(feed, entry, baseURI, eLink);
+        for (Element l : eLinks) {
+            final Link link = parseLink(feed, entry, baseURI, l);
             if (!"alternate".equals(link.getRel())) {
                 links.add(link);
             }
@@ -310,22 +326,22 @@ public class Atom10Parser extends BaseWireFeedParser {
 
         final Person person = new Person();
 
-        final Element name = ePerson.getChild("name", getAtomNamespace());
+        final Element name = super.getChild(ePerson, "name");
         if (name != null) {
-            person.setName(name.getText());
+            person.setName(name.getTextContent());
         }
 
-        final Element uri = ePerson.getChild("uri", getAtomNamespace());
+        final Element uri = super.getChild(ePerson, "uri");
         if (uri != null) {
-            person.setUri(uri.getText());
-            if (isRelativeURI(uri.getText())) {
-                person.setUriResolved(resolveURI(baseURI, ePerson, uri.getText()));
+            person.setUri(uri.getTextContent());
+            if (isRelativeURI(uri.getTextContent())) {
+                person.setUriResolved(resolveURI(baseURI, ePerson, uri.getTextContent()));
             }
         }
 
-        final Element email = ePerson.getChild("email", getAtomNamespace());
+        final Element email = super.getChild(ePerson, "email");
         if (email != null) {
-            person.setEmail(email.getText());
+            person.setEmail(email.getTextContent());
         }
 
         person.setModules(parsePersonModules(ePerson, locale));
@@ -337,15 +353,15 @@ public class Atom10Parser extends BaseWireFeedParser {
     private List<SyndPerson> parsePersons(final String baseURI, final List<Element> ePersons, final Locale locale) {
 
         final List<SyndPerson> persons = new ArrayList<SyndPerson>();
-        for (final Element ePerson : ePersons) {
-            persons.add(parsePerson(baseURI, ePerson, locale));
+        for (Element p : ePersons) {
+            persons.add(parsePerson(baseURI, p, locale));
         }
 
         return Lists.emptyToNull(persons);
 
     }
 
-    private Content parseContent(final Element e) {
+    private Content parseContent(final Element e) throws FeedException {
 
         final String value = parseTextConstructToString(e);
         final String src = getAttributeValue(e, "src");
@@ -359,122 +375,129 @@ public class Atom10Parser extends BaseWireFeedParser {
 
     }
 
-    private String parseTextConstructToString(final Element e) {
-
-        String type = getAttributeValue(e, "type");
-        if (type == null) {
-            type = Content.TEXT;
-        }
-
-        String value = null;
-        if (type.equals(Content.XHTML) || type.indexOf("/xml") != -1 || type.indexOf("+xml") != -1) {
-            // XHTML content needs special handling
-            final XMLOutputter outputter = new XMLOutputter();
-            final List<org.jdom2.Content> contents = e.getContent();
-            for (final org.jdom2.Content content : contents) {
-                if (content instanceof Element) {
-                    final Element element = (Element) content;
-                    if (element.getNamespace().equals(getAtomNamespace())) {
-                        element.setNamespace(Namespace.NO_NAMESPACE);
-                    }
-                }
-            }
-            value = outputter.outputString(contents);
-        } else {
-            // Everything else comes in verbatim
-            value = e.getText();
-        }
-
-        return value;
-
+    private String parseTextConstructToString(final Element e) throws FeedException {
+    	String type = e.getAttribute("type");
+    	if (null == type) {
+    		type = Content.TEXT;
+    	}
+    	
+    	StringBuffer value = new StringBuffer("");
+    	if (Content.XHTML.equals(type) || type.indexOf("/xml") != -1 || type.indexOf("+xml") != -1) {
+			try {
+				TransformerFactory tf = TransformerFactory.newInstance();
+				tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+				tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+				Transformer t = tf.newTransformer();
+				t.setOutputProperty(OutputKeys.METHOD, "xml");
+		    	t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		    	for (int i = 0; i < e.getChildNodes().getLength(); i++) {
+		    		StringWriter buffer = new StringWriter();
+		    		t.transform(new DOMSource(e.getChildNodes().item(i)),
+		    			new StreamResult(buffer));
+		    		value.append(buffer.toString());
+		    	}
+			} catch (TransformerConfigurationException tce) {
+				throw new FeedException("Failed parse Element", tce);
+			} catch (TransformerException te) {
+				throw new FeedException("Failed parse Element", te);
+			}
+    	} else {
+    		value.append(e.getTextContent());
+    	}
+    	
+    	return value.toString();
     }
 
     // List(Elements) -> List(Entries)
-    protected List<Entry> parseEntries(final Feed feed, final String baseURI, final List<Element> eEntries, final Locale locale) {
+    protected List<Entry> parseEntries(final Feed feed, final String baseURI, final List<Element> eEntries, final Locale locale) throws FeedException {
 
         final List<Entry> entries = new ArrayList<Entry>();
-        for (final Element entry : eEntries) {
-            entries.add(this.parseEntry(feed, entry, baseURI, locale));
+        for (Element e : eEntries) {
+            entries.add(this.parseEntry(feed, e, baseURI, locale));
         }
 
         return Lists.emptyToNull(entries);
 
     }
 
-    protected Entry parseEntry(final Feed feed, final Element eEntry, final String baseURI, final Locale locale) {
+    protected Entry parseEntry(final Feed feed, final Element eEntry, final String baseURI, final Locale locale) throws FeedException {
 
         final Entry entry = new Entry();
 
-        final String xmlBase = eEntry.getAttributeValue("base", Namespace.XML_NAMESPACE);
+        final String xmlBase = eEntry.getAttributeNS(XMLConstants.XML_NS_URI, "base");
         if (xmlBase != null) {
             entry.setXmlBase(xmlBase);
         }
 
-        final Element title = eEntry.getChild("title", getAtomNamespace());
+        final Element title = super.getChild(eEntry, "title");
         if (title != null) {
             final Content c = new Content();
             c.setValue(parseTextConstructToString(title));
-            c.setType(getAttributeValue(title, "type"));
+            c.setType(title.getAttribute("type"));
             entry.setTitleEx(c);
         }
 
-        final List<Element> links = eEntry.getChildren("link", getAtomNamespace());
-        entry.setAlternateLinks(parseAlternateLinks(feed, entry, baseURI, links));
-        entry.setOtherLinks(parseOtherLinks(feed, entry, baseURI, links));
+        final List<Element> links = super.getChildren(eEntry, "link");
+        if (links != null) {
+        	entry.setAlternateLinks(parseAlternateLinks(feed, entry, baseURI, links));
+        	entry.setOtherLinks(parseOtherLinks(feed, entry, baseURI, links));
+        }
 
-        final List<Element> authors = eEntry.getChildren("author", getAtomNamespace());
-        if (!authors.isEmpty()) {
+        final List<Element> authors = super.getChildren(eEntry, "author");
+        if (authors != null) {
             entry.setAuthors(parsePersons(baseURI, authors, locale));
         }
 
-        final List<Element> contributors = eEntry.getChildren("contributor", getAtomNamespace());
-        if (!contributors.isEmpty()) {
+        final List<Element> contributors = super.getChildren(eEntry, "contributor");
+        if (contributors != null) {
             entry.setContributors(parsePersons(baseURI, contributors, locale));
         }
 
-        final Element id = eEntry.getChild("id", getAtomNamespace());
+        final Element id = super.getChild(eEntry, "id");
         if (id != null) {
-            entry.setId(id.getText());
+            entry.setId(id.getTextContent());
         }
 
-        final Element updated = eEntry.getChild("updated", getAtomNamespace());
+        final Element updated = super.getChild(eEntry, "updated");
         if (updated != null) {
-            entry.setUpdated(DateParser.parseDate(updated.getText(), locale));
+            entry.setUpdated(DateParser.parseDate(updated.getTextContent(), locale));
         }
 
-        final Element published = eEntry.getChild("published", getAtomNamespace());
+        final Element published = super.getChild(eEntry, "published");
         if (published != null) {
-            entry.setPublished(DateParser.parseDate(published.getText(), locale));
+            entry.setPublished(DateParser.parseDate(published.getTextContent(), locale));
         }
 
-        final Element summary = eEntry.getChild("summary", getAtomNamespace());
+        final Element summary = super.getChild(eEntry, "summary");
         if (summary != null) {
             entry.setSummary(parseContent(summary));
         }
 
-        final Element content = eEntry.getChild("content", getAtomNamespace());
+        final Element content = super.getChild(eEntry, "content");
         if (content != null) {
             final List<Content> contents = new ArrayList<Content>();
             contents.add(parseContent(content));
             entry.setContents(contents);
         }
 
-        final Element rights = eEntry.getChild("rights", getAtomNamespace());
+        final Element rights = super.getChild(eEntry, "rights");
         if (rights != null) {
-            entry.setRights(rights.getText());
+            entry.setRights(rights.getTextContent());
         }
 
-        final List<Element> categories = eEntry.getChildren("category", getAtomNamespace());
-        entry.setCategories(parseCategories(baseURI, categories));
+        final List<Element> categories = super.getChildren(eEntry, "category");
+        if (categories != null) {
+        	entry.setCategories(parseCategories(baseURI, categories));
+        }
 
-        final Element source = eEntry.getChild("source", getAtomNamespace());
+        final Element source = super.getChild(eEntry, "source");
         if (source != null) {
             entry.setSource(parseFeedMetadata(baseURI, source, locale));
         }
 
         entry.setModules(parseItemModules(eEntry, locale));
 
-        final List<Element> foreignMarkup = extractForeignMarkup(eEntry, entry, getAtomNamespace());
+        final List<WireFeedForeignMarkup> foreignMarkup = extractForeignMarkup(eEntry, entry, getAtomNamespace());
         if (!foreignMarkup.isEmpty()) {
             entry.setForeignMarkup(foreignMarkup);
         }
@@ -485,8 +508,8 @@ public class Atom10Parser extends BaseWireFeedParser {
     private List<Category> parseCategories(final String baseURI, final List<Element> eCategories) {
 
         final List<Category> cats = new ArrayList<Category>();
-        for (final Element eCategory : eCategories) {
-            cats.add(parseCategory(baseURI, eCategory));
+        for (Element c : eCategories) {
+            cats.add(parseCategory(baseURI, c));
         }
 
         return Lists.emptyToNull(cats);
@@ -555,7 +578,7 @@ public class Atom10Parser extends BaseWireFeedParser {
      * @param url URL to be resolved
      * @return The resolve URI
      */
-    public static String resolveURI(final String baseURI, final Parent parent, String url) {
+    public static String resolveURI(final String baseURI, final Node parent, String url) {
 
         if (!resolveURIs) {
             return url;
@@ -573,6 +596,8 @@ public class Atom10Parser extends BaseWireFeedParser {
                 final int nextslash = baseURI.indexOf("/", slashslash + 2);
                 if (nextslash != -1) {
                     base = baseURI.substring(0, nextslash);
+                } else {
+                	base = "";
                 }
                 return formURI(base, url);
             }
@@ -581,7 +606,7 @@ public class Atom10Parser extends BaseWireFeedParser {
             if (parent != null && parent instanceof Element) {
 
                 // Do we have an xml:base?
-                String xmlbase = ((Element) parent).getAttributeValue("base", Namespace.XML_NAMESPACE);
+                String xmlbase = ((Element) parent).getAttributeNS(XMLConstants.XML_NS_URI, "base");
                 if (xmlbase != null && xmlbase.trim().length() > 0) {
                     if (isAbsoluteURI(xmlbase)) {
                         // Absolute xml:base, so form URI right now
@@ -601,15 +626,15 @@ public class Atom10Parser extends BaseWireFeedParser {
                         return formURI(xmlbase, url);
                     } else {
                         // Relative xml:base, so walk up tree
-                        return resolveURI(baseURI, parent.getParent(), stripTrailingSlash(xmlbase) + "/" + stripStartingSlash(url));
+                        return resolveURI(baseURI, parent.getParentNode(), stripTrailingSlash(xmlbase) + "/" + stripStartingSlash(url));
                     }
                 }
                 // No xml:base so walk up tree
-                return resolveURI(baseURI, parent.getParent(), url);
+                return resolveURI(baseURI, parent.getParentNode(), url);
 
                 // Relative URI with no parent (i.e. top of tree), so form URI
                 // right now
-            } else if (parent == null || parent instanceof Document) {
+            } else if (null != baseURI && (parent == null || parent instanceof Document)) {
                 return formURI(baseURI, url);
             }
         }
@@ -630,10 +655,11 @@ public class Atom10Parser extends BaseWireFeedParser {
             if (".".equals(ret) || "./".equals(ret)) {
                 ret = "";
             }
-            if (ret.indexOf("/") != -1) {
+            if (null != ret && ret.indexOf("/") != -1) {
                 ret = ret.substring(0, ret.lastIndexOf("/"));
+            } else if (null != ret) {
+            	ret = resolveURI(null, root, ret);
             }
-            ret = resolveURI(null, root, ret);
         }
         return ret;
     }
@@ -647,12 +673,11 @@ public class Atom10Parser extends BaseWireFeedParser {
      */
     private String findAtomLink(final Element parent, final String rel) {
         String ret = null;
-        final List<Element> linksList = parent.getChildren("link", ATOM_10_NS);
+        final List<Element> linksList = super.getChildren(parent, "link");
         if (linksList != null) {
-            for (final Element element : linksList) {
-                final Element link = element;
-                final Attribute relAtt = getAttribute(link, "rel");
-                final Attribute hrefAtt = getAttribute(link, "href");
+            for (Element link : linksList) {
+                final Attr relAtt = getAttribute(link, "rel");
+                final Attr hrefAtt = getAttribute(link, "href");
                 if (relAtt == null && "alternate".equals(rel) || relAtt != null && relAtt.getValue().equals(rel)) {
                     ret = hrefAtt.getValue();
                     break;
@@ -672,10 +697,10 @@ public class Atom10Parser extends BaseWireFeedParser {
     private static String formURI(String base, String append) {
         base = stripTrailingSlash(base);
         append = stripStartingSlash(append);
-        if (append.startsWith("..")) {
+        if (null != append && append.startsWith("..")) {
             final String[] parts = append.split("/");
             for (final String part : parts) {
-                if ("..".equals(part)) {
+                if (null != base && "..".equals(part)) {
                     final int last = base.lastIndexOf("/");
                     if (last != -1) {
                         base = base.substring(0, last);
@@ -715,37 +740,41 @@ public class Atom10Parser extends BaseWireFeedParser {
      * @param baseURI the base URI of entry
      * @param locale the Locale used for entry
      * @return The Entry object
-     * @throws JDOMException Any DOM exception
      * @throws IOException Any I/O exception
      * @throws IllegalArgumentException Any illegal argument exception
      * @throws FeedException Any feed exception
      */
-    public static Entry parseEntry(final Reader rd, final String baseURI, final Locale locale) throws JDOMException, IOException, IllegalArgumentException,
+    public static Entry parseEntry(final Reader rd, final String baseURI, final Locale locale) throws IOException, IllegalArgumentException,
             FeedException {
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+			dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+	    	DocumentBuilder db = dbf.newDocumentBuilder();
+			final Document d = db.parse(new InputSource(rd));
+			final Element fetchedEntryElement = d.getDocumentElement();
 
-        // Parse entry into JDOM tree
-        final SAXBuilder builder = new SAXBuilder();
-        builder.setExpandEntities(false);
+	        final Feed feed = new Feed();
+	        feed.setFeedType("atom_1.0");
+	        final WireFeedOutput wireFeedOutput = new WireFeedOutput();
+	        final Document feedDoc = wireFeedOutput.outputDom(feed);
+	        Node newN = feedDoc.adoptNode(fetchedEntryElement.cloneNode(true));
+	        feedDoc.getFirstChild().appendChild(newN);
+	        
+	        if (baseURI != null) {
+	            feedDoc.getDocumentElement().setAttributeNS(XMLConstants.XML_NS_URI, "base", baseURI);
+	        }
 
-        final Document entryDoc = builder.build(rd);
-        final Element fetchedEntryElement = entryDoc.getRootElement();
-        fetchedEntryElement.detach();
-
-        // Put entry into a JDOM document with 'feed' root so that Rome can
-        // handle it
-        final Feed feed = new Feed();
-        feed.setFeedType("atom_1.0");
-        final WireFeedOutput wireFeedOutput = new WireFeedOutput();
-        final Document feedDoc = wireFeedOutput.outputJDom(feed);
-        feedDoc.getRootElement().addContent(fetchedEntryElement);
-
-        if (baseURI != null) {
-            feedDoc.getRootElement().setAttribute("base", baseURI, Namespace.XML_NAMESPACE);
-        }
-
-        final WireFeedInput input = new WireFeedInput(false, locale);
-        final Feed parsedFeed = (Feed) input.build(feedDoc);
-        return parsedFeed.getEntries().get(0);
+	        final WireFeedInput input = new WireFeedInput(false, locale);
+	        final Feed parsedFeed = (Feed) input.build(feedDoc);
+	        return parsedFeed.getEntries().get(0);
+		} catch (ParserConfigurationException | SAXException e) {
+			throw new FeedException("Invalid XML", e);
+		}
+        
+        
     }
 
 }

@@ -101,7 +101,7 @@ public class OPML20GeneratorTest {
     }
 
     private String categoryValueOf(final String... categories) {
-        return categoryOf(categories).item(0).getNodeValue();
+        return categoryOf(categories).item(0).getTextContent();
     }
 
 }

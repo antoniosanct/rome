@@ -18,6 +18,7 @@ package com.rometools.modules.georss.geometries;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Polygon, a surface object bounded by one external ring and zero or more internal rings
@@ -48,6 +49,11 @@ public final class Polygon extends AbstractSurface implements Cloneable {
         }
         return retval;
     }
+
+    @Override
+	public int hashCode() {
+		return Objects.hash(exterior, interior);
+	}
 
     @Override
     public boolean equals(final Object obj) {
@@ -82,7 +88,7 @@ public final class Polygon extends AbstractSurface implements Cloneable {
         return true;
     }
 
-    /**
+	/**
      * Retrieve the outer border
      *
      * @return the border ring

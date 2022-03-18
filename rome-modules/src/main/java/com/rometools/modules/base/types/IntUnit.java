@@ -15,6 +15,8 @@
  */
 package com.rometools.modules.base.types;
 
+import java.util.Objects;
+
 import com.rometools.modules.base.io.GoogleBaseParser;
 
 public class IntUnit implements CloneableType {
@@ -77,7 +79,12 @@ public class IntUnit implements CloneableType {
         }
     }
 
-    @Override
+	@Override
+	public int hashCode() {
+		return Objects.hash(units, value);
+	}
+
+	@Override
     public boolean equals(final Object o) {
         if (!(o instanceof IntUnit)) {
             return false;
@@ -91,4 +98,5 @@ public class IntUnit implements CloneableType {
         }
         return false;
     }
+    
 }

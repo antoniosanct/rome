@@ -16,8 +16,10 @@
  */
 package com.rometools.rome.io.impl;
 
-import org.jdom2.Attribute;
-import org.jdom2.Element;
+import java.util.List;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.rometools.rome.feed.rss.Description;
 import com.rometools.rome.feed.rss.Item;
@@ -38,15 +40,30 @@ public class RSS094Generator extends RSS093Generator {
     }
 
     @Override
-    protected void populateItem(final Item item, final Element eItem, final int index) {
-        super.populateItem(item, eItem, index);
+    protected void populateItem(final Item item, final Element eItem, final int index, final Element parent) {
+        super.populateItem(item, eItem, index, parent);
 
         final Description description = item.getDescription();
         if (description != null && description.getType() != null) {
-            final Element eDescription = eItem.getChild("description", getFeedNamespace());
-            eDescription.setAttribute(new Attribute("type", description.getType()));
+            final Element eDescription = super.getChild(eItem, "description");
+            if (null != eDescription) {
+            	eDescription.setAttribute("type", description.getType());
+            }
         }
-        eItem.removeChild("expirationDate", getFeedNamespace());
+        final List<Element> listItems = super.getChildren(eItem);
+        if (null != listItems && !listItems.isEmpty()) {
+        	boolean found = false;
+        	Node foundNode = null;
+        	for (Element li : listItems) {
+        		if (!found && "expirationDate".equals(li.getNodeName())) {
+        			foundNode = li;
+        			found = true;
+        		}
+        	}
+        	if (!found && null != foundNode) {
+        		eItem.removeChild(foundNode);
+        	}
+        }
     }
 
 }

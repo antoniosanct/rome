@@ -20,10 +20,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.georss.geometries.AbstractGeometry;
 import com.rometools.modules.georss.geometries.AbstractRing;
@@ -90,10 +91,10 @@ public class SimpleGenerator implements ModuleGenerator {
         // this is not necessary, it is done to avoid the namespace definition
         // in every item.
         Element root = element;
-        while (root.getParent() != null && root.getParent() instanceof Element) {
-            root = (Element) element.getParent();
+        while (root.getParentNode() != null && root.getParentNode() instanceof Element) {
+            root = (Element) element.getParentNode();
         }
-        root.addNamespaceDeclaration(GeoRSSModule.SIMPLE_NS);
+//        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + GeoRSSModule.SIMPLE_NS.getPrefix(), GeoRSSModule.SIMPLE_NS.getNamespaceURI());
 
         final GeoRSSModule geoRSSModule = (GeoRSSModule) module;
 
@@ -101,24 +102,25 @@ public class SimpleGenerator implements ModuleGenerator {
         if (geometry instanceof Point) {
             final Position pos = ((Point) geometry).getPosition();
 
-            final Element pointElement = new Element("point", GeoRSSModule.SIMPLE_NS);
-            pointElement.addContent(pos.getLatitude() + " " + pos.getLongitude());
-            element.addContent(pointElement);
+            final Element pointElement = root.getOwnerDocument().createElementNS(GeoRSSModule.SIMPLE_NS.getNamespaceURI(), "point");
+            pointElement.setPrefix(GeoRSSModule.SIMPLE_NS.getPrefix());
+            pointElement.setTextContent(pos.getLatitude() + " " + pos.getLongitude());
+            element.appendChild(pointElement);
         } else if (geometry instanceof LineString) {
             final PositionList posList = ((LineString) geometry).getPositionList();
 
-            final Element lineElement = new Element("line", GeoRSSModule.SIMPLE_NS);
-
-            lineElement.addContent(posListToString(posList));
-            element.addContent(lineElement);
+            final Element lineElement = root.getOwnerDocument().createElementNS(GeoRSSModule.SIMPLE_NS.getNamespaceURI(), "line");
+            lineElement.setPrefix(GeoRSSModule.SIMPLE_NS.getPrefix());
+            lineElement.setTextContent(posListToString(posList));
+            element.appendChild(lineElement);
         } else if (geometry instanceof Polygon) {
             final AbstractRing ring = ((Polygon) geometry).getExterior();
             if (ring instanceof LinearRing) {
                 final PositionList posList = ((LinearRing) ring).getPositionList();
-                final Element polygonElement = new Element("polygon", GeoRSSModule.SIMPLE_NS);
-
-                polygonElement.addContent(posListToString(posList));
-                element.addContent(polygonElement);
+                final Element polygonElement = root.getOwnerDocument().createElementNS(GeoRSSModule.SIMPLE_NS.getNamespaceURI(), "polygon");
+                polygonElement.setPrefix(GeoRSSModule.SIMPLE_NS.getPrefix());
+                polygonElement.setTextContent(posListToString(posList));
+                element.appendChild(polygonElement);
             } else {
                 LOG.error("GeoRSS simple format can't handle rings of type: " + ring.getClass().getName());
             }
@@ -127,18 +129,20 @@ public class SimpleGenerator implements ModuleGenerator {
             }
         } else if (geometry instanceof Envelope) {
             final Envelope envelope = (Envelope) geometry;
-            final Element boxElement = new Element("box", GeoRSSModule.SIMPLE_NS);
-            boxElement.addContent(envelope.getMinLatitude() + " " + envelope.getMinLongitude() + " " + envelope.getMaxLatitude() + " "
+            final Element boxElement = root.getOwnerDocument().createElementNS(GeoRSSModule.SIMPLE_NS.getNamespaceURI(), "box");
+            boxElement.setPrefix(GeoRSSModule.SIMPLE_NS.getPrefix());
+            boxElement.setTextContent(envelope.getMinLatitude() + " " + envelope.getMinLongitude() + " " + envelope.getMaxLatitude() + " "
                     + envelope.getMaxLongitude());
-            element.addContent(boxElement);
+            element.appendChild(boxElement);
         } else {
             LOG.error("GeoRSS simple format can't handle geometries of type: " + geometry.getClass().getName());
         }
 
         if (geoRSSModule.getFeatureNameTag() != null) {
-            Element featureNameElement = new Element("featurename", GeoRSSModule.SIMPLE_NS);
-            featureNameElement.addContent(geoRSSModule.getFeatureNameTag());
-            element.addContent(featureNameElement);
+            Element featureNameElement = root.getOwnerDocument().createElementNS(GeoRSSModule.SIMPLE_NS.getNamespaceURI(), "featurename");
+            featureNameElement.setPrefix(GeoRSSModule.SIMPLE_NS.getPrefix());
+            featureNameElement.setTextContent(geoRSSModule.getFeatureNameTag());
+            element.appendChild(featureNameElement);
         }
     }
 

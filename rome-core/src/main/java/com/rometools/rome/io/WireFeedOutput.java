@@ -19,18 +19,23 @@ package com.rometools.rome.io;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.jdom2.ProcessingInstruction;
-import org.jdom2.output.DOMOutputter;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import javax.xml.XMLConstants;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.ProcessingInstruction;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.impl.ConfigurableClassLoader;
@@ -121,21 +126,28 @@ public class WireFeedOutput {
      *
      */
     public String outputString(final WireFeed feed, final boolean prettyPrint) throws IllegalArgumentException, FeedException {
-
-        final Document doc = outputJDom(feed);
-        final String encoding = feed.getEncoding();
-        Format format;
-        if (prettyPrint) {
-            format = Format.getPrettyFormat();
-        } else {
-            format = Format.getCompactFormat();
-        }
-        if (encoding != null) {
-            format.setEncoding(encoding);
-        }
-
-        final XMLOutputter outputter = new XMLOutputter(format);
-        return outputter.outputString(doc);
+        final Document doc = outputDom(feed);
+		try {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+			Transformer t = tf.newTransformer();
+			t.setOutputProperty(OutputKeys.METHOD, "xml");
+			if (prettyPrint) {
+		        t.setOutputProperty(OutputKeys.INDENT, "yes");
+		        t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+	        }
+			if (null != feed.getEncoding()) {
+				t.setOutputProperty(OutputKeys.ENCODING, feed.getEncoding());
+			}
+	        StreamResult result = new StreamResult(new StringWriter());
+	        DOMSource source = new DOMSource(doc);
+	        t.transform(source, result);
+	        return result.getWriter().toString();
+		} catch (TransformerException | TransformerFactoryConfigurationError e) {
+			throw new FeedException("Error outputting feed", e);
+		}
+        
     }
 
     /**
@@ -236,52 +248,32 @@ public class WireFeedOutput {
      *
      */
     public void output(final WireFeed feed, final Writer writer, final boolean prettyPrint) throws IllegalArgumentException, IOException, FeedException {
-
-        final Document doc = outputJDom(feed);
-        final String encoding = feed.getEncoding();
-        Format format;
-        if (prettyPrint) {
-            format = Format.getPrettyFormat();
-        } else {
-            format = Format.getCompactFormat();
-        }
-        if (encoding != null) {
-            format.setEncoding(encoding);
-        }
-
-        final XMLOutputter outputter = new XMLOutputter(format);
-        outputter.output(doc, writer);
-
+        final Document doc = outputDom(feed);
+		try {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+			Transformer t = tf.newTransformer();
+			t.setOutputProperty(OutputKeys.METHOD, "xml");
+			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			if (prettyPrint) {
+		        t.setOutputProperty(OutputKeys.INDENT, "yes");
+		        t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+	        }
+			if (null != feed.getEncoding()) {
+				t.setOutputProperty(OutputKeys.ENCODING, feed.getEncoding());
+			}
+	        StreamResult result = new StreamResult(writer);
+	        DOMSource source = new DOMSource(doc);
+	        t.transform(source, result);
+		} catch (TransformerException | TransformerFactoryConfigurationError e) {
+			throw new FeedException("Error outputting feed", e);
+		}
     }
 
-    /**
-     * Creates a W3C DOM document for the given WireFeed.
-
-     * This method does not use the feed encoding property.
-
-     * NOTE: This method delages to the 'Document WireFeedOutput#outputJDom(WireFeed)'.
-
-     *
-     * @param feed Abstract feed to create W3C DOM document from. The type of the WireFeed must
-     *            match the type given to the FeedOuptut constructor.
-     * @return the W3C DOM document for the given WireFeed.
-     * @throws IllegalArgumentException thrown if the feed type of the WireFeedOutput and WireFeed
-     *             don't match.
-     * @throws FeedException thrown if the W3C DOM document for the feed could not be created.
-     *
-     */
-    public org.w3c.dom.Document outputW3CDom(final WireFeed feed) throws IllegalArgumentException, FeedException {
-        final Document doc = outputJDom(feed);
-        final DOMOutputter outputter = new DOMOutputter();
-        try {
-            return outputter.output(doc);
-        } catch (final JDOMException jdomEx) {
-            throw new FeedException("Could not create DOM", jdomEx);
-        }
-    }
 
     /**
-     * Creates a JDOM document for the given WireFeed.
+     * Creates a W3C document for the given WireFeed.
 
      * This method does not use the feed encoding property.
 
@@ -296,7 +288,7 @@ public class WireFeedOutput {
      * @throws FeedException thrown if the JDOM document for the feed could not be created.
      *
      */
-    public Document outputJDom(final WireFeed feed) throws IllegalArgumentException, FeedException {
+    public Document outputDom(final WireFeed feed) throws IllegalArgumentException, FeedException {
 
         final String type = feed.getFeedType();
 
@@ -313,10 +305,11 @@ public class WireFeedOutput {
 
         final String styleSheet = feed.getStyleSheet();
         if (styleSheet != null) {
-            final Map<String, String> data = new LinkedHashMap<String, String>();
-            data.put("type", "text/xsl");
-            data.put("href", styleSheet);
-            doc.addContent(0, new ProcessingInstruction("xml-stylesheet", data));
+            ProcessingInstruction pi = (ProcessingInstruction)
+                doc.createProcessingInstruction(
+                		"xml-stylesheet",
+                		"type=\"text/xsl\" href=\"" + styleSheet + "\"");
+            doc.insertBefore(pi, doc.getFirstChild());
         }
 
         return doc;

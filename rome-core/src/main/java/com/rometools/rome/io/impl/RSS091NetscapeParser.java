@@ -16,10 +16,10 @@
  */
 package com.rometools.rome.io.impl;
 
-import org.jdom2.Attribute;
-import org.jdom2.DocType;
-import org.jdom2.Document;
-import org.jdom2.Element;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.Element;
 
 public class RSS091NetscapeParser extends RSS091UserlandParser {
 
@@ -38,13 +38,13 @@ public class RSS091NetscapeParser extends RSS091UserlandParser {
     @Override
     public boolean isMyType(final Document document) {
 
-        final Element rssRoot = document.getRootElement();
-        final String name = rssRoot.getName();
-        final Attribute version = rssRoot.getAttribute("version");
-        final DocType docType = document.getDocType();
+        final Element rssRoot = document.getDocumentElement();
+        final String name = rssRoot.getNodeName();
+        final Attr version = rssRoot.getAttributeNode("version");
+        final DocumentType docType = document.getDoctype();
 
         return name.equals(ELEMENT_NAME) && version != null && version.getValue().equals(getRSSVersion()) && docType != null
-                && ELEMENT_NAME.equals(docType.getElementName()) && PUBLIC_ID.equals(docType.getPublicID()) && SYSTEM_ID.equals(docType.getSystemID());
+                && ELEMENT_NAME.equals(docType.getName()) && PUBLIC_ID.equals(docType.getPublicId()) && SYSTEM_ID.equals(docType.getSystemId());
 
     }
 

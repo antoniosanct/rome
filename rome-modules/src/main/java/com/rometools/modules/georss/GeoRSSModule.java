@@ -13,9 +13,12 @@
  */
 package com.rometools.modules.georss;
 
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.rometools.modules.georss.geometries.AbstractGeometry;
 import com.rometools.modules.georss.geometries.Point;
 import com.rometools.modules.georss.geometries.Position;
@@ -61,19 +64,19 @@ public abstract class GeoRSSModule extends ModuleImpl implements Cloneable {
     /**
      * Namespace for georss simple : <i>xmlns:georss="http://www.georss.org/georss"</i>
      */
-    public static final Namespace SIMPLE_NS = Namespace.getNamespace("georss", GeoRSSModule.GEORSS_GEORSS_URI);
+    public static final Namespace SIMPLE_NS = XMLEventFactory.newDefaultFactory().createNamespace("georss", GeoRSSModule.GEORSS_GEORSS_URI);
 
     /**
      *
      * Namespace for w3c georss : <i>xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"</i>
      */
-    public static final Namespace W3CGEO_NS = Namespace.getNamespace("geo", GeoRSSModule.GEORSS_W3CGEO_URI);
+    public static final Namespace W3CGEO_NS = XMLEventFactory.newDefaultFactory().createNamespace("geo", GeoRSSModule.GEORSS_W3CGEO_URI);
 
     /**
      *
      * Namespace for gml georss : <i>xmlns:gml="http://www.opengis.net/gml"</i>
      */
-    public static final Namespace GML_NS = Namespace.getNamespace("gml", GeoRSSModule.GEORSS_GML_URI);
+    public static final Namespace GML_NS = XMLEventFactory.newDefaultFactory().createNamespace("gml", GeoRSSModule.GEORSS_GML_URI);
 
     protected GeoRSSModule(final Class<? extends GeoRSSModule> beanClass, final java.lang.String uri) {
         super(beanClass, uri);

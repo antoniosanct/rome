@@ -18,7 +18,7 @@ package com.rometools.rome.io;
 
 import java.util.Locale;
 
-import org.jdom2.Element;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.module.Module;
 

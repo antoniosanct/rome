@@ -19,7 +19,7 @@ package com.rometools.modules.sle;
 
 import java.util.List;
 
-import org.jdom2.Document;
+import org.w3c.dom.Document;
 
 import com.rometools.modules.sle.types.Group;
 import com.rometools.modules.sle.types.Sort;
@@ -104,7 +104,7 @@ public final class SleUtility {
         // final ModuleGenerators g = new ModuleGenerators(feed.getFeedType() +
         // ITEM_MODULE_GENERATORS_POSFIX_KEY, null);
         final SyndFeedOutput output = new SyndFeedOutput();
-        final Document document = output.outputJDom(feed);
+        final Document document = output.outputDom(feed);
         final SyndFeed copy = new SyndFeedInput().build(document);
         feed.copyFrom(copy);
     }

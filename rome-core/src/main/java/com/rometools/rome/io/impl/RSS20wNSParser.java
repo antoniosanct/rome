@@ -18,9 +18,10 @@ package com.rometools.rome.io.impl;
 
 import java.util.Locale;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.WireFeed;
 
@@ -49,14 +50,14 @@ public class RSS20wNSParser extends RSS20Parser {
 
     @Override
     public boolean isMyType(final Document document) {
-        final Element rssRoot = document.getRootElement();
-        final Namespace defaultNS = rssRoot.getNamespace();
+        final Element rssRoot = document.getDocumentElement();
+        final Namespace defaultNS = super.createNamespace(rssRoot.getNamespaceURI());
         return defaultNS != null && defaultNS.equals(getRSSNamespace()) && super.isMyType(document);
     }
 
     @Override
     protected Namespace getRSSNamespace() {
-        return Namespace.getNamespace(RSS20_URI);
+        return super.createNamespace(RSS20_URI);
     }
 
     /**

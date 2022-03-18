@@ -19,8 +19,10 @@ package com.rometools.modules.slash.io;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.slash.Slash;
 import com.rometools.rome.feed.module.Module;
@@ -31,7 +33,7 @@ import com.rometools.rome.io.ModuleGenerator;
  */
 public class SlashModuleGenerator implements ModuleGenerator {
 
-    private static final Namespace NAMESPACE = Namespace.getNamespace("slash", Slash.URI);
+    private static final Namespace NAMESPACE = XMLEventFactory.newDefaultFactory().createNamespace("slash", Slash.URI);
 
     public SlashModuleGenerator() {
     }
@@ -43,13 +45,13 @@ public class SlashModuleGenerator implements ModuleGenerator {
         }
         final Slash slash = (Slash) module;
         if (slash.getComments() != null) {
-            element.addContent(generateSimpleElement("comments", slash.getComments().toString()));
+            element.appendChild(generateSimpleElement("comments", slash.getComments().toString(), element));
         }
         if (slash.getDepartment() != null) {
-            element.addContent(generateSimpleElement("department", slash.getDepartment()));
+            element.appendChild(generateSimpleElement("department", slash.getDepartment(), element));
         }
         if (slash.getSection() != null) {
-            element.addContent(generateSimpleElement("section", slash.getSection()));
+            element.appendChild(generateSimpleElement("section", slash.getSection(), element));
         }
         if (slash.getHitParade() != null && slash.getHitParade().length > 0) {
             final StringBuffer buff = new StringBuffer();
@@ -60,14 +62,14 @@ public class SlashModuleGenerator implements ModuleGenerator {
                 }
                 buff.append(p[i]);
             }
-            element.addContent(generateSimpleElement("hit_parade", buff.toString()));
+            element.appendChild(generateSimpleElement("hit_parade", buff.toString(), element));
         }
 
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, SlashModuleGenerator.NAMESPACE);
-        element.addContent(value);
+    protected Element generateSimpleElement(final String name, final String value, final Element parent) {
+        final Element element = parent.getOwnerDocument().createElementNS(NAMESPACE.getNamespaceURI(), name);
+        element.setTextContent(value);
         return element;
     }
 

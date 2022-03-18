@@ -15,6 +15,7 @@
  */
 package com.rometools.modules.base.types;
 
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 /**
@@ -124,7 +125,12 @@ public class Size implements CloneableType {
         }
     }
 
-    @Override
+	@Override
+	public int hashCode() {
+		return Objects.hash(height, length, width);
+	}
+
+	@Override
     public boolean equals(final Object o) {
         if (!(o instanceof Size)) {
             return false;
