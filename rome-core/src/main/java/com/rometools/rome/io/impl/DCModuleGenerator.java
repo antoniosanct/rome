@@ -96,11 +96,9 @@ public class DCModuleGenerator implements ModuleGenerator {
      *
      * @param module the module to populate from.
      * @param element the root element to attach child elements to.
-     * @throws ParserConfigurationException 
-     * @throws DOMException 
      */
     @Override
-    public final void generate(final Module module, final Element element) throws DOMException {
+    public final void generate(final Module module, final Element element) {
 
         final DCModule dcModule = (DCModule) module;
 
@@ -185,9 +183,9 @@ public class DCModuleGenerator implements ModuleGenerator {
 
     /**
      * Utility method to generate an element for a subject.
-
      *
      * @param subject the subject to generate an element for.
+     * @param element the parent element for recovering DOM document.
      * @return the element for the subject.
      */
     protected final Element generateSubjectElement(final DCSubject subject, final Element element) {
@@ -228,8 +226,8 @@ public class DCModuleGenerator implements ModuleGenerator {
      *
      * @param name the name of the elment to generate.
      * @param value the value of the text in the element.
+     * @param element the parent element for recovering DOM document.
      * @return the element generated.
-     * @throws ParserConfigurationException 
      */
     protected final Node generateSimpleElement(final String name, final String value, final Element element) {
         final Node child = element.getOwnerDocument().createElementNS(getDCNamespace().getValue(), name);
@@ -245,11 +243,10 @@ public class DCModuleGenerator implements ModuleGenerator {
      *
      * @param name the name of the element list to generate.
      * @param values the list of values for the elements.
+     * @param element the parent element for recovering DOM document.
      * @return a list of Elements created.
-     * @throws ParserConfigurationException 
-     * @throws DOMException 
      */
-    protected final Node generateSimpleElementList(final String name, final List<String> values, final Element element) throws DOMException {
+    protected final Node generateSimpleElementList(final String name, final List<String> values, final Element element) {
         final Element child = element.getOwnerDocument().createElement(name);
         for (final String value : values) {
             child.appendChild(generateSimpleElement(name, value, element));

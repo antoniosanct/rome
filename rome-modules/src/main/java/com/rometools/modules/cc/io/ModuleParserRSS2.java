@@ -29,8 +29,8 @@ import org.w3c.dom.Element;
 import com.rometools.modules.cc.CreativeCommonsImpl;
 import com.rometools.modules.cc.types.License;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class ModuleParserRSS2 extends ChildNavigator implements ModuleParser {
 

@@ -30,8 +30,8 @@ import com.rometools.modules.georss.geometries.Polygon;
 import com.rometools.modules.georss.geometries.Position;
 import com.rometools.modules.georss.geometries.PositionList;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 import com.rometools.utils.Strings;
 
 /**

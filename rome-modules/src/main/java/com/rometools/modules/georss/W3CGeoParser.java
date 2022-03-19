@@ -23,8 +23,8 @@ import org.w3c.dom.Element;
 import com.rometools.modules.georss.geometries.Point;
 import com.rometools.modules.georss.geometries.Position;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 import com.rometools.utils.Strings;
 
 /**

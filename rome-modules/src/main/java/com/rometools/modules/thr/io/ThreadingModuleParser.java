@@ -25,8 +25,8 @@ import org.w3c.dom.Element;
 import com.rometools.modules.thr.ThreadingModule;
 import com.rometools.modules.thr.ThreadingModuleImpl;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 /**
  * Currently no support for thr:count, thr:updated, thr:total link attributes.

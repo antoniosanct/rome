@@ -131,8 +131,7 @@ public class SyndFeedInput {
      * @throws IllegalArgumentException thrown if feed type could not be understood by any of the
      *             underlying parsers.
      * @throws FeedException if the feed could not be parsed
-     * @throws IOException 
-     * @throws  
+     * @throws IOException any I/O exception
      *
      */
     public SyndFeed build(final Reader reader) throws IllegalArgumentException, FeedException, IOException {

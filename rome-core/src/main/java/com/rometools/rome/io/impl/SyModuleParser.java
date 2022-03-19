@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.module.SyModule;
 import com.rometools.rome.feed.module.SyModuleImpl;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 
 public class SyModuleParser extends ChildNavigator implements ModuleParser {

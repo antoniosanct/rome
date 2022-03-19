@@ -44,7 +44,9 @@ public class MediaModuleImpl extends ModuleImpl implements MediaModule, Serializ
     }
 
     /**
-     * constructor that passes values up to ModuleImpl.
+     * Constructor that passes values up to ModuleImpl.
+     * @param clazz the implementation class.
+     * @param uri a URI resource to parse.
      */
     public MediaModuleImpl(final Class<? extends MediaModule> clazz, final String uri) {
         super(clazz, uri);

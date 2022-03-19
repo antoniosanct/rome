@@ -26,8 +26,8 @@ import org.w3c.dom.Element;
 
 import com.rometools.modules.feedpress.modules.FeedpressModule;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 /**
  * The ModuleGenerator implementation for the Feedpress module.

@@ -31,8 +31,8 @@ import com.rometools.rome.feed.atom.Link;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.rome.feed.synd.SyndPersonImpl;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 import com.rometools.rome.io.impl.NumberParser;
 
 public class AtomModuleParser extends ChildNavigator implements ModuleParser {

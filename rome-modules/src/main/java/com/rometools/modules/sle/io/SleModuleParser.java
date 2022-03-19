@@ -33,8 +33,8 @@ import com.rometools.modules.sle.SimpleListExtensionImpl;
 import com.rometools.modules.sle.types.Group;
 import com.rometools.modules.sle.types.Sort;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class SleModuleParser extends ChildNavigator implements ModuleParser {
 

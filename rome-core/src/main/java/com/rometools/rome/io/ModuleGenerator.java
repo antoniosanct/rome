@@ -63,5 +63,5 @@ public interface ModuleGenerator {
      * @param module the module to inject into the XML node (JDOM element).
      * @param element the XML node into which module meta-data will be injected.
      */
-    public void generate(Module module, Element element) throws DOMException;
+    public void generate(Module module, Element element);
 }

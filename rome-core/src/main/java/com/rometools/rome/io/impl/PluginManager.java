@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.rometools.rome.feed.impl.ConfigurableClassLoader;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.DelegatingModuleGenerator;
 import com.rometools.rome.io.DelegatingModuleParser;
 import com.rometools.rome.io.WireFeedGenerator;

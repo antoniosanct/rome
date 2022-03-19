@@ -104,6 +104,8 @@ public class ConditionCode implements Serializable {
 
     /**
      * Text description of condition (from the table at top of class)
+     * 
+     * @return the description to get.
      */
     public String getDescription() {
         return description;

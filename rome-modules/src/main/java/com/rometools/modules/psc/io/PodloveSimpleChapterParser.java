@@ -30,8 +30,8 @@ import com.rometools.modules.psc.modules.PodloveSimpleChapterModule;
 import com.rometools.modules.psc.modules.PodloveSimpleChapterModuleImpl;
 import com.rometools.modules.psc.types.SimpleChapter;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 /**
  * The ModuleParser implementation for the Podlove Simple Chapter plug in.

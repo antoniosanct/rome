@@ -26,8 +26,8 @@ import org.w3c.dom.Element;
 import com.rometools.modules.feedburner.FeedBurner;
 import com.rometools.modules.feedburner.FeedBurnerImpl;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 /**
  * ModuleParser implementation for the FeedBurner RSS extension.

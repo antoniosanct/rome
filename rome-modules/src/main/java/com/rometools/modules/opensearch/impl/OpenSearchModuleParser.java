@@ -33,8 +33,8 @@ import com.rometools.modules.opensearch.OpenSearchModule;
 import com.rometools.modules.opensearch.entity.OSQuery;
 import com.rometools.rome.feed.atom.Link;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class OpenSearchModuleParser extends ChildNavigator implements ModuleParser {
 

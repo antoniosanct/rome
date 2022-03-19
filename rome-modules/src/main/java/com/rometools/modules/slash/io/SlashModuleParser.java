@@ -27,8 +27,8 @@ import org.w3c.dom.Element;
 import com.rometools.modules.slash.Slash;
 import com.rometools.modules.slash.SlashImpl;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 /**
  * ModuleParser implementation for Slash RSS.

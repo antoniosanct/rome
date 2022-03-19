@@ -123,7 +123,9 @@ public class PositionList implements Cloneable, Serializable {
     }
 
     /**
-     * Add a position at the end of the list
+     * Add a position at the end of the list.
+     * @param latitude the latitude to add.
+     * @param longitude the longitude to add.
      */
     public void add(final double latitude, final double longitude) {
         ensureCapacity(size + 1);
@@ -137,6 +139,8 @@ public class PositionList implements Cloneable, Serializable {
      * "right"
      *
      * @param pos position index
+     * @param latitude the latitude to set.
+     * @param longitude the longitude to set.
      */
     public void insert(final int pos, final double latitude, final double longitude) {
         ensureCapacity(size + 1);
@@ -151,6 +155,8 @@ public class PositionList implements Cloneable, Serializable {
      * Replace the position at the index with new values
      *
      * @param pos position index
+     * @param latitude the latitude to set.
+     * @param longitude the longitude to set.
      */
     public void replace(final int pos, final double latitude, final double longitude) {
         this.longitude[pos] = longitude;

@@ -33,6 +33,7 @@ import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.module.Extendable;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.WireFeedParser;
 
 /**
