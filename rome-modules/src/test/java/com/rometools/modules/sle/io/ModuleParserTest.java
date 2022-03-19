@@ -22,11 +22,6 @@ package com.rometools.modules.sle.io;
 
 import java.io.File;
 
-import javax.xml.stream.XMLEventFactory;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +33,9 @@ import com.rometools.modules.sle.types.Sort;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class ModuleParserTest extends AbstractTestCase {
 

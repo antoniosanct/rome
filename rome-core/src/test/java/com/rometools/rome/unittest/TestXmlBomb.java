@@ -24,8 +24,6 @@ import java.nio.charset.Charset;
 
 import com.rometools.rome.io.WireFeedInput;
 
-import junit.framework.TestCase;
-
 public class TestXmlBomb {
 
 	public void testXmlBomb() throws Exception {

@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;

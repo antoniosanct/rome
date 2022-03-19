@@ -20,7 +20,6 @@ import java.util.Set;
 
 import javax.xml.stream.events.Namespace;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.module.Module;
