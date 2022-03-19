@@ -16,6 +16,7 @@
 package com.rometools.rome.unittest.issues;
 
 import java.io.Reader;
+import java.io.StringWriter;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -26,7 +27,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.io.output.NullWriter;
 import org.xml.sax.InputSource;
 
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -78,9 +78,11 @@ public class Issue137Test extends FeedTest {
 		tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 		t.setOutputProperty(OutputKeys.METHOD, "xml");
     	t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        StreamResult result = new StreamResult(new NullWriter());
+    	StringWriter sw = new StringWriter();
+        StreamResult result = new StreamResult(sw);
         DOMSource source = new DOMSource(db.parse(new InputSource(r)));
         t.transform(source, result);
+        assertNotNull(sw.toString());
     }
     
 }

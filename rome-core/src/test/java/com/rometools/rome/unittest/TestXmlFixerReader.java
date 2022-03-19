@@ -126,7 +126,7 @@ public class TestXmlFixerReader extends TestCase {
     	dbf.setFeature("http://apache.org/xml/features/continue-after-fatal-error", true);
     	DocumentBuilder db = dbf.newDocumentBuilder();
     	db.setErrorHandler(new DefaultHandler());
-    	db.parse(new InputSource(getStream(garbish, xmlDoc)));
+    	assertNotNull(db.parse(new InputSource(getStream(garbish, xmlDoc))));
     }
 
     protected void testValidTrim(final String garbish, final String xmlDoc) throws Exception {

@@ -546,6 +546,8 @@ public class GoogleBaseParserTest extends AbstractTestCase {
      */
     public void testGetNamespaceUri() {
         LOG.debug("testGetNamespaceUri");
-        LOG.debug(new GoogleBaseParser().getNamespaceUri());
+        final String uri = new GoogleBaseParser().getNamespaceUri(); 
+        LOG.debug(uri);
+        assertEquals("http://base.google.com/ns/1.0", uri);
     }
 }
