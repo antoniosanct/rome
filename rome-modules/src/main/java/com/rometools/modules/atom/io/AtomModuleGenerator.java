@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 

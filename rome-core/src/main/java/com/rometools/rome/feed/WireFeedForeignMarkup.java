@@ -1,11 +1,9 @@
 package com.rometools.rome.feed;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import org.w3c.dom.Element;
 
-import com.rometools.rome.feed.atom.Category;
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 

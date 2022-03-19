@@ -40,7 +40,6 @@ import com.rometools.rome.feed.atom.Generator;
 import com.rometools.rome.feed.atom.Link;
 import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.rome.io.FeedException;
-import com.rometools.rome.io.ModuleGenerator;
 import com.rometools.utils.Lists;
 
 /**
