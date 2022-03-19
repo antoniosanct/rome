@@ -165,9 +165,9 @@ public class MediaModuleParser extends ChildNavigator implements ModuleParser {
                 final Element content = contents.get(i);
                 MediaContent mc = null;
 
-                if (content.getAttribute("url") != null) {
+                if (null != super.getAttributeNotBlank("url",  content)) {
                     try {
-                        mc = new MediaContent(new UrlReference(URIs.parse(content.getAttribute("url"))));
+                        mc = new MediaContent(new UrlReference(URIs.parse(super.getAttributeNotBlank("url",  content))));
                         mc.setPlayer(parsePlayer(content));
                     } catch (final Exception ex) {
                         LOG.warn("Exception parsing content tag.", ex);
@@ -178,22 +178,22 @@ public class MediaModuleParser extends ChildNavigator implements ModuleParser {
                 if (mc != null) {
                     values.add(mc);
                     try {
-                        if (content.getAttribute("channels") != null) {
-                            mc.setAudioChannels(Integer.valueOf(content.getAttribute("channels")));
+                        if (null != super.getAttributeNotBlank("channels",  content)) {
+                            mc.setAudioChannels(Integer.valueOf(super.getAttributeNotBlank("channels",  content)));
                         }
                     } catch (final Exception ex) {
                         LOG.warn("Exception parsing content tag.", ex);
                     }
                     try {
-                        if (content.getAttribute("bitrate") != null) {
-                            mc.setBitrate(Float.valueOf(content.getAttribute("bitrate")));
+                        if (null != super.getAttributeNotBlank("bitrate",  content)) {
+                            mc.setBitrate(Float.valueOf(super.getAttributeNotBlank("bitrate",  content)));
                         }
                     } catch (final Exception ex) {
                         LOG.warn("Exception parsing content tag.", ex);
                     }
                     try {
-                        if (content.getAttribute("duration") != null) {
-                            mc.setDuration(Longs.parseDecimal(content.getAttribute("duration")));
+                        if (null != super.getAttributeNotBlank("duration",  content)) {
+                            mc.setDuration(Longs.parseDecimal(super.getAttributeNotBlank("duration",  content)));
                         }
                     } catch (final Exception ex) {
                         LOG.warn("Exception parsing content tag.", ex);
@@ -214,22 +214,22 @@ public class MediaModuleParser extends ChildNavigator implements ModuleParser {
                     }
 
                     try {
-                        if (content.getAttribute("fileSize") != null) {
-                            mc.setFileSize(parseFileSize(content.getAttribute("fileSize")));
+                        if (null != super.getAttributeNotBlank("fileSize",  content)) {
+                            mc.setFileSize(parseFileSize(super.getAttributeNotBlank("fileSize",  content)));
                         }
                     } catch (final Exception ex) {
                         LOG.warn("Exception parsing content tag.", ex);
                     }
                     try {
-                        if (content.getAttribute("framerate") != null) {
-                            mc.setFramerate(Float.valueOf(content.getAttribute("framerate")));
+                        if (null != super.getAttributeNotBlank("framerate",  content)) {
+                            mc.setFramerate(Float.valueOf(super.getAttributeNotBlank("framerate",  content)));
                         }
                     } catch (final Exception ex) {
                         LOG.warn("Exception parsing content tag.", ex);
                     }
                     try {
-                        if (content.getAttribute("height") != null) {
-                            mc.setHeight(Integer.valueOf(content.getAttribute("height")));
+                        if (null != super.getAttributeNotBlank("height",  content)) {
+                            mc.setHeight(Integer.valueOf(super.getAttributeNotBlank("height",  content)));
                         }
                     } catch (final Exception ex) {
                         LOG.warn("Exception parsing content tag.", ex);
@@ -238,8 +238,8 @@ public class MediaModuleParser extends ChildNavigator implements ModuleParser {
                     mc.setLanguage(content.getAttribute("lang"));
                     mc.setMetadata(parseMetadata(content, locale));
                     try {
-                        if (content.getAttribute("samplingrate") != null) {
-                            mc.setSamplingrate(Float.valueOf(content.getAttribute("samplingrate")));
+                        if (null != super.getAttributeNotBlank("samplingrate",  content)) {
+                            mc.setSamplingrate(Float.valueOf(super.getAttributeNotBlank("samplingrate",  content)));
                         }
                     } catch (final Exception ex) {
                         LOG.warn("Exception parsing content tag.", ex);
@@ -247,15 +247,15 @@ public class MediaModuleParser extends ChildNavigator implements ModuleParser {
 
                     mc.setType(content.getAttribute("type"));
                     try {
-                        if (content.getAttribute("width") != null) {
-                            mc.setWidth(Integer.valueOf(content.getAttribute("width")));
+                        if (null != super.getAttributeNotBlank("width",  content)) {
+                            mc.setWidth(Integer.valueOf(super.getAttributeNotBlank("width",  content)));
                         }
                     } catch (final Exception ex) {
                         LOG.warn("Exception parsing content tag.", ex);
                     }
 
-                    if (content.getAttribute("isDefault") != null) {
-                        mc.setDefaultContent(Boolean.valueOf(content.getAttribute("isDefault")));
+                    if (null != super.getAttributeNotBlank("isDefault",  content)) {
+                        mc.setDefaultContent(Boolean.valueOf(super.getAttributeNotBlank("isDefault",  content)));
                     }
                 } else {
                     LOG.warn("Could not find MediaContent.");
@@ -472,19 +472,17 @@ public class MediaModuleParser extends ChildNavigator implements ModuleParser {
             final Element priceElement = priceElements.get(i);
             prices[i] = new Price();
             
-            final String currency = priceElement.getAttribute("currency");
-            if (currency != null) {
+            if (null != super.getAttributeNotBlank("currency", priceElement)) {
                 try {
-                    prices[i].setCurrency(Currency.getInstance(currency));
+                    prices[i].setCurrency(Currency.getInstance(super.getAttributeNotBlank("currency", priceElement)));
                 } catch (IllegalArgumentException ex) {
                     LOG.warn("Invalid currency", ex);
                 }
             }
 
-            final String price = priceElement.getAttribute("price");
-            if (price != null) {
+            if (null != super.getAttributeNotBlank("price", priceElement)) {
                 try {
-                    prices[i].setPrice(new BigDecimal(price));
+                    prices[i].setPrice(new BigDecimal(super.getAttributeNotBlank("price", priceElement)));
                 } catch (NumberFormatException ex) {
                     LOG.warn("Invalid price", ex);
                 }
@@ -493,9 +491,9 @@ public class MediaModuleParser extends ChildNavigator implements ModuleParser {
             if (priceElement.getAttribute("type") != null) {
                 prices[i].setType(Price.Type.valueOf(priceElement.getAttribute("type").toUpperCase()));
             }
-            if (priceElement.getAttribute("info") != null) {
+            if (null != super.getAttributeNotBlank("info", priceElement)) {
                 try {
-                    prices[i].setInfo(new URL(priceElement.getAttribute("info")));
+                    prices[i].setInfo(new URL(super.getAttributeNotBlank("info", priceElement)));
                 } catch (MalformedURLException ex) {
                     LOG.warn("Exception parsing price info attribute.", ex);
                 }
