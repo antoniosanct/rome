@@ -6,6 +6,8 @@
         </encoder>
     </appender>
 
+	<logger name="com.rometools.modules" level="DEBUG"/>
+
     <root level="ERROR">
         <appender-ref ref="STDOUT" />
     </root>
