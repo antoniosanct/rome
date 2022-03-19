@@ -45,9 +45,9 @@ import com.rometools.modules.itunes.FeedInformationImpl;
 import com.rometools.modules.itunes.types.Category;
 import com.rometools.modules.itunes.types.Duration;
 import com.rometools.modules.itunes.types.Subcategory;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 import com.rometools.rome.io.WireFeedParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class ITunesParser extends ChildNavigator implements ModuleParser {
 

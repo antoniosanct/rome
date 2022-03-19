@@ -30,7 +30,11 @@ public class Envelope extends AbstractGeometry {
     }
 
     /**
-     * Construct object from coordinate values
+     * Construct object from coordinate values.
+     * @param minLatitude the min latitude.
+     * @param minLongitude the min longitude.
+     * @param maxLatitude the max latitude. 
+     * @param maxLongitude the max longitude.
      */
     public Envelope(final double minLatitude, final double minLongitude, final double maxLatitude, final double maxLongitude) {
         this.minLatitude = minLatitude;

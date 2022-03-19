@@ -25,8 +25,8 @@ import org.w3c.dom.Element;
 import com.rometools.modules.fyyd.modules.FyydModule;
 import com.rometools.modules.fyyd.modules.FyydModuleImpl;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 /**
  * The ModuleParser implementation for the Fyyd module.

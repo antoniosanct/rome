@@ -35,8 +35,8 @@ import com.rometools.modules.photocast.PhotocastModuleImpl;
 import com.rometools.modules.photocast.types.Metadata;
 import com.rometools.modules.photocast.types.PhotoDate;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class Parser extends ChildNavigator implements ModuleParser {
 

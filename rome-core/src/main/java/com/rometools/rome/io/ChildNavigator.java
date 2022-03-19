@@ -1,4 +1,4 @@
-package com.rometools.rome.io.impl;
+package com.rometools.rome.io;
 
 import java.util.ArrayList;
 import java.util.List;

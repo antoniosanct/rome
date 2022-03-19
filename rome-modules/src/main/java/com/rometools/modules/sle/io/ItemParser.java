@@ -34,7 +34,7 @@ import com.rometools.modules.sle.types.NumberValue;
 import com.rometools.modules.sle.types.Sort;
 import com.rometools.modules.sle.types.StringValue;
 import com.rometools.rome.feed.module.Module;
-import com.rometools.rome.io.impl.ChildNavigator;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.impl.DateParser;
 
 public class ItemParser extends ChildNavigator implements com.rometools.rome.io.ModuleParser {

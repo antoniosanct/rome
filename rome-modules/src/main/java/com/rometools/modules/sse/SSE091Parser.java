@@ -33,9 +33,9 @@ import com.rometools.modules.sse.modules.Sync;
 import com.rometools.modules.sse.modules.Update;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.rss.Item;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.DelegatingModuleParser;
 import com.rometools.rome.io.WireFeedParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 import com.rometools.rome.io.impl.DateParser;
 import com.rometools.rome.io.impl.RSS20Parser;
 

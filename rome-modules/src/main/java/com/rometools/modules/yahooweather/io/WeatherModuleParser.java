@@ -39,8 +39,8 @@ import com.rometools.modules.yahooweather.types.Location;
 import com.rometools.modules.yahooweather.types.Units;
 import com.rometools.modules.yahooweather.types.Wind;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 /**
  * ModuleParser implementation for Slash RSS.

@@ -28,8 +28,8 @@ import com.rometools.modules.sle.SimpleListExtension;
 import com.rometools.modules.sle.types.Group;
 import com.rometools.modules.sle.types.Sort;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class SleModuleGenerator extends ChildNavigator implements ModuleGenerator {
 

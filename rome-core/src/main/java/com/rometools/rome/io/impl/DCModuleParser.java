@@ -31,6 +31,7 @@ import com.rometools.rome.feed.module.DCModuleImpl;
 import com.rometools.rome.feed.module.DCSubject;
 import com.rometools.rome.feed.module.DCSubjectImpl;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 
 /**

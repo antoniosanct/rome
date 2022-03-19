@@ -94,9 +94,7 @@ public class EntryInformationImpl extends AbstractITunesObject implements EntryI
     public String getEpisodeType() { return episodeType; }
 
     /**
-     * Set the episode type to one of full (default), trailer or bonus. See see the <a href="http://podcasts.apple.com/resources/spec/ApplePodcastsSpecUpdatesiOS11.pdf">new spec by Apple</a> for details.
-     *
-     * @param episodeType
+     * {@inheritDoc}
      */
     @Override
     public void setEpisodeType(String episodeType) { this.episodeType = episodeType; }

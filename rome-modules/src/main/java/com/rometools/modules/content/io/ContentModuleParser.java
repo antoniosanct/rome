@@ -41,8 +41,8 @@ import org.w3c.dom.Element;
 import com.rometools.modules.content.ContentItem;
 import com.rometools.modules.content.ContentModule;
 import com.rometools.modules.content.ContentModuleImpl;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class ContentModuleParser extends ChildNavigator implements ModuleParser {
     private static final Namespace CONTENT_NS = XMLEventFactory.newDefaultFactory().createNamespace("content", ContentModule.URI);

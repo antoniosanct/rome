@@ -55,8 +55,8 @@ import com.rometools.modules.mediarss.types.Text;
 import com.rometools.modules.mediarss.types.Thumbnail;
 import com.rometools.modules.mediarss.types.UrlReference;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 /**
  * Generator for MediaRSS module.

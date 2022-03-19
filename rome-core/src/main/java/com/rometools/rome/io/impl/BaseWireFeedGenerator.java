@@ -31,6 +31,7 @@ import org.w3c.dom.NamedNodeMap;
 
 import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.WireFeedGenerator;
 
 public abstract class BaseWireFeedGenerator extends ChildNavigator implements WireFeedGenerator {

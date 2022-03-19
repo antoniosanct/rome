@@ -42,8 +42,8 @@ import com.rometools.modules.base.types.FloatUnit;
 import com.rometools.modules.base.types.IntUnit;
 import com.rometools.modules.base.types.ShortDate;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class CustomTagParser extends ChildNavigator implements ModuleParser {
 

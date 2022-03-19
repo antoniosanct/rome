@@ -30,8 +30,8 @@ import com.rometools.modules.cc.CreativeCommonsImpl;
 import com.rometools.modules.cc.types.License;
 import com.rometools.modules.cc.types.License.Behaviour;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class ModuleParserRSS1 extends ChildNavigator implements ModuleParser {
 

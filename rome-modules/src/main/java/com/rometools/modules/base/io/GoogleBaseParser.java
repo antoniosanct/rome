@@ -49,8 +49,8 @@ import com.rometools.modules.base.types.YearType;
 import com.rometools.rome.feed.impl.BeanIntrospector;
 import com.rometools.rome.feed.impl.PropertyDescriptor;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import com.rometools.rome.io.impl.ChildNavigator;
 
 public class GoogleBaseParser extends ChildNavigator implements ModuleParser {
 

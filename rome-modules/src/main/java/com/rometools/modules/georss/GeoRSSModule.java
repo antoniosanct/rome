@@ -112,7 +112,7 @@ public abstract class GeoRSSModule extends ModuleImpl implements Cloneable {
     /**
      * Set Feature Type tag of GeoRSS element
      *
-     * @param featureTypeTag
+     * @param featureTypeTag the featureTypeTag to set.
      */
     public void setFeatureTypeTag(String featureTypeTag) {
         this.featureTypeTag = featureTypeTag;
@@ -130,7 +130,7 @@ public abstract class GeoRSSModule extends ModuleImpl implements Cloneable {
     /**
      * Set Relationship tag of GeoRSS element
      *
-     * @param relationshipTag
+     * @param relationshipTag the relationshipTag to set.
      */
     public void setRelationshipTag(String relationshipTag) {
         this.relationshipTag = relationshipTag;
@@ -148,7 +148,7 @@ public abstract class GeoRSSModule extends ModuleImpl implements Cloneable {
     /**
      * Set Feature Name tag of GeoRSS element
      *
-     * @param featureNameTag
+     * @param featureNameTag the featureNameTag to set.
      */
     public void setFeatureNameTag(String featureNameTag) {
         this.featureNameTag = featureNameTag;
