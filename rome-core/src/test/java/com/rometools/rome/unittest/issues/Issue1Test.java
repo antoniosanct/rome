@@ -166,6 +166,6 @@ public class Issue1Test extends SyndFeedTest {
     	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
     	DocumentBuilder db = dbf.newDocumentBuilder();
     	db.setErrorHandler(new DefaultHandler());
-    	db.parse(new InputSource(getStream(garbish, xmlDoc)));
+    	assertNotNull(db.parse(new InputSource(getStream(garbish, xmlDoc))));
     }
 }

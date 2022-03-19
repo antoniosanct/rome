@@ -138,7 +138,7 @@ public abstract class SyndFeedTest extends FeedTest {
         return e.getLink();
     }
 
-    public void testEntryPublishedDate() throws Exception {
+    public void _testEntryPublishedDate() throws Exception {
         // this only works for RSS 0.93+
         // assertEquals(DateParser.parseRFC822("Mon, 01 Jan 2001 00:00:00 GMT"),
         // getEntryPublishedDate(getCachedSyndFeed().getEntries().get(0)));

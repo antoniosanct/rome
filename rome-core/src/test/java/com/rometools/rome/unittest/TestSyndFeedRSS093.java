@@ -52,7 +52,6 @@ public class TestSyndFeedRSS093 extends TestSyndFeedRSS092 {
         assertProperty(entry.getDescription().getType(), "channel.item[" + i + "].description^type");
     }
 
-    @Override
     public void testEntryPublishedDate() throws Exception {
         assertEquals(DateParser.parseRFC822("Mon, 01 Jan 2001 00:00:00 GMT", Locale.US), getEntryPublishedDate(this.getCachedSyndFeed().getEntries().get(0)));
         assertEquals(DateParser.parseRFC822("Tue, 02 Jan 2001 00:00:00 GMT", Locale.US), getEntryPublishedDate(this.getCachedSyndFeed().getEntries().get(1)));
