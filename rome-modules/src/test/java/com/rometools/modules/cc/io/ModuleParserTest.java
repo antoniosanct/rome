@@ -50,7 +50,7 @@ public class ModuleParserTest extends AbstractTestCase {
     }
 
     public void testNull() {
-        return;
+        assertNull(null);
     }
 
     public void atestParse() throws Exception {

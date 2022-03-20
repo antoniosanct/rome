@@ -22,6 +22,9 @@ package com.rometools.modules.content;
 import java.io.File;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.rometools.modules.AbstractTestCase;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -33,6 +36,8 @@ import com.rometools.rome.io.XmlReader;
  *
  */
 public class ContentModuleParserTest extends AbstractTestCase {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ContentModuleParserTest.class);
 	
 	/**
 	 * Public constructor
@@ -74,8 +79,9 @@ public class ContentModuleParserTest extends AbstractTestCase {
         final List<ContentItem> items = module.getContentItems();
 
         for (int i = 0; i < items.size(); i++) {
-            // final ContentItem item = ContentModuleImplTest.contentItems.get(i);
-            // assertEquals (item , items.get(i));
+        	LOG.debug("ContentModuleParserTest-testParse-{}", i);
+            final ContentItem item = ContentModuleImplTest.contentItems.get(i);
+            assertEquals (item , items.get(i));
         }
 
     }

@@ -198,4 +198,12 @@ public class ChildNavigator {
 		}
 		return result;
 	}
+	
+	protected String getAttributeNotBlank(final String name, final Element e, final Namespace n) {
+		String result = null;
+		if (null != e.getAttributeNS(n.getNamespaceURI(), name) && !"".equals(e.getAttributeNS(n.getNamespaceURI(), name))) {
+			result = e.getAttributeNS(n.getNamespaceURI(), name);
+		}
+		return result;
+	}
 }

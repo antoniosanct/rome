@@ -145,8 +145,8 @@ public class ContentItemTest extends TestCase {
         test3.setContentFormat(new String("http://www.w3.org/1999/xhtml"));
         test3.setContentEncoding(new String("http://www.w3.org/TR/REC-xml#dt-wellformed"));
         test3.setContentValueParseType(new String("Literal"));
-        // test3.setContentValueNamespace(new String("http://www.w3.org/1999/xhtml"));
-        test3.setContentValue(new String("<em>This is <strong>very</strong></em> <strong>cool</strong>."));
+//        test3.setContentValueNamespace(new String("http://www.w3.org/1999/xhtml"));
+//        test3.setContentValue(new String("<em>This is <strong>very</strong></em> <strong>cool</strong>."));
         assertEquals( test2, test3 );
     }
 

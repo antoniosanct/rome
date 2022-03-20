@@ -24,6 +24,9 @@ import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
 
+import com.rometools.rome.feed.impl.ToStringBean;
+import com.rometools.utils.DOMNodes;
+
 /**
  * This class represents a content item per the "Original Syntax".
  * http://purl.org/rss/1.0/modules/content/
@@ -33,7 +36,7 @@ public class ContentItem implements Cloneable {
     private String contentFormat;
     private String contentEncoding;
     private String contentValue;
-    private List<Element> contentValueDOM;
+    private Element contentValueDOM;
     private String contentAbout;
     private String contentValueParseType;
     private List<Namespace> contentValueNamespace;
@@ -66,11 +69,11 @@ public class ContentItem implements Cloneable {
         this.contentValue = contentValue;
     }
 
-    public List<Element> getContentValueDOM() {
+    public Element getContentValueDOM() {
         return contentValueDOM;
     }
 
-    public void setContentValueDOM(final List<Element> contentValueDOM) {
+    public void setContentValueDOM(final Element contentValueDOM) {
         this.contentValueDOM = contentValueDOM;
     }
 
@@ -111,7 +114,7 @@ public class ContentItem implements Cloneable {
     @Override
 	public int hashCode() {
 		return Objects.hash(contentAbout, contentEncoding, contentFormat, contentResource, contentValue,
-				contentValueDOM, contentValueNamespace, contentValueParseType);
+				contentValueNamespace, contentValueParseType);
 	}
 
 	@Override
@@ -123,14 +126,18 @@ public class ContentItem implements Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		ContentItem other = (ContentItem) obj;
-		final String thisCV = contentValue.replaceAll(" xmlns=\"http://www.w3.org/1999/xhtml\"", "").trim();
-        final String thatCV = other.contentValue.replaceAll(" xmlns=\"http://www.w3.org/1999/xhtml\"", "").trim();
+		String thisCV = null;
+		String thatCV = null;
+		if (null != contentValue && null != other.contentValue) {
+			thisCV = contentValue.replaceAll(" xmlns=\"http://www.w3.org/1999/xhtml\"", "").trim();
+	        thatCV = other.contentValue.replaceAll(" xmlns=\"http://www.w3.org/1999/xhtml\"", "").trim();
+		}
 		return Objects.equals(contentAbout, other.contentAbout)
 				&& Objects.equals(contentEncoding, other.contentEncoding)
 				&& Objects.equals(contentFormat, other.contentFormat)
 				&& Objects.equals(contentResource, other.contentResource)
 				&& Objects.equals(thisCV, thatCV)
-				&& Objects.equals(contentValueDOM, other.contentValueDOM)
+				&& DOMNodes.compareNodes(contentValueDOM, other.contentValueDOM)
 				&& Objects.equals(contentValueNamespace, other.contentValueNamespace)
 				&& Objects.equals(contentValueParseType, other.contentValueParseType);
 	}
@@ -149,4 +156,11 @@ public class ContentItem implements Cloneable {
 
         return o;
     }
+
+	@Override
+	public String toString() {
+		return ToStringBean.toString(ContentItem.class, this);
+	}
+	
+	
 }
