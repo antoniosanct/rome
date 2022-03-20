@@ -27,7 +27,7 @@
         <content:format rdf:resource="http://www.w3.org/1999/xhtml" />
         <content:encoding rdf:resource="http://www.w3.org/TR/REC-xml#dt-wellformed" />
         <rdf:value rdf:parseType="Literal" xmlns="http://www.w3.org/1999/xhtml">
-          <em>Altered This is <strong>very</strong></em> <strong>cool</strong>.
+          <em>This is <strong>very</strong></em> <strong>cool</strong>.
         </rdf:value>
       </content:item></rdf:li>
       

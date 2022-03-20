@@ -104,7 +104,7 @@ public class ContentModuleGenerator implements ModuleGenerator {
 
                 if (contentItem.getContentFormat() != null) {
                     final Element format = element.getOwnerDocument().createElementNS(CONTENT_NS.getNamespaceURI(), "format");
-                    li.setPrefix(CONTENT_NS.getPrefix());
+                    format.setPrefix(CONTENT_NS.getPrefix());
                     format.setAttributeNS(RDF_NS.getNamespaceURI(), "resource", contentItem.getContentFormat());
                     item.appendChild(format);
                 }
@@ -116,7 +116,10 @@ public class ContentModuleGenerator implements ModuleGenerator {
                     item.appendChild(encoding);
                 }
 
-                if (contentItem.getContentValue() != null) {
+                if (null != contentItem.getContentValueDOM()) {
+                	Node newN = element.getOwnerDocument().adoptNode(contentItem.getContentValueDOM().cloneNode(true));
+                	item.appendChild(newN);
+                } else {
                     final Element value = element.getOwnerDocument().createElementNS(RDF_NS.getNamespaceURI(), "value");
                     value.setPrefix(RDF_NS.getPrefix());
                     
@@ -128,22 +131,10 @@ public class ContentModuleGenerator implements ModuleGenerator {
                         final List<Namespace> namespaces = contentItem.getContentValueNamespaces();
 
                         for (int ni = 0; ni < namespaces.size(); ni++) {
-//                            value.addNamespaceDeclaration(namespaces.get(ni));
                         	value.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + namespaces.get(ni).getPrefix(), namespaces.get(ni).getNamespaceURI());
                         }
                     }
-
-//                    final List<Content> detached = new ArrayList<Content>();
-//
-//                    for (int c = 0; c < contentItem.getContentValueDOM().size(); c++) {
-//                        detached.add(contentItem.getContentValueDOM().get(c).clone().detach());
-//                    }
-//
-//                    value.setContent(detached);
-                    for (Element e : contentItem.getContentValueDOM()) {
-                    	Node newN = element.getOwnerDocument().adoptNode(e.cloneNode(true));
-                    	value.appendChild(newN);
-                    }
+                	value.setTextContent(contentItem.getContentValue());
                     item.appendChild(value);
                 } // end value
 

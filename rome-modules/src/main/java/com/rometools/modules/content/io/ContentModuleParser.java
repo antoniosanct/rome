@@ -17,21 +17,12 @@
  */
 package com.rometools.modules.content.io;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +34,7 @@ import com.rometools.modules.content.ContentModule;
 import com.rometools.modules.content.ContentModuleImpl;
 import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
+import com.rometools.utils.DOMNodes;
 
 public class ContentModuleParser extends ChildNavigator implements ModuleParser {
     private static final Namespace CONTENT_NS = XMLEventFactory.newDefaultFactory().createNamespace("content", ContentModule.URI);
@@ -92,20 +84,20 @@ public class ContentModuleParser extends ChildNavigator implements ModuleParser 
                 final Element value = super.getChild(item, "value", RDF_NS);
 
                 if (value != null) {
-                    if (value.getAttributeNS(RDF_NS.getNamespaceURI(), "parseType") != null) {
-                        ci.setContentValueParseType(value.getAttributeNS(RDF_NS.getNamespaceURI(), "parseType"));
+                    if (super.getAttributeNotBlank("parseType", value, RDF_NS) != null) {
+                        ci.setContentValueParseType(super.getAttributeNotBlank("parseType", value, RDF_NS));
                     }
 
                     if (ci.getContentValueParseType() != null && ci.getContentValueParseType().equals("Literal")) {
-                        ci.setContentValue(getXmlInnerText(value));
-                        contentStrings.add(getXmlInnerText(value));
+                		ci.setContentValue(getXmlInnerText(value));
+                		contentStrings.add(getXmlInnerText(value));
 //                        ci.setContentValueNamespaces(value.getAdditionalNamespaces());
                     } else {
                         ci.setContentValue(value.getTextContent());
                         contentStrings.add(value.getTextContent());
                     }
 
-                    ci.setContentValueDOM(super.getChildren(value));
+                    ci.setContentValueDOM(value);
                 }
 
                 if (format != null) {
@@ -135,22 +127,13 @@ public class ContentModuleParser extends ChildNavigator implements ModuleParser 
         return foundSomething ? cm : null;
     }
 
-    protected String getXmlInnerText(final Element e) {
-        String result = null;
-		try {
-			TransformerFactory tf = TransformerFactory.newInstance();
-			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-			Transformer t = tf.newTransformer();
-			t.setOutputProperty(OutputKeys.METHOD, "xml");
-			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-	        StreamResult sr = new StreamResult(new StringWriter());
-	        DOMSource source = new DOMSource(e);
-	        t.transform(source, sr);
-	        result = sr.getWriter().toString();
-		} catch (TransformerException | TransformerFactoryConfigurationError te) {
-			LOG.warn("Unable to get XML inner type on " + e, te);
-		}
-		return result;
+    private String getXmlInnerText(Element e) {
+    	StringBuilder sb = new StringBuilder();
+    	for (int i = 0; i < e.getChildNodes().getLength(); i++) {
+    		sb.append(DOMNodes.nodeToString(e.getChildNodes().item(i)));
+    	}
+    	return sb.toString();
+    	
     }
+    
 }

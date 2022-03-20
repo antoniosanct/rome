@@ -56,6 +56,8 @@ public class ContentModuleGeneratorTest extends AbstractTestCase {
 
     /**
      * Test of generate method, of class com.totsp.xml.syndication.content.ContentModuleGenerator.
+     * 
+     * @throws Exception any exception thrown.
      */
     public void testGenerate() throws Exception {
 
@@ -66,10 +68,8 @@ public class ContentModuleGeneratorTest extends AbstractTestCase {
         final SyndEntry entry = feed.getEntries().get(0);
         entry.getModule(ContentModule.URI);
         final SyndFeedOutput output = new SyndFeedOutput();
-        final StringWriter writer = new StringWriter();
-        output.output(feed, writer);
-
-        LOG.debug("{}", writer);
-
+        output.output(feed, new File("target/test-rdf-testGenerate.xml"));
+        final SyndFeed feed2 = input.build(new File("target/test-rdf-testGenerate.xml"));
+//        assertEquals(feed, feed2);
     }
 }
