@@ -89,8 +89,9 @@ public class RSS090Generator extends BaseWireFeedGenerator {
 
     protected Element createRootElement(final Channel channel, final Document doc) {
         final Element root = doc.createElementNS(getRDFNamespace().getNamespaceURI(), "RDF");
+        root.setPrefix(getRDFNamespace().getPrefix());
 //        root.addNamespaceDeclaration(getFeedNamespace());
-//        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + getFeedNamespace().getPrefix(), getFeedNamespace().getNamespaceURI());
+        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns", getFeedNamespace().getNamespaceURI());
 //        root.addNamespaceDeclaration(getRDFNamespace());
         root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + getRDFNamespace().getPrefix(), getRDFNamespace().getNamespaceURI());
 //        root.addNamespaceDeclaration(getContentNamespace());
@@ -104,11 +105,12 @@ public class RSS090Generator extends BaseWireFeedGenerator {
         addImage(channel, parent);
         addTextInput(channel, parent);
         addItems(channel, parent);
-        generateForeignMarkup(parent, channel.getForeignMarkup(), parent);
+        generateForeignMarkup(parent, channel.getForeignMarkup(), null);
     }
 
     protected void addChannel(final Channel channel, final Element parent) throws FeedException {
         final Element eChannel = parent.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "channel");
+        eChannel.setPrefix(getFeedNamespace().getPrefix());
         populateChannel(channel, eChannel);
         checkChannelConstraints(eChannel);
         parent.appendChild(eChannel);
@@ -163,6 +165,7 @@ public class RSS090Generator extends BaseWireFeedGenerator {
         final Image image = channel.getImage();
         if (image != null) {
             final Element eImage = parent.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "image");
+            eImage.setPrefix(getFeedNamespace().getPrefix());
             populateImage(image, eImage);
             checkImageConstraints(eImage);
             parent.appendChild(eImage);
@@ -193,6 +196,7 @@ public class RSS090Generator extends BaseWireFeedGenerator {
         final TextInput textInput = channel.getTextInput();
         if (textInput != null) {
             final Element eTextInput = parent.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), getTextInputLabel());
+            eTextInput.setPrefix(getFeedNamespace().getPrefix());
             populateTextInput(textInput, eTextInput);
             checkTextInputConstraints(eTextInput);
             parent.appendChild(eTextInput);
@@ -228,6 +232,7 @@ public class RSS090Generator extends BaseWireFeedGenerator {
 
     protected void addItem(final Item item, final Element parent, final int index) throws FeedException {
         final Element eItem = parent.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "item");
+        eItem.setPrefix(getFeedNamespace().getPrefix());
         populateItem(item, eItem, index, parent);
         checkItemConstraints(eItem);
         generateItemModules(item.getModules(), eItem);
@@ -248,6 +253,7 @@ public class RSS090Generator extends BaseWireFeedGenerator {
 
     protected Element generateSimpleElement(final String name, final String value, final Element e) {
         final Element element = e.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), name);
+        element.setPrefix(getFeedNamespace().getPrefix());
         element.setTextContent(value);
         return element;
     }
@@ -272,7 +278,7 @@ public class RSS090Generator extends BaseWireFeedGenerator {
     }
 
     protected void checkItemsConstraints(final Element parent) throws FeedException {
-    	final List<Element> nodeItems = super.getChildren(parent, "item");
+    	final List<Element> nodeItems = super.getChildren(parent, "item", getFeedNamespace());
     	if (null == nodeItems || nodeItems.size() < 1 || nodeItems.size() > 15) {
     		final int count = (null == nodeItems ? 0 : nodeItems.size());
             throw new FeedException("Invalid " + getType() + " feed, item count is " + count + " it must be between 1 an 15");

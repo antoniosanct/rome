@@ -151,7 +151,8 @@ public abstract class BaseWireFeedGenerator extends ChildNavigator implements Wi
 
         for (final Namespace ns : additionalNamespaces) {
             final String prefix = ns.getPrefix();
-            if (prefix != null && prefix.length() > 0 && !usedPrefixes.contains(prefix)) {
+            if (prefix != null && prefix.length() > 0 && !usedPrefixes.contains(prefix) &&
+            		!"xmlns".equals(prefix)) {
                 root.removeAttribute(String.join(":", XMLConstants.XMLNS_ATTRIBUTE, prefix));
             }
         }

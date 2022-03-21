@@ -48,7 +48,7 @@ public class ModuleParserRSS2 extends ChildNavigator implements ModuleParser {
             while (!root.getLocalName().equals("channel") && !root.getLocalName().equals("feed")) {
                 root = (Element) root.getParentNode();
             }
-            final ArrayList<License> licenses = new ArrayList<License>();
+            final List<License> licenses = new ArrayList<>(1);
             List<Element> items = null;
             if (root.getLocalName().equals("channel")) {
                 items = super.getChildren(root, "item");
@@ -75,7 +75,7 @@ public class ModuleParserRSS2 extends ChildNavigator implements ModuleParser {
             }
         }
         // do element local
-        final ArrayList<License> licenses = new ArrayList<License>();
+        final List<License> licenses = new ArrayList<License>(1);
         final List<Element> licenseTags = super.getChildren(element, "license", NS);
         final Iterator<Element> it = licenseTags.iterator();
         while (it.hasNext()) {

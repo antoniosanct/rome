@@ -18,6 +18,8 @@ package com.rometools.modules.itunes;
 
 import java.net.URL;
 
+import com.rometools.rome.feed.impl.EqualsBean;
+
 /**
  * This is an abstract object that implements the attributes common across Feeds or Items in an
  * iTunes compatible RSS feed.
@@ -261,4 +263,17 @@ public abstract class AbstractITunesObject implements ITunes, java.lang.Cloneabl
 
         return sb.toString();
     }
+    
+    @Override
+	public int hashCode() {
+		return EqualsBean.beanHashCode(this);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof AbstractITunesObject)) {
+            return false;
+        }
+        return EqualsBean.beanEquals(this.getClass(), this, other);
+	}
 }

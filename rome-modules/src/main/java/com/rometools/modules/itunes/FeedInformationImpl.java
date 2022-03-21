@@ -20,12 +20,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rometools.modules.itunes.types.Category;
 import com.rometools.rome.feed.CopyFrom;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
+import com.rometools.rome.feed.impl.EqualsBean;
 
 /**
  * This class contains information for iTunes podcast feeds that exist at the Channel level.
@@ -218,4 +221,19 @@ public class FeedInformationImpl extends AbstractITunesObject implements FeedInf
 
         return sb.toString();
     }
+
+	@Override
+	public int hashCode() {
+		return EqualsBean.beanHashCode(this);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof FeedInformationImpl)) {
+            return false;
+        }
+        return EqualsBean.beanEquals(this.getClass(), this, other);
+	}
+    
+    
 }

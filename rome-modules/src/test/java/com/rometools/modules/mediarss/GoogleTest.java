@@ -49,7 +49,7 @@ public class GoogleTest extends AbstractTestCase {
         for (final Object element : feed.getEntries()) {
             final SyndEntry entry = (SyndEntry) element;
             final MediaEntryModule m = (MediaEntryModule) entry.getModule(MediaModule.URI);
-            System.out.print(m);
+            assertNotNull(m);
         }
     }
 

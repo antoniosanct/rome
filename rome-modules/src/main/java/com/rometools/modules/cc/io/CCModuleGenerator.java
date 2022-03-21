@@ -34,8 +34,6 @@ import com.rometools.rome.io.ModuleGenerator;
 
 public class CCModuleGenerator implements ModuleGenerator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CCModuleGenerator.class);
-
     private static final Namespace RSS1 = XMLEventFactory.newDefaultFactory().createNamespace("cc", CreativeCommonsImpl.RSS1_URI);
     private static final Namespace RSS2 = XMLEventFactory.newDefaultFactory().createNamespace("creativeCommons", CreativeCommonsImpl.RSS2_URI);
     private static final Namespace RSS = XMLEventFactory.newDefaultFactory().createNamespace("http://purl.org/rss/1.0/");
@@ -84,29 +82,27 @@ public class CCModuleGenerator implements ModuleGenerator {
     private void generateRSS1(final CreativeCommons module, final Element element) {
         // throw new RuntimeException( "Generating RSS1 Feeds not currently Supported.");
 
-        LOG.debug(element.getLocalName());
         if (element.getLocalName().equals("channel")) {
             // Do all licenses list.
             final License[] all = module.getAllLicenses();
-            for (final License element2 : all) {
+            for (int i = 0; all != null && i < all.length; i++) {
                 final Element license = element.getOwnerDocument().createElementNS(RSS1.getNamespaceURI(), "License");
                 license.setPrefix(RSS1.getPrefix());
-                license.setAttributeNS(RDF.getNamespaceURI(), "about", element2.getValue());
-                final License.Behaviour[] permits = element2.getPermits();
+                license.setAttributeNS(RDF.getNamespaceURI(), "about", all[i].getValue());
+                final License.Behaviour[] permits = all[i].getPermits();
                 for (int j = 0; permits != null && j < permits.length; j++) {
                     final Element permit = element.getOwnerDocument().createElementNS(RSS1.getNamespaceURI(), "permits");
                     permit.setPrefix(RSS1.getPrefix());
                     permit.setAttributeNS(RDF.getNamespaceURI(), "resource", permits[j].toString());
                     license.appendChild(permit);
                 }
-                final License.Behaviour[] requires = element2.getRequires();
+                final License.Behaviour[] requires = all[i].getRequires();
                 for (int j = 0; requires != null && j < requires.length; j++) {
                     final Element require = element.getOwnerDocument().createElementNS(RSS1.getNamespaceURI(), "requires");
                     require.setPrefix(RSS1.getPrefix());
                     require.setAttributeNS(RDF.getNamespaceURI(), "resource", requires[j].toString());
                     license.appendChild(require);
                 }
-                LOG.debug("Is Root? {}", element.getParentNode());
                 element.getParentNode().appendChild(license);
             }
         }

@@ -20,7 +20,6 @@
 package com.rometools.modules.content;
 
 import java.io.File;
-import java.io.StringWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +69,8 @@ public class ContentModuleGeneratorTest extends AbstractTestCase {
         final SyndFeedOutput output = new SyndFeedOutput();
         output.output(feed, new File("target/test-rdf-testGenerate.xml"));
         final SyndFeed feed2 = input.build(new File("target/test-rdf-testGenerate.xml"));
-//        assertEquals(feed, feed2);
+        final SyndEntry entry2 = feed2.getEntries().get(0);
+        final ContentModule cm2 = (ContentModule) entry2.getModule(ContentModule.URI);
+        assertNotNull(cm2);
     }
 }
