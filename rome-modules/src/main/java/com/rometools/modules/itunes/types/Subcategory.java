@@ -18,6 +18,8 @@ package com.rometools.modules.itunes.types;
 
 import java.io.Serializable;
 
+import com.rometools.rome.feed.impl.EqualsBean;
+
 /**
  * This class represents a Subcategor of a Category.
  */
@@ -77,5 +79,18 @@ public class Subcategory implements Serializable {
     @Override
     public String toString() {
         return new StringBuffer(getName()).toString();
+    }
+    
+    @Override
+    public int hashCode() {
+        return EqualsBean.beanHashCode(this);
+    }
+
+	@Override
+    public boolean equals(final Object other) {
+        if (!(other instanceof Subcategory)) {
+            return false;
+        }
+        return EqualsBean.beanEquals(this.getClass(), this, other);
     }
 }

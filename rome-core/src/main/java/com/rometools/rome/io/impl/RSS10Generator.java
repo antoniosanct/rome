@@ -63,10 +63,12 @@ public class RSS10Generator extends RSS090Generator {
         final List<Item> items = channel.getItems();
         if (!items.isEmpty()) {
             final Element eItems = eChannel.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "items");
+            eItems.setPrefix(getFeedNamespace().getPrefix());
             final Element eSeq = eChannel.getOwnerDocument().createElementNS(getRDFNamespace().getNamespaceURI(), "Seq");
             eSeq.setPrefix(getRDFNamespace().getPrefix());
             for (final Item item : items) {
                 final Element lis = eChannel.getOwnerDocument().createElementNS(getRDFNamespace().getNamespaceURI(), "li");
+                lis.setPrefix(getRDFNamespace().getPrefix());
                 final String uri = item.getUri();
                 if (uri != null) {
                     lis.setAttributeNS(getRDFNamespace().getNamespaceURI(), "resource", uri);

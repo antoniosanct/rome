@@ -99,7 +99,8 @@ public class GroupAndSortTest extends AbstractTestCase {
         final SyndFeedInput input = new SyndFeedInput();
         final SyndFeed feed = input.build(new File(super.getTestFile("data/YahooTopSongs.xml")));
         final SimpleListExtension sle = (SimpleListExtension) feed.getModule(SimpleListExtension.URI);
-
+        assertNotNull(sle);
+        
         final List<Extendable> entries = new ArrayList<Extendable>(feed.getEntries());
         final List<Extendable> sortedEntries = SleUtility.sort(entries, sle.getSortFields()[0], true);
         for (int i = 0; i < sortedEntries.size(); i++) {
@@ -112,7 +113,7 @@ public class GroupAndSortTest extends AbstractTestCase {
     /**
      * Test of group method, of class com.rometools.rome.feed.module.sle.GroupAndSort.
      */
-    public void testGroup() {
+    public void _testGroup() {
         // TODO add your test code.
     }
 

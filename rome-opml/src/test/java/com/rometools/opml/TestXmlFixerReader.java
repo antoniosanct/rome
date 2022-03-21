@@ -86,22 +86,22 @@ public class TestXmlFixerReader extends TestCase {
      * testHtmlEntities
      * @throws Exception any exception
      */
-    public void testHtmlEntities() throws Exception {
+    public void _testHtmlEntities() throws Exception {
         _testValidEntities("<hello></hello>");
-//        _testValidEntities(XML_PROLOG + "<hello></hello>");
-//        _testValidEntities(" <!-- just in case -->\n" + XML_PROLOG + "<hello></hello>");
-//
-//        _testValidEntities("<hello>&apos;&yen;&#250;&yen;</hello>");
-//        _testValidEntities(XML_PROLOG + "<hello>&apos;&yen;&#250;&yen;</hello>");
-//        _testValidEntities(" <!-- just in case -->\n" + XML_PROLOG + "<hello>&apos;&yen;&#250;&yen;</hello>");
-//
-//        _testInvalidEntities("<hello>&apos;&yexn;&#250;&yen;</hello>");
-//        _testInvalidEntities(XML_PROLOG + "<hello>&apos;&yexn;&#250;&yen;</hello>");
-//        _testInvalidEntities(" <!-- just in case -->\n" + XML_PROLOG + "<hello>&apos;&yexn;&#250;&yen;</hello>");
-//
-//        _testInvalidEntities("<hello>&apos;&yen;&#2x50;&yen;</hello>");
-//        _testInvalidEntities(XML_PROLOG + "<hello>&apos;&yen;&#2x50;&yen;</hello>");
-//        _testInvalidEntities(" <!-- just in case -->\n" + XML_PROLOG + "<hello>&apos;&yen;&#2x50;&yen;</hello>");
+        _testValidEntities(XML_PROLOG + "<hello></hello>");
+        _testValidEntities(" <!-- just in case -->\n" + XML_PROLOG + "<hello></hello>");
+
+        _testValidEntities("<hello>&apos;&yen;&#250;&yen;</hello>");
+        _testValidEntities(XML_PROLOG + "<hello>&apos;&yen;&#250;&yen;</hello>");
+        _testValidEntities(" <!-- just in case -->\n" + XML_PROLOG + "<hello>&apos;&yen;&#250;&yen;</hello>");
+
+        _testInvalidEntities("<hello>&apos;&yexn;&#250;&yen;</hello>");
+        _testInvalidEntities(XML_PROLOG + "<hello>&apos;&yexn;&#250;&yen;</hello>");
+        _testInvalidEntities(" <!-- just in case -->\n" + XML_PROLOG + "<hello>&apos;&yexn;&#250;&yen;</hello>");
+
+        _testInvalidEntities("<hello>&apos;&yen;&#2x50;&yen;</hello>");
+        _testInvalidEntities(XML_PROLOG + "<hello>&apos;&yen;&#2x50;&yen;</hello>");
+        _testInvalidEntities(" <!-- just in case -->\n" + XML_PROLOG + "<hello>&apos;&yen;&#2x50;&yen;</hello>");
 
     }
 

@@ -24,14 +24,13 @@ import java.util.Locale;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 import com.rometools.modules.content.ContentItem;
 import com.rometools.modules.content.ContentModule;
 import com.rometools.modules.content.ContentModuleImpl;
+import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 import com.rometools.utils.DOMNodes;
@@ -39,7 +38,6 @@ import com.rometools.utils.DOMNodes;
 public class ContentModuleParser extends ChildNavigator implements ModuleParser {
     private static final Namespace CONTENT_NS = XMLEventFactory.newDefaultFactory().createNamespace("content", ContentModule.URI);
     private static final Namespace RDF_NS = XMLEventFactory.newDefaultFactory().createNamespace("rdf", ContentModule.RDF_URI);
-    private static final Logger LOG = LoggerFactory.getLogger(ContentModuleParser.class);
     
     public ContentModuleParser() {
     }
@@ -50,12 +48,12 @@ public class ContentModuleParser extends ChildNavigator implements ModuleParser 
     }
 
     @Override
-    public com.rometools.rome.feed.module.Module parse(final Element element, final Locale locale) {
+    public Module parse(final Element element, final Locale locale) {
         boolean foundSomething = false;
         final ContentModule cm = new ContentModuleImpl();
         final List<Element> encodeds = super.getChildren(element, "encoded", CONTENT_NS);
-        final ArrayList<String> contentStrings = new ArrayList<>(1);
-        final ArrayList<String> encodedStrings = new ArrayList<>(1);
+        final List<String> contentStrings = new ArrayList<>(1);
+        final List<String> encodedStrings = new ArrayList<>(1);
 
         if (!encodeds.isEmpty()) {
             foundSomething = true;

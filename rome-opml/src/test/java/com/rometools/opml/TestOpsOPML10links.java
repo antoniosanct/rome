@@ -23,8 +23,9 @@ package com.rometools.opml;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 
-import com.rometools.opml.test.NullWriter;
 import com.rometools.opml.test.TestUtil;
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -77,7 +78,10 @@ public class TestOpsOPML10links extends FeedOpsTest {
         sf.setDescription("");
         sf.setLink("http://foo.com");
         sf.setFeedType("opml_1.0");
-        output.output(sf.createWireFeed(), new NullWriter());
+        StringWriter sw = new StringWriter();
+        output.output(sf.createWireFeed(), sw);
+        WireFeed wf2 = input.build(new StringReader(sw.toString()));
+        assertEquals(sf.getFeedType(), wf2.getFeedType());
     }
 
 }

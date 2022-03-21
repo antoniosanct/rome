@@ -255,7 +255,7 @@ public class WireFeedOutput {
 			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 			Transformer t = tf.newTransformer();
 			t.setOutputProperty(OutputKeys.METHOD, "xml");
-			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+//			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			if (prettyPrint) {
 		        t.setOutputProperty(OutputKeys.INDENT, "yes");
 		        t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");

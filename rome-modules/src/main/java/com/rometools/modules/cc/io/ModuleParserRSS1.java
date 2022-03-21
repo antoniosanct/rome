@@ -51,7 +51,7 @@ public class ModuleParserRSS1 extends ChildNavigator implements ModuleParser {
 //                root = (Element) root.getParentNode();
 //            }
             final List<Element> licenseList = super.getChildren(root, "License", NS);
-            final ArrayList<License> licenses = new ArrayList<License>();
+            final List<License> licenses = new ArrayList<>(1);
             final Iterator<Element> it = licenseList.iterator();
             while (it.hasNext()) {
                 final Element licenseTag = it.next();
@@ -84,7 +84,7 @@ public class ModuleParserRSS1 extends ChildNavigator implements ModuleParser {
             }
             module.setAllLicenses(licenses.toArray(new License[0]));
         }
-        final ArrayList<License> licenses = new ArrayList<License>();
+        final List<License> licenses = new ArrayList<>(1);
         final List<Element> licenseTags = super.getChildren(element, "license", NS);
         final Iterator<Element> lit = licenseTags.iterator();
         while (lit.hasNext()) {

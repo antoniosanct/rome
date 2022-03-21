@@ -16,6 +16,8 @@
  */
 package com.rometools.modules.itunes.types;
 
+import com.rometools.rome.feed.WireFeedForeignMarkup;
+import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.utils.Lists;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -120,4 +122,19 @@ public class Category implements Serializable {
 
         return sb.toString();
     }
+    
+    @Override
+    public int hashCode() {
+        return EqualsBean.beanHashCode(this);
+    }
+
+	@Override
+    public boolean equals(final Object other) {
+        if (!(other instanceof Category)) {
+            return false;
+        }
+        return EqualsBean.beanEquals(this.getClass(), this, other);
+    }
+    
+    
 }
