@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * Polygon, a surface object bounded by one external ring and zero or more internal rings
  */
-public final class Polygon extends AbstractSurface implements Cloneable {
+public final class Polygon extends AbstractSurface {
 
     private static final long serialVersionUID = 1L;
     private AbstractRing exterior;

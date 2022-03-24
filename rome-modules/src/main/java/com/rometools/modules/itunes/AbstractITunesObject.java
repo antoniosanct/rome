@@ -24,7 +24,7 @@ import com.rometools.rome.feed.impl.EqualsBean;
  * This is an abstract object that implements the attributes common across Feeds or Items in an
  * iTunes compatible RSS feed.
  */
-public abstract class AbstractITunesObject implements ITunes, java.lang.Cloneable {
+public abstract class AbstractITunesObject implements ITunes {
 
     private static final long serialVersionUID = 1L;
 
