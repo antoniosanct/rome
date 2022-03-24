@@ -20,14 +20,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rometools.modules.itunes.types.Category;
 import com.rometools.rome.feed.CopyFrom;
-import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.impl.EqualsBean;
 
 /**

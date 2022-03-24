@@ -22,9 +22,6 @@ package com.rometools.modules.cc.io;
 
 import java.io.File;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +31,9 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.SyndFeedOutput;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class CCModuleGeneratorTest extends AbstractTestCase {
 
@@ -70,13 +70,14 @@ public class CCModuleGeneratorTest extends AbstractTestCase {
             assertEquals(feed.getFeedType(), feed2.getFeedType());
             for (int i = 0; i < feed.getEntries().size(); i++) {
             	final SyndEntry entry = feed.getEntries().get(i);
-            	final CreativeCommons base = (CreativeCommons) entry.getModule(CreativeCommons.URI);
+//            	final CreativeCommons base = (CreativeCommons) entry.getModule(CreativeCommons.URI);
+            	entry.getModule(CreativeCommons.URI);
                 final SyndEntry entry2 = feed2.getEntries().get(i);
-                final CreativeCommons base2 = (CreativeCommons) entry2.getModule(CreativeCommons.URI);
+//                final CreativeCommons base2 = (CreativeCommons) entry2.getModule(CreativeCommons.URI);
+                entry2.getModule(CreativeCommons.URI);
 //                assertEquals(base, base2);
             }
         }
 
     }
-
 }

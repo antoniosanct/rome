@@ -112,9 +112,13 @@ public class ConverterForAtom10 implements Converter {
             syndFeed.setDescriptionEx(c);
         }
 
-        // use first alternate links as THE link
+        // use first alternate link as THE link
+        // Set the first "self" link as LINK
+        syndFeed.setLink(aFeed.getOtherLinks().stream().filter(
+        		l -> "self".equals(l.getRel())).findFirst().map(Link::getHrefResolved).orElse(null));
+        
         final List<Link> alternateLinks = aFeed.getAlternateLinks();
-        if (Lists.isNotEmpty(alternateLinks)) {
+        if (Lists.isNotEmpty(alternateLinks) && null == syndFeed.getLink()) {
             final Link theLink = alternateLinks.get(0);
             syndFeed.setLink(theLink.getHrefResolved());
         }

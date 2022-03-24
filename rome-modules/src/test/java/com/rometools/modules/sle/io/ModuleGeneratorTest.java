@@ -29,7 +29,6 @@ import com.rometools.modules.AbstractTestCase;
 import com.rometools.modules.sle.SimpleListExtension;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.io.ModuleGenerator;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.XmlReader;

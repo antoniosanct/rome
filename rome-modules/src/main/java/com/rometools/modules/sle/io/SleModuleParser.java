@@ -88,7 +88,7 @@ public class SleModuleParser extends ChildNavigator implements ModuleParser {
         values = values.size() == 0 ? values : new ArrayList<Object>();
 
         for (final Element se : super.getChildren(listInfo, "sort", NS)) {
-            LOG.debug("Parse cf:sort {}{}", se.getAttribute("element"), se.getAttribute("data-type"));
+            LOG.debug("Parse cf:sort {} {}", se.getAttribute("element"), se.getAttribute("data-type"));
             final String nsUri = se.getAttribute("ns") == null ? element.getNamespaceURI() : se.getAttribute("ns");
             final Namespace ns = XMLEventFactory.newDefaultFactory().createNamespace(nsUri);
             final String elementName = se.getAttribute("element");
