@@ -91,7 +91,7 @@ public class GoogleBaseParser extends ChildNavigator implements ModuleParser {
                 final String tagName = GoogleBaseParser.PROPS2TAGS.getProperty(pd.getName());
 
                 if (tagName == null) {
-                    LOG.debug("Property: {} doesn't have a tag mapping.", pd.getName());
+//                    LOG.debug("Property: {} doesn't have a tag mapping.", pd.getName());
                 } else {
                     tag2pd.put(tagName, pd);
                 }

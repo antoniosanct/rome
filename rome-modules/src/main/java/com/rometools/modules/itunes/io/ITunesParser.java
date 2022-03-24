@@ -130,7 +130,8 @@ public class ITunesParser extends ChildNavigator implements ModuleParser {
 
             final Element duration = super.getChild(element, "duration", ns);
 
-            if (duration != null && duration.getTextContent() != null) {
+            if (duration != null && duration.getTextContent() != null &&
+            		!"".equals(duration.getTextContent().trim())) {
                 try {
                     final Duration dur = new Duration(duration.getTextContent().trim());
                     entryInfo.setDuration(dur);
@@ -245,7 +246,7 @@ public class ITunesParser extends ChildNavigator implements ModuleParser {
 
             final Element image = super.getChild(element, "image", ns);
 
-            if (image != null && image.getAttribute("href") != null) {
+            if (image != null && super.getAttributeNotBlank("href", image) != null) {
                 try {
                     final URL imageURL = new URL(image.getAttribute("href").trim());
                     module.setImage(imageURL);

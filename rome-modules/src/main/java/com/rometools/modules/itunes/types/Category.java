@@ -16,12 +16,12 @@
  */
 package com.rometools.modules.itunes.types;
 
-import com.rometools.rome.feed.WireFeedForeignMarkup;
-import com.rometools.rome.feed.impl.EqualsBean;
-import com.rometools.utils.Lists;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.rometools.rome.feed.impl.EqualsBean;
+import com.rometools.utils.Lists;
 
 /**
  * This Category information. Basically a name and an optional Subcategory. Categories are defined

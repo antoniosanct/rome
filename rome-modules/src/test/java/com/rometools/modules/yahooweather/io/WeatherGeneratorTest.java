@@ -69,7 +69,7 @@ public class WeatherGeneratorTest extends AbstractTestCase {
             if (!testFiles[h].getName().endsWith(".xml")) {
                 continue;
             }
-            LOG.debug("processing" + testFiles[h]);
+            LOG.debug("Processing {}", testFiles[h]);
             final SyndFeed feed = input.build(testFiles[h]);
             output.output(feed, new File("target/" + testFiles[h].getName()));
             final SyndFeed feed2 = input.build(new File("target/" + testFiles[h].getName()));

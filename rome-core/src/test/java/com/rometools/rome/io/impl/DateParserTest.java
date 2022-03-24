@@ -40,4 +40,5 @@ public class DateParserTest {
                 DateParser.parseRFC822("Sa., 28 März 20 09:12:38 MEZ", Locale.GERMANY)
         );
     }
+    
 }
