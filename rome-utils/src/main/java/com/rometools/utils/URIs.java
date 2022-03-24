@@ -17,7 +17,7 @@ public class URIs {
         FIXES.put(" ", "%20"); // fix spaces
     }
 
-    public URI parse(final String str) throws URISyntaxException {
+    public static URI parse(final String str) throws URISyntaxException {
 
         String fixed = str;
         for (final Entry<String, String> entry : FIXES.entrySet()) {

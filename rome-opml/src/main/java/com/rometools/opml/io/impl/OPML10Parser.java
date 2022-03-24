@@ -32,7 +32,6 @@ import com.rometools.opml.feed.opml.Opml;
 import com.rometools.opml.feed.opml.Outline;
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.io.FeedException;
-import com.rometools.rome.io.WireFeedParser;
 import com.rometools.rome.io.impl.BaseWireFeedParser;
 import com.rometools.rome.io.impl.DateParser;
 
@@ -40,7 +39,7 @@ import com.rometools.rome.io.impl.DateParser;
  * OPML 1.0 Parser class
  *
  */
-public class OPML10Parser extends BaseWireFeedParser implements WireFeedParser {
+public class OPML10Parser extends BaseWireFeedParser {
 
     /**
      * Public constructor.
