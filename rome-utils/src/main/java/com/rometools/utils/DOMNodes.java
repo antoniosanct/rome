@@ -114,9 +114,9 @@ public class DOMNodes {
 						// compare attributes
 						NamedNodeMap expectedAttrs = expectedElement.getAttributes();
 						NamedNodeMap actualAttrs = actualElement.getAttributes();
-						if (countNonNamespaceAttribures(expectedAttrs) != countNonNamespaceAttribures(actualAttrs)) {
+						if (countNonNamespaceAttributes(expectedAttrs) != countNonNamespaceAttributes(actualAttrs)) {
 							LOG.debug(elementName + ": Number of attributes do not match up: "
-									+ countNonNamespaceAttribures(expectedAttrs) + " " + countNonNamespaceAttribures(actualAttrs));
+									+ countNonNamespaceAttributes(expectedAttrs) + " " + countNonNamespaceAttributes(actualAttrs));
 							result = false;
 						} else {
 							for (int i = 0; i < expectedAttrs.getLength(); i++) {
@@ -172,7 +172,7 @@ public class DOMNodes {
 		return result;
 	}
 
-	private static int countNonNamespaceAttribures(NamedNodeMap attrs) {
+	private static int countNonNamespaceAttributes(NamedNodeMap attrs) {
 		int n = 0;
 		for (int i = 0; i < attrs.getLength(); i++) {
 			Attr attr = (Attr) attrs.item(i);
