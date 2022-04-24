@@ -29,7 +29,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.module.Extendable;
 import com.rometools.rome.feed.module.Module;
