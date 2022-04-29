@@ -73,10 +73,8 @@ public abstract class BaseWireFeedParser extends ChildNavigator implements WireF
 
     /**
      * Returns the type of feed the parser handles.
-
-     *
-     * @see WireFeed for details on the format of this string.
-
+	 * See WireFeed for details on the format of this string.
+	 *
      * @return the type of feed the parser handles.
      *
      */
