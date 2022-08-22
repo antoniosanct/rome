@@ -144,28 +144,27 @@ public abstract class PluginManager<T> extends ChildNavigator {
      *             properties file cannot be loaded and hard failure is ON.
      *
      */
-    @SuppressWarnings("unchecked")
     private Class<T>[] getClasses() throws ClassNotFoundException {
 
         final ClassLoader classLoader = ConfigurableClassLoader.INSTANCE.getClassLoader();
 
-        final List<Class<T>> classes = new ArrayList<Class<T>>();
+        final List<Class<?>> classes = new ArrayList<Class<?>>();
 
         final boolean useLoadClass = Boolean.valueOf(System.getProperty("rome.pluginmanager.useloadclass", "false")).booleanValue();
 
         for (final String propertyValue : propertyValues) {
-            final Class<T> mClass;
+            final Class<?> mClass;
             if (useLoadClass) {
-                mClass = (Class<T>) classLoader.loadClass(propertyValue);
+                mClass = classLoader.loadClass(propertyValue);
             } else {
-                mClass = (Class<T>) Class.forName(propertyValue, true, classLoader);
+                mClass = Class.forName(propertyValue, true, classLoader);
             }
             classes.add(mClass);
         }
 
-        final Class<T>[] array = new Class[classes.size()];
+        final Class<?>[] array = new Class<?>[classes.size()];
         classes.toArray(array);
-        return array;
+        return (Class<T>[]) array;
     }
 
 }
