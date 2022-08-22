@@ -117,7 +117,6 @@ public class CloneableBean {
 
     }
 
-    @SuppressWarnings("unchecked")
     private static <T> T doClone(T value) throws Exception {
         if (value != null) {
             final Class<?> vClass = value.getClass();
@@ -126,7 +125,7 @@ public class CloneableBean {
             } else if (value instanceof Collection) {
                 value = (T) cloneCollection((Collection<Object>) value);
             } else if (value instanceof Map) {
-                value = (T) cloneMap((Map<Object, Object>) value);
+                value = (T) cloneMap((Map<Object,Object>) value);
             } else if (isBasicType(vClass)) {
                 // NOTHING SPECIAL TO DO HERE, THEY ARE INMUTABLE
             } else if (value instanceof Cloneable) {
@@ -150,7 +149,9 @@ public class CloneableBean {
         return value;
     }
 
-	private static <T> T executeCloneMethod(T value, final String method, final Class<?>[] paramsDef, final Object[] params, final Class<?> vClass) throws NoSuchMethodException,
+	private static <T> T executeCloneMethod(T value, final String method,
+			final Class<?>[] paramsDef, final Object[] params, 
+			final Class<?> vClass) throws NoSuchMethodException,
 			IllegalAccessException, InvocationTargetException, CloneNotSupportedException {
 		final Method cloneMethod = vClass.getMethod(method, paramsDef);
 		if (Modifier.isPublic(cloneMethod.getModifiers())) {
@@ -164,7 +165,6 @@ public class CloneableBean {
     private static <T> T cloneArray(final T array) throws Exception {
         final Class<?> elementClass = array.getClass().getComponentType();
         final int length = Array.getLength(array);
-        @SuppressWarnings("unchecked")
         final T newArray = (T) Array.newInstance(elementClass, length);
         for (int i = 0; i < length; i++) {
             Array.set(newArray, i, doClone(Array.get(array, i)));
@@ -173,15 +173,14 @@ public class CloneableBean {
     }
 
     private static <T> Collection<T> cloneCollection(final Collection<T> collection) throws Exception {
-        @SuppressWarnings("unchecked")
-        final Collection<T> newCollection = newCollection(collection.getClass());
+        final Collection<T> newCollection = CloneableBean.<Collection<T>,T>newCollection(collection.getClass());
         for (final T item : collection) {
             newCollection.add(doClone(item));
         }
         return newCollection;
     }
 
-    private static <T extends Collection<E>, E> Collection<E> newCollection(Class<T> type)
+    private static <T extends Collection<E>, E> Collection<E> newCollection(Class<?> type)
         throws InstantiationException, IllegalAccessException {
         Collection<E> collection = null;
         if (SortedSet.class.isAssignableFrom(type)) {
@@ -192,7 +191,7 @@ public class CloneableBean {
             collection = new ArrayList<E>();
         } else {
             try {
-				collection = type.getDeclaredConstructor().newInstance();
+				collection = (Collection<E>) type.getDeclaredConstructor().newInstance();
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				LOG.error("Error", e);
@@ -203,8 +202,7 @@ public class CloneableBean {
     }
 
     private static <K, V> Map<K, V> cloneMap(final Map<K, V> map) throws Exception {
-        @SuppressWarnings("unchecked")
-        final Map<K, V> newMap = newMap(map.getClass());
+        final Map<K, V> newMap = CloneableBean.<Map<K,V>,K,V>newMap(map.getClass());
         for (final Entry<K, V> entry : map.entrySet()) {
             final K clonedKey = doClone(entry.getKey());
             final V clonedValue = doClone(entry.getValue());
@@ -213,7 +211,7 @@ public class CloneableBean {
         return newMap;
     }
 
-    private static <T extends Map<K, V>, K, V> Map<K, V> newMap(Class<T> type)
+    private static <T extends Map<K, V>, K, V> Map<K, V> newMap(Class<?> type)
         throws InstantiationException, IllegalAccessException {
         Map<K, V> map;
         if (SortedMap.class.isAssignableFrom(type)) {

@@ -121,7 +121,6 @@ public class CopyFromHelper {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private <T> T doCopy(T value, final Class<?> baseInterface) throws Exception {
         if (value != null) {
             final Class<?> vClass = value.getClass();
@@ -156,7 +155,6 @@ public class CopyFromHelper {
     private <T> T[] doCopyArray(final T[] array, final Class<?> baseInterface) throws Exception {
         final Class<?> elementClass = array.getClass().getComponentType();
         final int length = Array.getLength(array);
-        @SuppressWarnings("unchecked")
         final T[] newArray = (T[]) Array.newInstance(elementClass, length);
         for (int i = 0; i < length; i++) {
             final Object element = doCopy(Array.get(array, i), baseInterface);
