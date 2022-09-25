@@ -78,6 +78,13 @@ public class DOMNodes {
 		return sb.toString();
 	}
 	
+	/**
+	 * Compare two nodes and returns if true
+	 * 
+	 * @param expected the first node to compare
+	 * @param actual the actual node to be compared
+	 * @return if true
+	 */
 	public static boolean compareNodes(Node expected, Node actual) {
 		boolean result = true;
 		if (null != expected && null != actual) {
