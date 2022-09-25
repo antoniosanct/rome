@@ -14,6 +14,9 @@
 
 package com.rometools.utils;
 
+/**
+ * Integer utility class.
+ */
 public final class Integers {
 
     private Integers() {
