@@ -22,8 +22,9 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.module.SyModule;
@@ -31,12 +32,12 @@ import com.rometools.rome.io.ModuleGenerator;
 
 /**
  * Feed Generator for SY ModuleImpl
- * <p/>
+ * 
  */
 public class SyModuleGenerator implements ModuleGenerator {
 
     private static final String SY_URI = "http://purl.org/rss/1.0/modules/syndication/";
-    private static final Namespace SY_NS = Namespace.getNamespace("sy", SY_URI);
+    private static final Namespace SY_NS = BaseWireFeedParser.createNamespace("sy", SY_URI);
 
     private static final Set<Namespace> NAMESPACES;
 
@@ -53,10 +54,10 @@ public class SyModuleGenerator implements ModuleGenerator {
 
     /**
      * Returns a set with all the URIs (JDOM Namespace elements) this module generator uses.
-     * <p/>
+     * 
      * It is used by the the feed generators to add their namespace definition in the root element
      * of the generated document (forward-missing of Java 5.0 Generics).
-     * <p/>
+     * 
      *
      * @return a set with all the URIs (JDOM Namespace elements) this module generator uses.
      */
@@ -72,20 +73,23 @@ public class SyModuleGenerator implements ModuleGenerator {
 
         final String updatePeriod = syModule.getUpdatePeriod();
         if (updatePeriod != null) {
-            final Element updatePeriodElement = new Element("updatePeriod", SY_NS);
-            updatePeriodElement.addContent(updatePeriod);
-            element.addContent(updatePeriodElement);
+            final Element updatePeriodElement = element.getOwnerDocument().createElementNS(SY_NS.getNamespaceURI(), "updatePeriod");
+            updatePeriodElement.setPrefix(SY_NS.getPrefix());
+            updatePeriodElement.setTextContent(updatePeriod);
+            element.appendChild(updatePeriodElement);
         }
 
-        final Element updateFrequencyElement = new Element("updateFrequency", SY_NS);
-        updateFrequencyElement.addContent(String.valueOf(syModule.getUpdateFrequency()));
-        element.addContent(updateFrequencyElement);
+        final Element updateFrequencyElement = element.getOwnerDocument().createElementNS(SY_NS.getNamespaceURI(), "updateFrequency");
+        updateFrequencyElement.setPrefix(SY_NS.getPrefix());
+        updateFrequencyElement.setTextContent(String.valueOf(syModule.getUpdateFrequency()));
+        element.appendChild(updateFrequencyElement);
 
         final Date updateBase = syModule.getUpdateBase();
         if (updateBase != null) {
-            final Element updateBaseElement = new Element("updateBase", SY_NS);
-            updateBaseElement.addContent(DateParser.formatW3CDateTime(updateBase, Locale.US));
-            element.addContent(updateBaseElement);
+            final Element updateBaseElement = element.getOwnerDocument().createElementNS(SY_NS.getNamespaceURI(), "updateBase");
+            updateBaseElement.setPrefix(SY_NS.getPrefix());
+            updateBaseElement.setTextContent(DateParser.formatW3CDateTime(updateBase, Locale.US));
+            element.appendChild(updateBaseElement);
         }
 
     }

@@ -18,23 +18,26 @@ package com.rometools.rome.io;
 
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.module.Module;
 
 /**
  * Injects module metadata into a XML node (JDOM element).
- * <p>
+
  * ModuleGenerator instances must thread safe.
- * <p>
+
  * TODO: explain how developers can plugin their own implementations.
  */
 public interface ModuleGenerator {
 
+	static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
+	
     /**
      * Returns the namespace URI this generator handles.
-     * <p>
+
      *
      * @return the namespace URI.
      *
@@ -43,10 +46,10 @@ public interface ModuleGenerator {
 
     /**
      * Returns a set with all the URIs (JDOM Namespace elements) this module generator uses.
-     * <p/>
+     * 
      * It is used by the the feed generators to add their namespace definition in the root element
      * of the generated document (forward-missing of Java 5.0 Generics).
-     * <p/>
+     * 
      *
      * @return a set with all the URIs (JDOM Namespace elements) this module generator uses.
      */
@@ -54,7 +57,7 @@ public interface ModuleGenerator {
 
     /**
      * Generates and injects module metadata into an XML node (JDOM element).
-     * <p>
+
      *
      * @param module the module to inject into the XML node (JDOM element).
      * @param element the XML node into which module meta-data will be injected.

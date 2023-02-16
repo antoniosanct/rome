@@ -15,22 +15,25 @@
  */
 package com.rometools.modules.feedpress.io;
 
-import com.rometools.modules.feedpress.modules.FeedpressModule;
-import com.rometools.rome.feed.module.Module;
-import com.rometools.rome.io.ModuleGenerator;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
+
+import com.rometools.modules.feedpress.modules.FeedpressModule;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ModuleGenerator;
 
 /**
  * The ModuleGenerator implementation for the Feedpress module.
  */
 public class FeedpressGenerator implements ModuleGenerator {
 
-    private static final Namespace NS = Namespace.getNamespace(FeedpressElement.PREFIX, FeedpressModule.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(FeedpressElement.PREFIX, FeedpressModule.URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {
@@ -62,27 +65,31 @@ public class FeedpressGenerator implements ModuleGenerator {
     }
 
     private void generateNewsletterId(String newsletterId, Element parent) {
-        final Element child = new Element(FeedpressElement.NEWSLETTER_ID, NS);
-        child.setText(newsletterId);
-        parent.addContent(child);
+        final Element child = parent.getOwnerDocument().createElementNS(NS.getNamespaceURI(), FeedpressElement.NEWSLETTER_ID);
+        child.setPrefix(NS.getPrefix());
+        child.setTextContent(newsletterId);
+        parent.appendChild(child);
     }
 
     private void generateLocale(String locale, Element parent) {
-        final Element child = new Element(FeedpressElement.LOCALE, NS);
-        child.setText(locale);
-        parent.addContent(child);
+        final Element child = parent.getOwnerDocument().createElementNS(NS.getNamespaceURI(), FeedpressElement.LOCALE);
+        child.setPrefix(NS.getPrefix());
+        child.setTextContent(locale);
+        parent.appendChild(child);
     }
 
     private void generatePodcastId(String podcastId, Element parent) {
-        final Element child = new Element(FeedpressElement.PODCAST_ID, NS);
-        child.setText(podcastId);
-        parent.addContent(child);
+        final Element child = parent.getOwnerDocument().createElementNS(NS.getNamespaceURI(), FeedpressElement.PODCAST_ID);
+        child.setPrefix(NS.getPrefix());
+        child.setTextContent(podcastId);
+        parent.appendChild(child);
     }
 
     private void generateCssFile(String cssFile, Element parent) {
-        final Element child = new Element(FeedpressElement.CSS_FILE, NS);
-        child.setText(cssFile);
-        parent.addContent(child);
+        final Element child = parent.getOwnerDocument().createElementNS(NS.getNamespaceURI(), FeedpressElement.CSS_FILE);
+        child.setPrefix(NS.getPrefix());
+        child.setTextContent(cssFile);
+        parent.appendChild(child);
     }
 
 }

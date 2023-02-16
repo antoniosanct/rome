@@ -17,8 +17,9 @@
 package com.rometools.modules.georss;
 
 import java.util.Locale;
-import com.rometools.utils.Integers;
-import org.jdom2.Element;
+
+import org.w3c.dom.Element;
+
 import com.rometools.modules.georss.geometries.Envelope;
 import com.rometools.modules.georss.geometries.LineString;
 import com.rometools.modules.georss.geometries.LinearRing;
@@ -27,14 +28,16 @@ import com.rometools.modules.georss.geometries.Polygon;
 import com.rometools.modules.georss.geometries.Position;
 import com.rometools.modules.georss.geometries.PositionList;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 import com.rometools.utils.Doubles;
+import com.rometools.utils.Integers;
 import com.rometools.utils.Strings;
 
 /**
  * SimpleParser is a parser for the GeoRSS Simple format.
  */
-public class SimpleParser implements ModuleParser {
+public class SimpleParser extends ChildNavigator implements ModuleParser {
 
     @Override
     public String getNamespaceUri() {
@@ -45,7 +48,7 @@ public class SimpleParser implements ModuleParser {
 
         PositionList posList = null;
 
-        final String coordinates = Strings.trimToNull(element.getText());
+        final String coordinates = Strings.trimToNull(element.getTextContent());
         if (coordinates != null) {
 
             posList = new PositionList();
@@ -72,25 +75,25 @@ public class SimpleParser implements ModuleParser {
         return parseSimple(element);
     }
 
-    static Module parseSimple(final Element element) {
+    Module parseSimple(final Element element) {
 
-        final Element pointElement = element.getChild("point", GeoRSSModule.SIMPLE_NS);
-        final Element lineElement = element.getChild("line", GeoRSSModule.SIMPLE_NS);
-        final Element polygonElement = element.getChild("polygon", GeoRSSModule.SIMPLE_NS);
-        final Element boxElement = element.getChild("box", GeoRSSModule.SIMPLE_NS);
-        final Element whereElement = element.getChild("where", GeoRSSModule.SIMPLE_NS);
-        final Element featureNameTagElement = element.getChild("featurename", GeoRSSModule.SIMPLE_NS);
-        final Element featureTypeTagElement = element.getChild("featuretypetag", GeoRSSModule.SIMPLE_NS);
-        final Element relationshipTagElement = element.getChild("relationshiptag", GeoRSSModule.SIMPLE_NS);
-        final Element elevElement = element.getChild("elev", GeoRSSModule.SIMPLE_NS);
-        final Element floorElement = element.getChild("floor", GeoRSSModule.SIMPLE_NS);
-        final Element radiusElement = element.getChild("radius", GeoRSSModule.SIMPLE_NS);
+        final Element pointElement = super.getChild(element, "point", GeoRSSModule.SIMPLE_NS);
+        final Element lineElement = super.getChild(element, "line", GeoRSSModule.SIMPLE_NS);
+        final Element polygonElement = super.getChild(element, "polygon", GeoRSSModule.SIMPLE_NS);
+        final Element boxElement = super.getChild(element, "box", GeoRSSModule.SIMPLE_NS);
+        final Element whereElement = super.getChild(element, "where", GeoRSSModule.SIMPLE_NS);
+        final Element featureNameTagElement = super.getChild(element, "featurename", GeoRSSModule.SIMPLE_NS);
+        final Element featureTypeTagElement = super.getChild(element, "featuretypetag", GeoRSSModule.SIMPLE_NS);
+        final Element relationshipTagElement = super.getChild(element, "relationshiptag", GeoRSSModule.SIMPLE_NS);
+        final Element elevElement = super.getChild(element, "elev", GeoRSSModule.SIMPLE_NS);
+        final Element floorElement = super.getChild(element, "floor", GeoRSSModule.SIMPLE_NS);
+        final Element radiusElement = super.getChild(element, "radius", GeoRSSModule.SIMPLE_NS);
 
         GeoRSSModule geoRSSModule = null;
 
         if (pointElement != null) {
 
-            final String coordinates = Strings.trimToNull(pointElement.getText());
+            final String coordinates = Strings.trimToNull(pointElement.getTextContent());
             if (coordinates != null) {
 
                 final String[] coord = coordinates.split("\\s+");
@@ -145,7 +148,7 @@ public class SimpleParser implements ModuleParser {
 
         } else if (boxElement != null) {
 
-            final String coordinates = Strings.trimToNull(boxElement.getText());
+            final String coordinates = Strings.trimToNull(boxElement.getTextContent());
             if (coordinates != null) {
 
                 final String[] coord = coordinates.split("\\s+");
@@ -166,28 +169,28 @@ public class SimpleParser implements ModuleParser {
             }
 
         } else if (whereElement != null) {
-            geoRSSModule = (GeoRSSModule) GMLParser.parseGML(whereElement);
+            geoRSSModule = (GeoRSSModule) new GMLParser().parseGML(whereElement);
         }
 
         if (geoRSSModule != null) {
 
             if (featureTypeTagElement != null)
-                geoRSSModule.setFeatureTypeTag(featureTypeTagElement.getText());
+                geoRSSModule.setFeatureTypeTag(featureTypeTagElement.getTextContent());
 
             if (featureNameTagElement != null)
-                geoRSSModule.setFeatureNameTag(featureNameTagElement.getText());
+                geoRSSModule.setFeatureNameTag(featureNameTagElement.getTextContent());
 
             if (relationshipTagElement != null)
-                geoRSSModule.setRelationshipTag(relationshipTagElement.getText());
+                geoRSSModule.setRelationshipTag(relationshipTagElement.getTextContent());
 
             if (elevElement != null)
-                geoRSSModule.setElev(Doubles.parse(elevElement.getText()));
+                geoRSSModule.setElev(Doubles.parse(elevElement.getTextContent()));
 
             if (floorElement != null)
-                geoRSSModule.setFloor(Integers.parse(floorElement.getText()));
+                geoRSSModule.setFloor(Integers.parse(floorElement.getTextContent()));
 
             if (radiusElement != null)
-                geoRSSModule.setRadius(Doubles.parse(radiusElement.getText()));
+                geoRSSModule.setRadius(Doubles.parse(radiusElement.getTextContent()));
         }
 
         return geoRSSModule;

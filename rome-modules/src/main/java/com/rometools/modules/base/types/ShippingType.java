@@ -16,6 +16,7 @@
 package com.rometools.modules.base.types;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * This class represents a specific shipping option for an item.
@@ -92,6 +93,13 @@ public class ShippingType implements CloneableType {
         return country + " " + price + " " + service;
     }
 
+    
+
+    @Override
+	public int hashCode() {
+		return Objects.hash(country, price, service);
+	}
+
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof ShippingType)) {
@@ -103,7 +111,7 @@ public class ShippingType implements CloneableType {
         return false;
     }
 
-    /**
+	/**
      * Enumeration class of valid options for ServiceType.
      */
     public static class ServiceEnumeration {
@@ -165,5 +173,22 @@ public class ShippingType implements CloneableType {
         public String toString() {
             return value;
         }
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(value);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ServiceEnumeration other = (ServiceEnumeration) obj;
+			return Objects.equals(value, other.value);
+		}
     }
 }

@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.module;
 
-import java.io.Serializable;
 import java.util.Collections;
 
 import com.rometools.rome.feed.impl.CloneableBean;
@@ -27,12 +26,14 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * Base class for modules describing Metadata of feeds, default implementations. Examples of such
  * modules are the Dublin Core and Syndication modules.
  */
-public abstract class ModuleImpl implements Cloneable, Serializable, Module {
+public abstract class ModuleImpl implements Module {
     private static final long serialVersionUID = 1L;
     private final Class<?> beanClass;
     private final String uri;
 
     /**
+     * 
+     * @param beanClass the bean class
      * @param uri URI of the module.
      *
      */
@@ -43,7 +44,7 @@ public abstract class ModuleImpl implements Cloneable, Serializable, Module {
 
     /**
      * Creates a deep 'bean' clone of the object.
-     * <p>
+
      *
      * @return a clone of the object.
      * @throws CloneNotSupportedException thrown if an element of the object cannot be cloned.
@@ -57,7 +58,7 @@ public abstract class ModuleImpl implements Cloneable, Serializable, Module {
     /**
      * Indicates whether some other object is "equal to" this one as defined by the Object equals()
      * method.
-     * <p>
+
      *
      * @param other he reference object with which to compare.
      * @return <b>true</b> if 'this' object is equal to the 'other' object.
@@ -73,9 +74,9 @@ public abstract class ModuleImpl implements Cloneable, Serializable, Module {
 
     /**
      * Returns a hashcode value for the object.
-     * <p>
+
      * It follows the contract defined by the Object hashCode() method.
-     * <p>
+
      *
      * @return the hashcode of the bean object.
      *
@@ -87,7 +88,7 @@ public abstract class ModuleImpl implements Cloneable, Serializable, Module {
 
     /**
      * Returns the String representation for the object.
-     * <p>
+
      *
      * @return String representation for the object.
      *
@@ -99,7 +100,7 @@ public abstract class ModuleImpl implements Cloneable, Serializable, Module {
 
     /**
      * Returns the URI of the module.
-     * <p>
+
      *
      * @return URI of the module.
      *

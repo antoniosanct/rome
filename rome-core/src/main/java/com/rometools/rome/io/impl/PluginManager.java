@@ -25,12 +25,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.rometools.rome.feed.impl.ConfigurableClassLoader;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.DelegatingModuleGenerator;
 import com.rometools.rome.io.DelegatingModuleParser;
 import com.rometools.rome.io.WireFeedGenerator;
 import com.rometools.rome.io.WireFeedParser;
 
-public abstract class PluginManager<T> {
+public abstract class PluginManager<T> extends ChildNavigator {
 
     private final String[] propertyValues;
     private final List<String> keys;
@@ -92,7 +93,7 @@ public abstract class PluginManager<T> {
             for (final Class<T> clazz : classes) {
 
                 className = clazz.getName();
-                final T plugin = clazz.newInstance();
+                final T plugin = clazz.getDeclaredConstructor().newInstance();
 
                 if (plugin instanceof DelegatingModuleParser) {
                     ((DelegatingModuleParser) plugin).setFeedParser(parentParser);
@@ -136,35 +137,34 @@ public abstract class PluginManager<T> {
      * "rome.pluginmanager.useloadclass" is set to true then classLoader.loadClass will be used to
      * load classes (instead of Class.forName). This is designed to improve OSGi compatibility.
      * Further information can be found in https://rome.dev.java.net/issues/show_bug.cgi?id=118
-     * <p>
+
      *
      * @return array containing the classes defined in the properties files.
      * @throws java.lang.ClassNotFoundException thrown if one of the classes defined in the
      *             properties file cannot be loaded and hard failure is ON.
      *
      */
-    @SuppressWarnings("unchecked")
     private Class<T>[] getClasses() throws ClassNotFoundException {
 
         final ClassLoader classLoader = ConfigurableClassLoader.INSTANCE.getClassLoader();
 
-        final List<Class<T>> classes = new ArrayList<Class<T>>();
+        final List<Class<?>> classes = new ArrayList<Class<?>>();
 
         final boolean useLoadClass = Boolean.valueOf(System.getProperty("rome.pluginmanager.useloadclass", "false")).booleanValue();
 
         for (final String propertyValue : propertyValues) {
-            final Class<T> mClass;
+            final Class<?> mClass;
             if (useLoadClass) {
-                mClass = (Class<T>) classLoader.loadClass(propertyValue);
+                mClass = classLoader.loadClass(propertyValue);
             } else {
-                mClass = (Class<T>) Class.forName(propertyValue, true, classLoader);
+                mClass = Class.forName(propertyValue, true, classLoader);
             }
             classes.add(mClass);
         }
 
-        final Class<T>[] array = new Class[classes.size()];
+        final Class<?>[] array = new Class<?>[classes.size()];
         classes.toArray(array);
-        return array;
+        return (Class<T>[]) array;
     }
 
 }

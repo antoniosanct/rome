@@ -19,6 +19,7 @@ package com.rometools.rome.feed.impl;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides deep <b>Bean</b> toString support.
- * <p>
+
  * It works on all read/write properties, recursively. It support all primitive types, Strings,
  * Collections, ToString objects and multi-dimensional arrays of any of them.
  */
@@ -47,9 +48,9 @@ public class ToStringBean {
 
     /**
      * Returns the String representation of the bean given in the constructor.
-     * <p>
      * It uses the Class name as the prefix.
-     * <p>
+     * @param beanClass the bean class
+     * @param obj the object reference
      *
      * @return bean object String representation.
      *
@@ -90,7 +91,7 @@ public class ToStringBean {
 
     /**
      * Returns the String representation of the bean given in the constructor.
-     * <p>
+
      *
      * @param prefix to use for bean properties.
      * @return bean object String representation.
@@ -135,9 +136,8 @@ public class ToStringBean {
 
         } else if (value instanceof Map) {
 
-            @SuppressWarnings("unchecked")
-            final Map<Object, Object> map = (Map<Object, Object>) value;
-            final Set<Entry<Object, Object>> entries = map.entrySet();
+            final Map<?, ?> map = (Map<?, ?>) value;
+            final Set<?> entries = map.entrySet();
 
             if (entries.isEmpty()) {
 
@@ -145,8 +145,8 @@ public class ToStringBean {
 
             } else {
 
-                for (final Entry<Object, Object> entry : entries) {
-
+                for (final Object o : entries) {
+                	final Entry<?,?> entry = (Entry<?,?>) o;
                     final Object eKey = entry.getKey();
                     final Object eValue = entry.getValue();
                     final String ePrefix = String.format("%s[%s]", prefix, eKey);
@@ -174,8 +174,7 @@ public class ToStringBean {
 
         } else if (value instanceof Collection) {
 
-            @SuppressWarnings("unchecked")
-            final Collection<Object> collection = (Collection<Object>) value;
+            final Collection<Object> collection = Collections.singleton(value);
             if (collection.isEmpty()) {
 
                 sb.append(prefix).append("=[]\n");

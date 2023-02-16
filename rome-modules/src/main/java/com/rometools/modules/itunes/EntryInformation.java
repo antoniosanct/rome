@@ -49,12 +49,13 @@ public interface EntryInformation extends ITunes {
     /**
      * Get the episode type
      * @see #setEpisodeType(String) setEpisodeType(episodeType) for details
+     * @return the episodeType.
      */
     public String getEpisodeType();
 
     /**
      * Set the episode type to one of full (default), trailer or bonus. See the <a href="http://podcasts.apple.com/resources/spec/ApplePodcastsSpecUpdatesiOS11.pdf">new spec by Apple</a> for details.
-     * @param episodeType
+     * @param episodeType the episodeType to set.
      */
     public void setEpisodeType(String episodeType);
 

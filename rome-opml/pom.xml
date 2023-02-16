@@ -17,22 +17,15 @@
     <name>rome-opml</name>
     <description>Support for OPML</description>
 
-    <build>
+	<build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Automatic-Module-Name>com.rometools.rome.opml</Automatic-Module-Name>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
+			    <groupId>org.jacoco</groupId>
+			    <artifactId>jacoco-maven-plugin</artifactId>
+			</plugin>
         </plugins>
     </build>
-
+    
     <dependencies>
         <!-- Rome -->
         <dependency>

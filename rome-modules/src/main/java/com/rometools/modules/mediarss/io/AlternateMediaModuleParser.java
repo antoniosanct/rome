@@ -16,11 +16,12 @@
 
 package com.rometools.modules.mediarss.io;
 
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
 
 public class AlternateMediaModuleParser extends MediaModuleParser {
 
-    private static final Namespace NS = Namespace.getNamespace("http://search.yahoo.com/mrss");
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("http://search.yahoo.com/mrss");
 
     public AlternateMediaModuleParser() {
         super();

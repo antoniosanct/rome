@@ -22,10 +22,6 @@ package com.rometools.modules.sle.io;
 
 import java.io.File;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import org.jdom2.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +33,9 @@ import com.rometools.modules.sle.types.Sort;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class ModuleParserTest extends AbstractTestCase {
 
@@ -67,7 +66,7 @@ public class ModuleParserTest extends AbstractTestCase {
         final Sort[] sorts = sle.getSortFields();
         assertEquals("Relevance", sorts[0].getLabel());
         assertTrue(sorts[0].getDefaultOrder());
-        assertEquals(sorts[1].getNamespace(), Namespace.getNamespace("http://www.example.com/book"));
+        assertEquals(sorts[1].getNamespace().getNamespaceURI(), "http://www.example.com/book");
         assertEquals(sorts[1].getDataType(), Sort.DATE_TYPE);
         assertEquals(sorts[1].getElement(), "firstedition");
         final SyndEntry entry = feed.getEntries().get(0);

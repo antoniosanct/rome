@@ -15,21 +15,41 @@
  */
 package com.rometools.opml.feed.synd.impl;
 
+import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.synd.SyndCategory;
 import com.rometools.rome.feed.synd.SyndCategoryImpl;
 
+/**
+ * TreeCategory implementation class.
+ *
+ */
 public class TreeCategoryImpl extends SyndCategoryImpl {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public boolean equals(final Object o) {
-        final SyndCategory c = (SyndCategory) o;
-        if (c.getTaxonomyUri() != null && c.getTaxonomyUri().equals(getTaxonomyUri())) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return EqualsBean.beanHashCode(this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(final Object o) {
+		if (o == null)
+			return false;
+
+		if (this.getClass() != o.getClass())
+			return false;
+
+		final SyndCategory c = (SyndCategory) o;
+		return null != c && 
+			null != c.getTaxonomyUri() &&
+			c.getTaxonomyUri().equals(getTaxonomyUri());
+	}
 
 }

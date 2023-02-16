@@ -16,20 +16,36 @@
  */
 package com.rometools.rome.io.impl;
 
-import com.rometools.rome.feed.WireFeed;
-import com.rometools.rome.feed.rss.*;
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.feed.rss.Channel;
+import com.rometools.rome.feed.rss.Content;
+import com.rometools.rome.feed.rss.Description;
+import com.rometools.rome.feed.rss.Image;
+import com.rometools.rome.feed.rss.Item;
+
+/**
+ * RSS 0.91 Userland Parser. 
+ *
+ */
 public class RSS091UserlandParser extends RSS090Parser {
 
+	/** The TEXTINPUT constant. */
+	private static final String TEXTINPUT = "textInput";
+	
+	/**
+	 * Public constructor.
+	 */
     public RSS091UserlandParser() {
         this("rss_0.91U");
     }
@@ -38,11 +54,14 @@ public class RSS091UserlandParser extends RSS090Parser {
         super(type, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isMyType(final Document document) {
-        final Element rssRoot = document.getRootElement();
-        final Attribute version = rssRoot.getAttribute("version");
-        return rssRoot.getName().equals("rss") && version != null && version.getValue().equals(getRSSVersion());
+        final Element rssRoot = document.getDocumentElement();
+        final Attr version = rssRoot.getAttributeNode("version");
+        return rssRoot.getNodeName().equals("rss") && version != null && version.getValue().equals(getRSSVersion());
     }
 
     protected String getRSSVersion() {
@@ -51,11 +70,14 @@ public class RSS091UserlandParser extends RSS090Parser {
 
     @Override
     protected Namespace getRSSNamespace() {
-        return Namespace.getNamespace("");
+        return super.createNamespace("");
     }
 
     /**
      * To be overriden by RSS 0.91 Netscape and RSS 0.94
+     * 
+     * @param rssRoot the root element of the RSS document to parse.
+     * @return the result of is hour format 24.
      */
     protected boolean isHourFormat24(final Element rssRoot) {
         return true;
@@ -63,12 +85,13 @@ public class RSS091UserlandParser extends RSS090Parser {
 
     /**
      * Parses the root element of an RSS document into a Channel bean.
-     * <p/>
+     * 
      * It first invokes super.parseChannel and then parses and injects the following properties if
      * present: language, pubDate, rating and copyright.
-     * <p/>
+     * 
      *
      * @param rssRoot the root element of the RSS document to parse.
+     * @param locale for date/time parsing
      * @return the parsed Channel bean.
      */
     @Override
@@ -76,82 +99,86 @@ public class RSS091UserlandParser extends RSS090Parser {
 
         final Channel channel = (Channel) super.parseChannel(rssRoot, locale);
 
-        final Element eChannel = rssRoot.getChild("channel", getRSSNamespace());
-
-        final Element language = eChannel.getChild("language", getRSSNamespace());
-        if (language != null) {
-            channel.setLanguage(language.getText());
+        final Element eChannel = super.getChild(rssRoot, "channel", getRSSNamespace());
+        if (null != eChannel) {
+	        final Element language = super.getChild(eChannel, "language", getRSSNamespace());
+	        if (language != null) {
+	            channel.setLanguage(language.getTextContent());
+	        }
+	
+	        final Element atinge = super.getChild(eChannel, "rating", getRSSNamespace());
+	        if (atinge != null) {
+	            channel.setRating(atinge.getTextContent());
+	        }
+	
+	        final Element copyright = super.getChild(eChannel, "copyright", getRSSNamespace());
+	        if (copyright != null) {
+	            channel.setCopyright(copyright.getTextContent());
+	        }
+	
+	        final Element pubDate = super.getChild(eChannel, "pubDate", getRSSNamespace());
+	        if (pubDate != null) {
+	            channel.setPubDate(DateParser.parseDate(pubDate.getTextContent(), locale));
+	        }
+	
+	        final Element lastBuildDate = super.getChild(eChannel, "lastBuildDate", getRSSNamespace());
+	        if (lastBuildDate != null) {
+	            channel.setLastBuildDate(DateParser.parseDate(lastBuildDate.getTextContent(), locale));
+	        }
+	
+	        final Element docs = super.getChild(eChannel, "docs", getRSSNamespace());
+	        if (docs != null) {
+	            channel.setDocs(docs.getTextContent());
+	        }
+	
+	        final Element generator = super.getChild(eChannel, "generator", getRSSNamespace());
+	        if (generator != null) {
+	            channel.setGenerator(generator.getTextContent());
+	        }
+	
+	        final Element managingEditor = super.getChild(eChannel, "managingEditor", getRSSNamespace());
+	        if (managingEditor != null) {
+	            channel.setManagingEditor(managingEditor.getTextContent());
+	        }
+	
+	        final Element webMaster = super.getChild(eChannel, "webMaster", getRSSNamespace());
+	        if (webMaster != null) {
+	            channel.setWebMaster(webMaster.getTextContent());
+	        }
+	
+	        final Element eSkipHours = super.getChild(eChannel, "skipHours");
+	        if (eSkipHours != null) {
+	            final List<Integer> skipHours = new ArrayList<Integer>();
+	            final List<Element> eHours = super.getChildren(eSkipHours, "hour", getRSSNamespace());
+	            if (null != eHours) {
+		            for (Element h : eHours) {
+		                skipHours.add(Integer.valueOf(h.getTextContent().trim()));
+		            }
+	            }
+	            channel.setSkipHours(skipHours);
+	        }
+	
+	        final Element eSkipDays = super.getChild(eChannel, "skipDays");
+	        if (eSkipDays != null) {
+	            final List<String> skipDays = new ArrayList<String>();
+	            final List<Element> eDays = super.getChildren(eSkipDays, "day", getRSSNamespace());
+	            if (null != eDays) {
+		            for (Element d : eDays) {
+		            	skipDays.add(d.getTextContent().trim());
+		            }
+	            }
+	            channel.setSkipDays(skipDays);
+	        }
         }
-
-        final Element atinge = eChannel.getChild("rating", getRSSNamespace());
-        if (atinge != null) {
-            channel.setRating(atinge.getText());
-        }
-
-        final Element copyright = eChannel.getChild("copyright", getRSSNamespace());
-        if (copyright != null) {
-            channel.setCopyright(copyright.getText());
-        }
-
-        final Element pubDate = eChannel.getChild("pubDate", getRSSNamespace());
-        if (pubDate != null) {
-            channel.setPubDate(DateParser.parseDate(pubDate.getText(), locale));
-        }
-
-        final Element lastBuildDate = eChannel.getChild("lastBuildDate", getRSSNamespace());
-        if (lastBuildDate != null) {
-            channel.setLastBuildDate(DateParser.parseDate(lastBuildDate.getText(), locale));
-        }
-
-        final Element docs = eChannel.getChild("docs", getRSSNamespace());
-        if (docs != null) {
-            channel.setDocs(docs.getText());
-        }
-
-        final Element generator = eChannel.getChild("generator", getRSSNamespace());
-        if (generator != null) {
-            channel.setGenerator(generator.getText());
-        }
-
-        final Element managingEditor = eChannel.getChild("managingEditor", getRSSNamespace());
-        if (managingEditor != null) {
-            channel.setManagingEditor(managingEditor.getText());
-        }
-
-        final Element webMaster = eChannel.getChild("webMaster", getRSSNamespace());
-        if (webMaster != null) {
-            channel.setWebMaster(webMaster.getText());
-        }
-
-        final Element eSkipHours = eChannel.getChild("skipHours");
-        if (eSkipHours != null) {
-            final List<Integer> skipHours = new ArrayList<Integer>();
-            final List<Element> eHours = eSkipHours.getChildren("hour", getRSSNamespace());
-            for (final Element eHour : eHours) {
-                skipHours.add(new Integer(eHour.getText().trim()));
-            }
-            channel.setSkipHours(skipHours);
-        }
-
-        final Element eSkipDays = eChannel.getChild("skipDays");
-        if (eSkipDays != null) {
-            final List<String> skipDays = new ArrayList<String>();
-            final List<Element> eDays = eSkipDays.getChildren("day", getRSSNamespace());
-            for (final Element eDay : eDays) {
-                skipDays.add(eDay.getText().trim());
-            }
-            channel.setSkipDays(skipDays);
-        }
-
         return channel;
     }
 
     /**
      * Parses the root element of an RSS document looking for image information.
-     * <p/>
+     * 
      * It first invokes super.parseImage and then parses and injects the following properties if
      * present: url, link, width, height and description.
-     * <p/>
+     * 
      *
      * @param rssRoot the root element of the RSS document to parse for image information.
      * @return the parsed RSSImage bean.
@@ -163,28 +190,28 @@ public class RSS091UserlandParser extends RSS090Parser {
         if (image != null) {
 
             final Element eImage = getImage(rssRoot);
-
-            final Element width = eImage.getChild("width", getRSSNamespace());
-            if (width != null) {
-                final Integer val = NumberParser.parseInt(width.getText());
-                if (val != null) {
-                    image.setWidth(val);
-                }
+            if (null != eImage) {
+	            final Element width = super.getChild(eImage, "width", getRSSNamespace());
+	            if (width != null) {
+	                final Integer val = NumberParser.parseInt(width.getTextContent());
+	                if (val != null) {
+	                    image.setWidth(val);
+	                }
+	            }
+	
+	            final Element height = super.getChild(eImage, "height", getRSSNamespace());
+	            if (height != null) {
+	                final Integer val = NumberParser.parseInt(height.getTextContent());
+	                if (val != null) {
+	                    image.setHeight(val);
+	                }
+	            }
+	
+	            final Element description = super.getChild(eImage, "description", getRSSNamespace());
+	            if (description != null) {
+	                image.setDescription(description.getTextContent());
+	            }
             }
-
-            final Element height = eImage.getChild("height", getRSSNamespace());
-            if (height != null) {
-                final Integer val = NumberParser.parseInt(height.getText());
-                if (val != null) {
-                    image.setHeight(val);
-                }
-            }
-
-            final Element description = eImage.getChild("description", getRSSNamespace());
-            if (description != null) {
-                image.setDescription(description.getText());
-            }
-
         }
 
         return image;
@@ -196,15 +223,15 @@ public class RSS091UserlandParser extends RSS090Parser {
      */
     @Override
     protected List<Element> getItems(final Element rssRoot) {
-
-        final Element eChannel = rssRoot.getChild("channel", getRSSNamespace());
+    	List<Element> items = new ArrayList<>(1);
+        final Element eChannel = super.getChild(rssRoot, "channel", getRSSNamespace());
 
         if (eChannel != null) {
-            return eChannel.getChildren("item", getRSSNamespace());
+            items = super.getChildren(eChannel, "item", getRSSNamespace());
         } else {
-            return Collections.emptyList();
+            items = Collections.emptyList();
         }
-
+        return items;
     }
 
     /**
@@ -212,22 +239,22 @@ public class RSS091UserlandParser extends RSS090Parser {
      */
     @Override
     protected Element getImage(final Element rssRoot) {
-
-        final Element eChannel = rssRoot.getChild("channel", getRSSNamespace());
+    	Element result = null;
+        final Element eChannel = super.getChild(rssRoot, "channel", getRSSNamespace());
 
         if (eChannel != null) {
-            return eChannel.getChild("image", getRSSNamespace());
-        } else {
-            return null;
-        }
+            result = super.getChild(eChannel, "image", getRSSNamespace());
+        } 
+        return result;
 
     }
 
     /**
      * To be overriden by RSS 0.91 Netscape parser
+     * @return the TEXTINPUT constant.
      */
     protected String getTextInputLabel() {
-        return "textInput";
+        return TEXTINPUT;
     }
 
     /**
@@ -238,9 +265,9 @@ public class RSS091UserlandParser extends RSS090Parser {
 
         final String elementName = getTextInputLabel();
 
-        final Element eChannel = rssRoot.getChild("channel", getRSSNamespace());
+        final Element eChannel = super.getChild(rssRoot, "channel", getRSSNamespace());
         if (eChannel != null) {
-            return eChannel.getChild(elementName, getRSSNamespace());
+            return super.getChild(eChannel, elementName, getRSSNamespace());
         } else {
             return null;
         }
@@ -249,13 +276,14 @@ public class RSS091UserlandParser extends RSS090Parser {
 
     /**
      * Parses an item element of an RSS document looking for item information.
-     * <p/>
+     * 
      * It first invokes super.parseItem and then parses and injects the description property if
      * present.
-     * <p/>
+     * 
      *
      * @param rssRoot the root element of the RSS document in case it's needed for context.
      * @param eItem the item element to parse.
+     * @param locale for date/time parsing
      * @return the parsed RSSItem bean.
      */
     @Override
@@ -263,21 +291,21 @@ public class RSS091UserlandParser extends RSS090Parser {
 
         final Item item = super.parseItem(rssRoot, eItem, locale);
 
-        final Element description = eItem.getChild("description", getRSSNamespace());
+        final Element description = super.getChild(eItem, "description", getRSSNamespace());
         if (description != null) {
             item.setDescription(parseItemDescription(rssRoot, description));
         }
 
-        final Element pubDate = eItem.getChild("pubDate", getRSSNamespace());
+        final Element pubDate = super.getChild(eItem, "pubDate", getRSSNamespace());
         if (pubDate != null) {
-            item.setPubDate(DateParser.parseDate(pubDate.getText(), locale));
+            item.setPubDate(DateParser.parseDate(pubDate.getTextContent(), locale));
         }
 
-        final Element encoded = eItem.getChild("encoded", getContentNamespace());
+        final Element encoded = super.getChild(eItem, "encoded", getContentNamespace());
         if (encoded != null) {
             final Content content = new Content();
             content.setType(Content.HTML);
-            content.setValue(encoded.getText());
+            content.setValue(encoded.getTextContent());
             item.setContent(content);
         }
 
@@ -288,7 +316,7 @@ public class RSS091UserlandParser extends RSS090Parser {
     protected Description parseItemDescription(final Element rssRoot, final Element eDesc) {
         final Description desc = new Description();
         desc.setType("text/plain");
-        desc.setValue(eDesc.getText());
+        desc.setValue(eDesc.getTextContent());
         return desc;
     }
 

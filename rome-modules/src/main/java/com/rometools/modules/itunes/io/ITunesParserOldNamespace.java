@@ -16,14 +16,14 @@
 
 package com.rometools.modules.itunes.io;
 
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
 
 public class ITunesParserOldNamespace extends ITunesParser {
     String URI = "http://www.itunes.com/DTDs/Podcast-1.0.dtd";
 
     public ITunesParserOldNamespace() {
         super();
-        super.ns = Namespace.getNamespace(URI);
+        super.ns = XMLEventFactory.newDefaultFactory().createNamespace(URI);
     }
 
     @Override

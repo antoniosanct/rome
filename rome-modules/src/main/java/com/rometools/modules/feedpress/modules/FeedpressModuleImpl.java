@@ -5,13 +5,16 @@ import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 import com.rometools.rome.feed.module.ModuleImpl;
 
-import java.io.Serializable;
-
 public class FeedpressModuleImpl
         extends ModuleImpl
-        implements FeedpressModule, Cloneable, Serializable {
+        implements FeedpressModule {
 
-    private String newsletterId;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5013141869124014476L;
+	
+	private String newsletterId;
     private String locale;
     private String podcastId;
     private String cssFile;

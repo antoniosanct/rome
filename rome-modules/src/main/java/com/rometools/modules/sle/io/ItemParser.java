@@ -23,8 +23,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.sle.SleEntryImpl;
 import com.rometools.modules.sle.types.DateValue;
@@ -33,9 +34,10 @@ import com.rometools.modules.sle.types.NumberValue;
 import com.rometools.modules.sle.types.Sort;
 import com.rometools.modules.sle.types.StringValue;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.impl.DateParser;
 
-public class ItemParser implements com.rometools.rome.io.ModuleParser {
+public class ItemParser extends ChildNavigator implements com.rometools.rome.io.ModuleParser {
 
     public ItemParser() {
         super();
@@ -43,18 +45,18 @@ public class ItemParser implements com.rometools.rome.io.ModuleParser {
 
     /**
      * Returns the namespace URI this parser handles.
-     * <p>
+
      *
      * @return the namespace URI.
      */
     @Override
     public String getNamespaceUri() {
-        return ModuleParser.TEMP.getURI();
+        return SleModuleParser.TEMP.getNamespaceURI();
     }
 
     /**
      * Parses the XML node (JDOM element) extracting module information.
-     * <p>
+
      *
      * @param element the XML node (JDOM element) to extract module information from.
      * @return a module instance, <b>null</b> if the element did not have module information.
@@ -63,58 +65,61 @@ public class ItemParser implements com.rometools.rome.io.ModuleParser {
     public Module parse(final Element element, final Locale locale) {
         final SleEntryImpl sle = new SleEntryImpl();
         ArrayList<EntryValue> values = new ArrayList<EntryValue>();
-        final List<Element> groups = element.getChildren("group", ModuleParser.TEMP);
+        final List<Element> groups = super.getChildren(element, "group", SleModuleParser.TEMP);
 
         for (final Element group : groups) {
             final StringValue value = new StringValue();
-            value.setElement(group.getAttributeValue("element"));
-            value.setLabel(group.getAttributeValue("label"));
-            value.setValue(group.getAttributeValue("value"));
-            if (group.getAttributeValue("ns") != null) {
-                value.setNamespace(Namespace.getNamespace(group.getAttributeValue("ns")));
+            value.setElement(group.getAttribute("element"));
+            value.setLabel(group.getAttribute("label"));
+            value.setValue(group.getAttribute("value"));
+            if (group.getAttribute("ns") != null) {
+                value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(group.getAttribute("ns")));
             } else {
-                value.setNamespace(element.getDocument().getRootElement().getNamespace());
+                value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(
+                		element.getOwnerDocument().getDocumentElement().getFirstChild().getNamespaceURI()));
             }
             values.add(value);
-            element.removeContent(group);
+            element.removeChild(group);
         }
 
         sle.setGroupValues(values.toArray(new EntryValue[values.size()]));
         values = values.size() == 0 ? values : new ArrayList<EntryValue>();
 
-        final List<Element> sorts = new ArrayList<Element>(element.getChildren("sort", ModuleParser.TEMP));
+        final List<Element> sorts = new ArrayList<Element>(super.getChildren(element, "sort", SleModuleParser.TEMP));
 
         for (final Element sort : sorts) {
-            final String dataType = sort.getAttributeValue("data-type");
+            final String dataType = sort.getAttribute("data-type");
             if (dataType == null || dataType.equals(Sort.TEXT_TYPE)) {
                 final StringValue value = new StringValue();
-                value.setElement(sort.getAttributeValue("element"));
-                value.setLabel(sort.getAttributeValue("label"));
-                value.setValue(sort.getAttributeValue("value"));
-                if (sort.getAttributeValue("ns") != null) {
-                    value.setNamespace(Namespace.getNamespace(sort.getAttributeValue("ns")));
+                value.setElement(sort.getAttribute("element"));
+                value.setLabel(sort.getAttribute("label"));
+                value.setValue(sort.getAttribute("value"));
+                if (sort.getAttribute("ns") != null) {
+                    value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(sort.getAttribute("ns")));
                 } else {
-                    value.setNamespace(element.getDocument().getRootElement().getNamespace());
+                	value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(
+                    		element.getOwnerDocument().getDocumentElement().getFirstChild().getNamespaceURI()));
                 }
                 values.add(value);
 
-                element.removeContent(sort);
+                element.removeChild(sort);
 
             } else if (dataType.equals(Sort.DATE_TYPE)) {
                 final DateValue value = new DateValue();
-                value.setElement(sort.getAttributeValue("element"));
-                value.setLabel(sort.getAttributeValue("label"));
-                if (sort.getAttributeValue("ns") != null) {
-                    value.setNamespace(Namespace.getNamespace(sort.getAttributeValue("ns")));
+                value.setElement(sort.getAttribute("element"));
+                value.setLabel(sort.getAttribute("label"));
+                if (sort.getAttribute("ns") != null) {
+                    value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(sort.getAttribute("ns")));
                 } else {
-                    value.setNamespace(element.getDocument().getRootElement().getNamespace());
+                	value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(
+                    		element.getOwnerDocument().getDocumentElement().getFirstChild().getNamespaceURI()));
                 }
                 Date dateValue = null;
 
                 try {
-                    dateValue = DateParser.parseRFC822(sort.getAttributeValue("value"), locale);
+                    dateValue = DateParser.parseRFC822(sort.getAttribute("value"), locale);
                     if (dateValue == null) {
-                        dateValue = DateParser.parseW3CDateTime(sort.getAttributeValue("value"), locale);
+                        dateValue = DateParser.parseW3CDateTime(sort.getAttribute("value"), locale);
                     }
                 } catch (final Exception e) {
                     ; // ignore parse exceptions
@@ -122,23 +127,24 @@ public class ItemParser implements com.rometools.rome.io.ModuleParser {
 
                 value.setValue(dateValue);
                 values.add(value);
-                element.removeContent(sort);
+                element.removeChild(sort);
             } else if (dataType.equals(Sort.NUMBER_TYPE)) {
                 final NumberValue value = new NumberValue();
-                value.setElement(sort.getAttributeValue("element"));
-                value.setLabel(sort.getAttributeValue("label"));
-                if (sort.getAttributeValue("ns") != null) {
-                    value.setNamespace(Namespace.getNamespace(sort.getAttributeValue("ns")));
+                value.setElement(sort.getAttribute("element"));
+                value.setLabel(sort.getAttribute("label"));
+                if (sort.getAttribute("ns") != null) {
+                    value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(sort.getAttribute("ns")));
                 } else {
-                    value.setNamespace(element.getDocument().getRootElement().getNamespace());
+                	value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(
+                    		element.getOwnerDocument().getDocumentElement().getFirstChild().getNamespaceURI()));
                 }
 
                 try {
-                    value.setValue(new BigDecimal(sort.getAttributeValue("value")));
+                    value.setValue(new BigDecimal(sort.getAttribute("value")));
                 } catch (final NumberFormatException nfe) {
                     ; // ignore
                     values.add(value);
-                    element.removeContent(sort);
+                    element.removeChild(sort);
                 }
             } else {
                 throw new RuntimeException("Unknown datatype");

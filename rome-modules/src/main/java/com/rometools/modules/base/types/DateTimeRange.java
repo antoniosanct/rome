@@ -16,6 +16,7 @@
 package com.rometools.modules.base.types;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Represents a time range.
@@ -87,7 +88,12 @@ public class DateTimeRange implements CloneableType {
         return "Start: " + start + " End: " + end;
     }
 
-    @Override
+	@Override
+	public int hashCode() {
+		return Objects.hash(end, start);
+	}
+
+	@Override
     public boolean equals(final Object o) {
         if (!(o instanceof DateTimeRange) || o == null) {
             return false;
@@ -104,4 +110,5 @@ public class DateTimeRange implements CloneableType {
         }
         return true;
     }
+    
 }

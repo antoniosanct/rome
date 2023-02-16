@@ -19,8 +19,11 @@ package com.rometools.modules.feedburner.io;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.feedburner.FeedBurner;
 import com.rometools.rome.feed.module.Module;
@@ -30,7 +33,7 @@ import com.rometools.rome.io.ModuleGenerator;
  * ModuleGenerator implementation for the FeedBurner RSS extension.
  */
 public class FeedBurnerModuleGenerator implements ModuleGenerator {
-    private static final Namespace NS = Namespace.getNamespace("feedburner", FeedBurner.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("feedburner", FeedBurner.URI);
 
     @Override
     public String getNamespaceUri() {
@@ -53,21 +56,22 @@ public class FeedBurnerModuleGenerator implements ModuleGenerator {
         final FeedBurner feedBurner = (FeedBurner) module;
 
         if (feedBurner.getAwareness() != null) {
-            element.addContent(generateSimpleElement("awareness", feedBurner.getAwareness()));
+            element.appendChild(generateSimpleElement("awareness", feedBurner.getAwareness(), element.getOwnerDocument()));
         }
 
         if (feedBurner.getOrigLink() != null) {
-            element.addContent(generateSimpleElement("origLink", feedBurner.getOrigLink()));
+            element.appendChild(generateSimpleElement("origLink", feedBurner.getOrigLink(), element.getOwnerDocument()));
         }
 
         if (feedBurner.getOrigEnclosureLink() != null) {
-            element.addContent(generateSimpleElement("origEnclosureLink", feedBurner.getOrigEnclosureLink()));
+            element.appendChild(generateSimpleElement("origEnclosureLink", feedBurner.getOrigEnclosureLink(), element.getOwnerDocument()));
         }
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, FeedBurnerModuleGenerator.NS);
-        element.addContent(value);
+    protected Element generateSimpleElement(final String name, final String value, final Document doc) {
+        final Element element = doc.createElementNS(FeedBurnerModuleGenerator.NS.getNamespaceURI(), name);
+        element.setPrefix(FeedBurnerModuleGenerator.NS.getPrefix());
+        element.setTextContent(value);
 
         return element;
     }

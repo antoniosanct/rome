@@ -17,6 +17,7 @@
 package com.rometools.modules.photocast.types;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 /**
@@ -28,7 +29,7 @@ public class PhotoDate extends Date {
 
     private static final long serialVersionUID = 1L;
     private static final long Y2K = 946616400531l;
-    private static final double DAY = 24 * 60 * 60 * 1000;
+    private static final double DAY = 24d * 60 * 60 * 1000;
 
     public PhotoDate() {
         super();
@@ -50,8 +51,8 @@ public class PhotoDate extends Date {
      * @param photoDateValue fractional number of days since 00:00:00 01/01/00
      */
     public PhotoDate(final double photoDateValue) {
-        BigDecimal d = new BigDecimal(photoDateValue);
-        d = d.multiply(new BigDecimal(DAY));
+        BigDecimal d = BigDecimal.valueOf(photoDateValue);
+        d = d.multiply(BigDecimal.valueOf(DAY));
         d = d.add(new BigDecimal(Y2K));
         setTime(d.longValue());
     }
@@ -66,17 +67,21 @@ public class PhotoDate extends Date {
         BigDecimal d = new BigDecimal(getTime());
         d = d.subtract(new BigDecimal(Y2K));
         d = d.multiply(new BigDecimal(1000000));
-        d = d.divide(new BigDecimal(DAY), BigDecimal.ROUND_HALF_UP);
-        return d.divide(new BigDecimal(1000000), 7, BigDecimal.ROUND_HALF_UP).toString();
+        d = d.divide(BigDecimal.valueOf(DAY), RoundingMode.HALF_UP);
+        return d.divide(new BigDecimal(1000000), 7, RoundingMode.HALF_UP).toString();
     }
 
-    @Override
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
     public boolean equals(final Object o) {
-        if (o instanceof Date || ((Date) o).getTime() / 1000 == getTime() / 1000) {
+        if (null != o && (o instanceof Date || ((Date) o).getTime() / 1000 == getTime() / 1000)) {
             return true;
         } else {
             return false;
         }
     }
-
 }

@@ -23,22 +23,63 @@ package com.rometools.opml;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.DifferenceListener;
+import org.custommonkey.xmlunit.ElementNameQualifier;
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.w3c.dom.Node;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.io.SyndFeedOutput;
 
+/**
+ * TestOpsOPML20 class 
+ *
+ */
 public class TestOpsOPML20 extends FeedOpsTest {
 
+	/**
+	 * Public constructor.
+	 */
     public TestOpsOPML20() {
         super("opml_2.0");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void testWireFeedSyndFeedConversion() throws Exception {
         final SyndFeed sFeed1 = getCachedSyndFeed();
+        final SyndFeedOutput output = new SyndFeedOutput();
+        final StringWriter sw1 = new StringWriter();
+        output.output(sFeed1, sw1);
         final WireFeed wFeed1 = sFeed1.createWireFeed();
         final SyndFeed sFeed2 = new SyndFeedImpl(wFeed1);
+        final StringWriter sw2 = new StringWriter();
+        output.output(sFeed2, sw2);
+        XMLUnit.setIgnoreWhitespace(true);
+        final Diff myDiff = new Diff(sw1.toString(), sw2.toString());
+        myDiff.overrideElementQualifier(new ElementNameQualifier());
+        myDiff.overrideDifferenceListener(new DifferenceListener() {
+			@Override
+			public int differenceFound(Difference difference) {
+				return DifferenceListener.RETURN_ACCEPT_DIFFERENCE;
+			}
+
+			@Override
+			public void skippedComparison(Node control, Node test) {
+				
+			}
+        });
+        XMLAssert.assertXMLEqual(myDiff, true);
+        
         PrintWriter w = new PrintWriter(new FileOutputStream("target/test-reports/3"));
         w.println(sFeed1.toString());
         w.close();

@@ -20,8 +20,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.sse.modules.Conflict;
 import com.rometools.modules.sse.modules.Conflicts;
@@ -34,6 +35,7 @@ import com.rometools.modules.sse.modules.Update;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.rss.Item;
 import com.rometools.rome.io.DelegatingModuleGenerator;
+import com.rometools.rome.io.ModuleGenerator;
 import com.rometools.rome.io.WireFeedGenerator;
 import com.rometools.rome.io.impl.DateParser;
 import com.rometools.rome.io.impl.RSS20Generator;
@@ -59,10 +61,10 @@ public class SSE091Generator implements DelegatingModuleGenerator {
 
     /**
      * Returns a set with all the URIs (JDOM Namespace elements) this module generator uses.
-     * <p/>
+     * 
      * It is used by the the feed generators to add their namespace definition in the root element
      * of the generated document (forward-missing of Java 5.0 Generics).
-     * <p/>
+     * 
      *
      * @return a set with all the URIs (JDOM Namespace elements) this module generator uses.
      */
@@ -83,10 +85,10 @@ public class SSE091Generator implements DelegatingModuleGenerator {
             final Sharing sharing = (Sharing) sseModule;
             // add sse namespace
             Element root = element;
-            while (root.getParent() != null && root.getParent() instanceof Element) {
-                root = (Element) root.getParent();
+            while (root.getParentNode() != null && root.getParentNode() instanceof Element) {
+                root = (Element) root.getParentNode();
             }
-            root.addNamespaceDeclaration(SSEModule.SSE_NS);
+            root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + SSEModule.SSE_NS.getPrefix(), SSEModule.SSE_NS.getNamespaceURI());
 
             generateSharing(sharing, root);
         } else if (sseModule instanceof Sync) {
@@ -96,7 +98,7 @@ public class SSE091Generator implements DelegatingModuleGenerator {
 
     private void generateSharing(final Sharing sharing, final Element parent) {
         // inject sse sharingModule element
-        final Element sharingElement = new Element(Sharing.NAME, SSEModule.SSE_NS);
+        final Element sharingElement = parent.getOwnerDocument().createElementNS(SSEModule.SSE_NS.getNamespaceURI(), Sharing.NAME);
         generateAttribute(sharingElement, Sharing.UNTIL_ATTRIBUTE, sharing.getUntil());
         generateAttribute(sharingElement, Sharing.SINCE_ATTRIBUTE, sharing.getSince());
         generateAttribute(sharingElement, Sharing.ORDERED_ATTRIBUTE, sharing.getOrdered());
@@ -104,16 +106,16 @@ public class SSE091Generator implements DelegatingModuleGenerator {
         generateAttribute(sharingElement, Sharing.VERSION_ATTRIBUTE, sharing.getVersion());
 
         // add sharing as the first element of the rss root
-        parent.addContent(0, sharingElement);
+        parent.insertBefore(sharingElement, parent.getFirstChild());
 
         final Related related = sharing.getRelated();
         if (related != null) {
-            generateRelated(related);
+            generateRelated(related, parent);
         }
     }
 
-    private void generateRelated(final Related related) {
-        final Element relatedElement = new Element(Related.NAME, SSEModule.SSE_NS);
+    private void generateRelated(final Related related, final Element parent) {
+        final Element relatedElement = parent.getOwnerDocument().createElementNS(SSEModule.SSE_NS.getNamespaceURI(), Related.NAME);
         generateAttribute(relatedElement, Related.SINCE_ATTRIBUTE, related.getSince());
         generateAttribute(relatedElement, Related.UNTIL_ATTRIBUTE, related.getUntil());
         generateAttribute(relatedElement, Related.LINK_ATTRIBUTE, related.getLink());
@@ -122,58 +124,58 @@ public class SSE091Generator implements DelegatingModuleGenerator {
     }
 
     protected void generateSync(final Sync sync, final Element parent) {
-        final Element syncElement = new Element(Sync.NAME, SSEModule.SSE_NS);
+        final Element syncElement = parent.getOwnerDocument().createElementNS(SSEModule.SSE_NS.getNamespaceURI(), Sync.NAME);
         generateAttribute(syncElement, Sync.DELETED_ATTRIBUTE, sync.isDeleted());
         generateAttribute(syncElement, Sync.VERSION_ATTRIBUTE, sync.getVersion());
         generateAttribute(syncElement, Sync.ID_ATTRIBUTE, sync.getId());
         generateAttribute(syncElement, Sync.CONFLICT_ATTRIBUTE, sync.isConflict());
         generateHistory(syncElement, sync.getHistory());
         generateConflicts(syncElement, sync.getConflicts());
-        parent.addContent(syncElement);
+        parent.appendChild(syncElement);
     }
 
     private void generateConflicts(final Element syncElement, final List<Conflict> conflicts) {
         if (conflicts != null) {
-            final Element conflictsElement = new Element(Conflicts.NAME, SSEModule.SSE_NS);
+            final Element conflictsElement = syncElement.getOwnerDocument().createElementNS(SSEModule.SSE_NS.getNamespaceURI(), Conflicts.NAME);
             for (final Conflict conflict2 : conflicts) {
-                final Element conflictElement = new Element(Conflict.NAME, SSEModule.SSE_NS);
+                final Element conflictElement = syncElement.getOwnerDocument().createElementNS(SSEModule.SSE_NS.getNamespaceURI(), Conflict.NAME);
                 final Conflict conflict = conflict2;
                 generateAttribute(conflictElement, Conflict.BY_ATTRIBUTE, conflict.getBy());
                 generateAttribute(conflictElement, Conflict.VERSION_ATTRIBUTE, conflict.getVersion());
                 generateAttribute(conflictElement, Conflict.WHEN_ATTRIBUTE, conflict.getWhen());
                 generateItem(conflictElement, conflict.getItem());
-                conflictsElement.addContent(conflictElement);
+                conflictsElement.appendChild(conflictElement);
             }
-            syncElement.addContent(conflictsElement);
+            syncElement.appendChild(conflictsElement);
         }
     }
 
     private void generateItem(final Element conflictElement, final Item item) {
         if (item != null) {
-            final Element itemElement = new Element("item");
-            parentGenerator.populateItem(item, itemElement, 0);
+            final Element itemElement = conflictElement.getOwnerDocument().createElement("item");
+            parentGenerator.populateItem(item, itemElement, 0, conflictElement);
             parentGenerator.generateItemModules(item.getModules(), itemElement);
-            conflictElement.addContent(itemElement);
+            conflictElement.appendChild(itemElement);
         }
     }
 
     private void generateHistory(final Element syncElement, final History history) {
         if (history != null) {
-            final Element historyElement = new Element(History.NAME, SSEModule.SSE_NS);
+            final Element historyElement = syncElement.getOwnerDocument().createElementNS(SSEModule.SSE_NS.getNamespaceURI(), History.NAME);
             generateAttribute(historyElement, History.BY_ATTRIBUTE, history.getBy());
             generateAttribute(historyElement, History.WHEN_ATTRIBUTE, history.getWhen());
             generateUpdates(historyElement, history.getUpdates());
-            syncElement.addContent(historyElement);
+            syncElement.appendChild(historyElement);
         }
     }
 
     private void generateUpdates(final Element historyElement, final List<Update> updates) {
         if (updates != null) {
             for (final Update update : updates) {
-                final Element updateElement = new Element(Update.NAME, SSEModule.SSE_NS);
+                final Element updateElement = historyElement.getOwnerDocument().createElementNS(SSEModule.SSE_NS.getNamespaceURI(), Update.NAME);
                 generateAttribute(updateElement, Update.BY_ATTRIBUTE, update.getBy());
                 generateAttribute(updateElement, Update.WHEN_ATTRIBUTE, update.getWhen());
-                historyElement.addContent(updateElement);
+                historyElement.appendChild(updateElement);
             }
         }
     }

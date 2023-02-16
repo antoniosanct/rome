@@ -17,6 +17,7 @@ package com.rometools.modules.base.types;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * This class represents a simple 4 digit year.
@@ -65,7 +66,12 @@ public class YearType implements CloneableType {
         return Integer.toString(year);
     }
 
-    @Override
+	@Override
+	public int hashCode() {
+		return Objects.hash(year);
+	}
+
+	@Override
     public boolean equals(final Object o) {
         if (!(o instanceof YearType)) {
             return false;

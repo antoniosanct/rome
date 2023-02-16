@@ -15,21 +15,25 @@
  */
 package com.rometools.modules.fyyd.io;
 
+import java.util.Locale;
+
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
+
 import com.rometools.modules.fyyd.modules.FyydModule;
 import com.rometools.modules.fyyd.modules.FyydModuleImpl;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-
-import java.util.Locale;
 
 /**
  * The ModuleParser implementation for the Fyyd module.
  */
-public class FyydParser implements ModuleParser {
+public class FyydParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace NS = Namespace.getNamespace(FyydModule.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(FyydModule.URI);
 
     @Override
     public String getNamespaceUri() {
@@ -38,11 +42,11 @@ public class FyydParser implements ModuleParser {
 
     @Override
     public Module parse(Element element, Locale locale) {
-        if (element.getName().equals("channel") || element.getName().equals("feed")) {
-            final Element verify = element.getChild(FyydElement.VERIFY, NS);
-            if (verify != null && verify.getValue() != null) {
+        if (element.getLocalName().equals("channel") || element.getLocalName().equals("feed")) {
+            final Element verify = super.getChild(element, FyydElement.VERIFY, NS);
+            if (verify != null && verify.getTextContent() != null) {
                 final FyydModule fyyd = new FyydModuleImpl();
-                fyyd.setVerify(verify.getValue().trim());
+                fyyd.setVerify(verify.getTextContent().trim());
                 return fyyd;
             }
         }

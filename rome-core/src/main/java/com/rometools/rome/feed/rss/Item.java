@@ -22,8 +22,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.jdom2.Element;
-
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.impl.CloneableBean;
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
@@ -35,9 +34,9 @@ import com.rometools.utils.Lists;
 
 /**
  * Bean for items of RSS feeds.
- * <p>
+
  * It handles all RSS versions without loosing information.
- * <p>
+
  * For RSS1.0 it supports Dublin Core and Syndication modules. Note that those modules currently
  * support simple syntax format only.
  */
@@ -59,13 +58,16 @@ public class Item implements Cloneable, Serializable, Extendable {
     private Date pubDate;
     private Date expirationDate;
     private List<Module> modules;
-    private List<Element> foreignMarkup;
+    private List<WireFeedForeignMarkup> foreignMarkup;
 
+    /**
+     * Empty public constructor.
+     */
     public Item() { }
 
     /**
      * Creates a deep 'bean' clone of the object.
-     * <p>
+
      *
      * @return a clone of the object.
      * @throws CloneNotSupportedException thrown if an element of the object cannot be cloned.
@@ -79,7 +81,7 @@ public class Item implements Cloneable, Serializable, Extendable {
     /**
      * Indicates whether some other object is "equal to" this one as defined by the Object equals()
      * method.
-     * <p>
+
      *
      * @param other he reference object with which to compare.
      * @return <b>true</b> if 'this' object is equal to the 'other' object.
@@ -91,7 +93,7 @@ public class Item implements Cloneable, Serializable, Extendable {
             return false;
         }
         // can't use foreign markup in equals, due to JDOM equals impl
-        final List<Element> fm = getForeignMarkup();
+        final List<WireFeedForeignMarkup> fm = getForeignMarkup();
         setForeignMarkup(((Item) other).getForeignMarkup());
         final boolean ret = EqualsBean.beanEquals(this.getClass(), this, other);
         // restore foreign markup
@@ -101,9 +103,9 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns a hashcode value for the object.
-     * <p>
+
      * It follows the contract defined by the Object hashCode() method.
-     * <p>
+
      *
      * @return the hashcode of the bean object.
      *
@@ -115,7 +117,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the String representation for the object.
-     * <p>
+
      *
      * @return String representation for the object.
      *
@@ -127,7 +129,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item title.
-     * <p>
+
      *
      * @return the item title, <b>null</b> if none.
      *
@@ -138,7 +140,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item title.
-     * <p>
+
      *
      * @param title the item title to set, <b>null</b> if none.
      *
@@ -149,7 +151,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item link.
-     * <p>
+
      *
      * @return the item link, <b>null</b> if none.
      *
@@ -160,7 +162,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item link.
-     * <p>
+
      *
      * @param link the item link to set, <b>null</b> if none.
      *
@@ -171,7 +173,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item uri.
-     * <p>
+
      *
      * @return the item uri, <b>null</b> if none.
      */
@@ -181,7 +183,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item uri.
-     * <p>
+
      *
      * @param uri the item uri to set, <b>null</b> if none.
      */
@@ -191,7 +193,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item description.
-     * <p>
+
      *
      * @return the item description, <b>null</b> if none.
      *
@@ -202,7 +204,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item description.
-     * <p>
+
      *
      * @param description the item description to set, <b>null</b> if none.
      *
@@ -213,7 +215,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item content.
-     * <p>
+
      *
      * @return the item content, <b>null</b> if none.
      *
@@ -224,7 +226,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item content.
-     * <p>
+
      *
      * @param content the item content to set, <b>null</b> if none.
      *
@@ -235,7 +237,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item source.
-     * <p>
+
      *
      * @return the item source, <b>null</b> if none.
      *
@@ -246,7 +248,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item source.
-     * <p>
+
      *
      * @param source the item source to set, <b>null</b> if none.
      *
@@ -257,7 +259,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item enclosures.
-     * <p>
+
      *
      * @return a list of Enclosure elements with the item enclosures, an empty list if none.
      *
@@ -268,7 +270,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item enclosures.
-     * <p>
+
      *
      * @param enclosures the list of Enclosure elements with the item enclosures to set, an empty
      *            list or <b>null</b> if none.
@@ -280,7 +282,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item categories.
-     * <p>
+
      *
      * @return a list of Category elements with the item categories, an empty list if none.
      *
@@ -291,7 +293,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item categories.
-     * <p>
+
      *
      * @param categories the list of Categories elements with the item categories to set, an empty
      *            list or <b>null</b> if none.
@@ -303,7 +305,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item GUID.
-     * <p>
+
      *
      * @return the item GUID, <b>null</b> if none.
      *
@@ -314,7 +316,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item GUID.
-     * <p>
+
      *
      * @param guid the item GUID to set, <b>null</b> if none.
      *
@@ -325,7 +327,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item comments.
-     * <p>
+
      *
      * @return the item comments, <b>null</b> if none.
      *
@@ -336,7 +338,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item comments.
-     * <p>
+
      *
      * @param comments the item comments to set, <b>null</b> if none.
      *
@@ -347,7 +349,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item author.
-     * <p>
+
      *
      * @return the item author, <b>null</b> if none.
      *
@@ -358,7 +360,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item author.
-     * <p>
+
      *
      * @param author the item author to set, <b>null</b> if none.
      *
@@ -369,7 +371,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item modules.
-     * <p>
+
      *
      * @return a list of ModuleImpl elements with the item modules, an empty list if none.
      *
@@ -381,7 +383,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item modules.
-     * <p>
+
      *
      * @param modules the list of ModuleImpl elements with the item modules to set, an empty list or
      *            <b>null</b> if none.
@@ -394,7 +396,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the module identified by a given URI.
-     * <p>
+
      *
      * @param uri the URI of the ModuleImpl.
      * @return The module with the given URI, <b>null</b> if none.
@@ -406,7 +408,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item publishing date.
-     * <p>
+
      *
      * @return the item publishing date, <b>null</b> if none.
      *
@@ -417,7 +419,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item publishing date.
-     * <p>
+
      *
      * @param pubDate the item publishing date to set, <b>null</b> if none.
      *
@@ -428,7 +430,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns the item expiration date.
-     * <p>
+
      *
      * @return the item expiration date, <b>null</b> if none.
      *
@@ -439,7 +441,7 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Sets the item expiration date.
-     * <p>
+
      *
      * @param expirationDate the item expiration date to set, <b>null</b> if none.
      *
@@ -450,23 +452,23 @@ public class Item implements Cloneable, Serializable, Extendable {
 
     /**
      * Returns foreign markup found at item level.
-     * <p>
+
      *
      * @return Opaque object to discourage use
      *
      */
-    public List<Element> getForeignMarkup() {
+    public List<WireFeedForeignMarkup> getForeignMarkup() {
         return foreignMarkup = Lists.createWhenNull(foreignMarkup);
     }
 
     /**
      * Sets foreign markup found at item level.
-     * <p>
+
      *
      * @param foreignMarkup Opaque object to discourage use
      *
      */
-    public void setForeignMarkup(final List<Element> foreignMarkup) {
+    public void setForeignMarkup(final List<WireFeedForeignMarkup> foreignMarkup) {
         this.foreignMarkup = foreignMarkup;
     }
 

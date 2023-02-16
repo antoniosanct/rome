@@ -18,8 +18,7 @@ package com.rometools.rome.io.impl;
 
 import java.util.List;
 
-import org.jdom2.Attribute;
-import org.jdom2.Element;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.rss.Category;
 import com.rometools.rome.feed.rss.Channel;
@@ -49,38 +48,38 @@ public class RSS092Generator extends RSS091UserlandGenerator {
 
         final Cloud cloud = channel.getCloud();
         if (cloud != null) {
-            eChannel.addContent(generateCloud(cloud));
+            eChannel.appendChild(generateCloud(cloud, eChannel));
         }
 
     }
 
-    protected Element generateCloud(final Cloud cloud) {
+    protected Element generateCloud(final Cloud cloud, final Element eChannel) {
 
-        final Element eCloud = new Element("cloud", getFeedNamespace());
+        final Element eCloud = eChannel.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "cloud");
 
         final String domain = cloud.getDomain();
         if (domain != null) {
-            eCloud.setAttribute(new Attribute("domain", domain));
+            eCloud.setAttribute("domain", domain);
         }
 
         final int port = cloud.getPort();
         if (port != 0) {
-            eCloud.setAttribute(new Attribute("port", String.valueOf(port)));
+            eCloud.setAttribute("port", String.valueOf(port));
         }
 
         final String path = cloud.getPath();
         if (path != null) {
-            eCloud.setAttribute(new Attribute("path", path));
+            eCloud.setAttribute("path", path);
         }
 
         final String registerProcedure = cloud.getRegisterProcedure();
         if (registerProcedure != null) {
-            eCloud.setAttribute(new Attribute("registerProcedure", registerProcedure));
+            eCloud.setAttribute("registerProcedure", registerProcedure);
         }
 
         final String protocol = cloud.getProtocol();
         if (protocol != null) {
-            eCloud.setAttribute(new Attribute("protocol", protocol));
+            eCloud.setAttribute("protocol", protocol);
         }
 
         return eCloud;
@@ -97,44 +96,44 @@ public class RSS092Generator extends RSS091UserlandGenerator {
     }
 
     @Override
-    protected void populateItem(final Item item, final Element eItem, final int index) {
+    protected void populateItem(final Item item, final Element eItem, final int index, final Element parent) {
 
-        super.populateItem(item, eItem, index);
+        super.populateItem(item, eItem, index, parent);
 
         final Source source = item.getSource();
         if (source != null) {
-            eItem.addContent(generateSourceElement(source));
+            eItem.appendChild(generateSourceElement(source, eItem));
         }
 
         final List<Enclosure> enclosures = item.getEnclosures();
         for (int i = 0; i < getNumberOfEnclosures(enclosures); i++) {
-            eItem.addContent(generateEnclosure(enclosures.get(i)));
+            eItem.appendChild(generateEnclosure(enclosures.get(i), eItem));
         }
 
         final List<Category> categories = item.getCategories();
         for (final Category category : categories) {
-            eItem.addContent(generateCategoryElement(category));
+            eItem.appendChild(generateCategoryElement(category, eItem));
         }
 
     }
 
-    protected Element generateSourceElement(final Source source) {
+    protected Element generateSourceElement(final Source source, final Element eChannel) {
 
-        final Element sourceElement = new Element("source", getFeedNamespace());
+        final Element sourceElement = eChannel.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "source");
 
         final String url = source.getUrl();
         if (url != null) {
-            sourceElement.setAttribute(new Attribute("url", url));
+            sourceElement.setAttribute("url", url);
         }
 
-        sourceElement.addContent(source.getValue());
+        sourceElement.setTextContent(source.getValue());
 
         return sourceElement;
     }
 
-    protected Element generateEnclosure(final Enclosure enclosure) {
+    protected Element generateEnclosure(final Enclosure enclosure, final Element eChannel) {
 
-        final Element enclosureElement = new Element("enclosure", getFeedNamespace());
+        final Element enclosureElement = eChannel.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "enclosure");
 
         final String url = enclosure.getUrl();
         if (url != null) {
@@ -154,16 +153,16 @@ public class RSS092Generator extends RSS091UserlandGenerator {
         return enclosureElement;
     }
 
-    protected Element generateCategoryElement(final Category category) {
+    protected Element generateCategoryElement(final Category category, final Element e) {
 
-        final Element categoryElement = new Element("category", getFeedNamespace());
+        final Element categoryElement = e.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "category");
 
         final String domain = category.getDomain();
         if (domain != null) {
             categoryElement.setAttribute("domain", domain);
         }
 
-        categoryElement.addContent(category.getValue());
+        categoryElement.setTextContent(category.getValue());
 
         return categoryElement;
     }

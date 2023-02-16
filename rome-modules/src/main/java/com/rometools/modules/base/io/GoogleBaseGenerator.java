@@ -16,16 +16,20 @@
 package com.rometools.modules.base.io;
 
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.base.GoogleBase;
 import com.rometools.modules.base.GoogleBaseImpl;
@@ -45,7 +49,7 @@ import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleGenerator;
 
 public class GoogleBaseGenerator implements ModuleGenerator {
-    private static final Namespace NS = Namespace.getNamespace("g-core", GoogleBase.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("g-core", GoogleBase.URI);
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleBaseGenerator.class);
 
@@ -89,7 +93,7 @@ public class GoogleBaseGenerator implements ModuleGenerator {
 
                 for (int j = 0; values != null && j < values.length; j++) {
                     if (values[j] != null) {
-                        element.addContent(generateTag(values[j], tagName));
+                        element.appendChild(generateTag(values[j], tagName, element));
                     }
                 }
             } catch (final Exception e) {
@@ -98,31 +102,34 @@ public class GoogleBaseGenerator implements ModuleGenerator {
         }
     }
 
-    public Element generateTag(final Object o, final String tagName) {
+    public Element generateTag(final Object o, final String tagName, final Element parent) {
+    	final DateFormat SHORT_DT_FMT = new SimpleDateFormat("yyyy-MM-dd");
+        final DateFormat LONG_DT_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         if (o instanceof URL || o instanceof Float || o instanceof Boolean || o instanceof Integer || o instanceof String || o instanceof FloatUnit
                 || o instanceof IntUnit || o instanceof GenderEnumeration || o instanceof PaymentTypeEnumeration || o instanceof PriceTypeEnumeration
                 || o instanceof CurrencyEnumeration || o instanceof Size || o instanceof YearType) {
-            return generateSimpleElement(tagName, o.toString());
+            return generateSimpleElement(tagName, o.toString(), parent);
         } else if (o instanceof ShortDate) {
-            return generateSimpleElement(tagName, GoogleBaseParser.SHORT_DT_FMT.format(o));
+            return generateSimpleElement(tagName, SHORT_DT_FMT.format(o), parent);
         } else if (o instanceof Date) {
-            return generateSimpleElement(tagName, GoogleBaseParser.LONG_DT_FMT.format(o));
+            return generateSimpleElement(tagName, LONG_DT_FMT.format(o), parent);
         } else if (o instanceof ShippingType) {
             final ShippingType st = (ShippingType) o;
-            final Element element = new Element(tagName, GoogleBaseGenerator.NS);
+            final Element element = parent.getOwnerDocument().createElementNS(GoogleBaseGenerator.NS.getNamespaceURI(), tagName);
 
-            element.addContent(generateSimpleElement("country", st.getCountry()));
-
-            element.addContent(generateSimpleElement("service", st.getService().toString()));
-
-            element.addContent(generateSimpleElement("price", st.getPrice().toString()));
+            element.setPrefix(GoogleBaseGenerator.NS.getPrefix());
+            element.appendChild(generateSimpleElement("country", st.getCountry(), parent));
+            element.appendChild(generateSimpleElement("service", st.getService().toString(), parent));
+            element.appendChild(generateSimpleElement("price", st.getPrice().toString(), parent));
 
             return element;
         } else if (o instanceof DateTimeRange) {
             final DateTimeRange dtr = (DateTimeRange) o;
-            final Element element = new Element(tagName, GoogleBaseGenerator.NS);
-            element.addContent(generateSimpleElement("start", GoogleBaseParser.LONG_DT_FMT.format(dtr.getStart())));
-            element.addContent(generateSimpleElement("end", GoogleBaseParser.LONG_DT_FMT.format(dtr.getEnd())));
+            final Element element = parent.getOwnerDocument().createElementNS(GoogleBaseGenerator.NS.getNamespaceURI(), tagName);
+            
+            element.setPrefix(GoogleBaseGenerator.NS.getPrefix());
+            element.appendChild(generateSimpleElement("start", LONG_DT_FMT.format(dtr.getStart()), parent));
+            element.appendChild(generateSimpleElement("end", LONG_DT_FMT.format(dtr.getEnd()), parent));
 
             return element;
         }
@@ -130,9 +137,10 @@ public class GoogleBaseGenerator implements ModuleGenerator {
         throw new RuntimeException("Unknown class type to handle: " + o.getClass().getName());
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, GoogleBaseGenerator.NS);
-        element.addContent(value);
+    protected Element generateSimpleElement(final String name, final String value, final Element parent) {
+        final Element element = parent.getOwnerDocument().createElementNS(GoogleBaseGenerator.NS.getNamespaceURI(), name);
+        element.setPrefix(GoogleBaseGenerator.NS.getPrefix());
+        element.setTextContent(value);
 
         return element;
     }

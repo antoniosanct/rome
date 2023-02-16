@@ -26,9 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jdom2.Element;
-
 import com.rometools.rome.feed.CopyFrom;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.impl.CloneableBean;
 import com.rometools.rome.feed.impl.CopyFromHelper;
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -69,7 +68,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
     private List<SyndPerson> authors;
     private List<SyndPerson> contributors;
     private SyndFeed source;
-    private List<Element> foreignMarkup;
+    private List<WireFeedForeignMarkup> foreignMarkup;
 
     // com.rometools.rome.feed.atom.Entry or com.rometools.rome.feed.rss.Item
     private Object wireEntry;
@@ -81,7 +80,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Unmodifiable Set containing the convenience properties of this class.
-     * <p>
+
      * Convenience properties are mapped to Modules, for cloning the convenience properties can be
      * ignored as the will be copied as part of the module cloning.
      */
@@ -116,9 +115,8 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
     /**
      * For implementations extending SyndEntryImpl to be able to use the ObjectBean functionality
      * with extended interfaces.
-     * <p>
      *
-     * @param beanClass
+     * @param beanClass the bean class
      * @param convenienceProperties set containing the convenience properties of the SyndEntryImpl
      *            (the are ignored during cloning, check CloneableBean for details).
      *
@@ -128,13 +126,15 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
         this.convenienceProperties = convenienceProperties;
     }
 
+    /**
+     * Public constructor
+     */
     public SyndEntryImpl() {
         this(SyndEntry.class, IGNORE_PROPERTIES);
     }
 
     /**
      * Creates a deep 'bean' clone of the object.
-     * <p>
      *
      * @return a clone of the object.
      * @throws CloneNotSupportedException thrown if an element of the object cannot be cloned.
@@ -148,7 +148,6 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
     /**
      * Indicates whether some other object is "equal to" this one as defined by the Object equals()
      * method.
-     * <p>
      *
      * @param other he reference object with which to compare.
      * @return <b>true</b> if 'this' object is equal to the 'other' object.
@@ -166,7 +165,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
             return false;
         }
         // can't use foreign markup in equals, due to JDOM equals impl
-        final List<Element> fm = getForeignMarkup();
+        final List<WireFeedForeignMarkup> fm = getForeignMarkup();
         setForeignMarkup(((SyndEntryImpl) other).getForeignMarkup());
         final boolean ret = EqualsBean.beanEquals(beanClass, this, other);
         // restore foreign markup
@@ -176,9 +175,9 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns a hashcode value for the object.
-     * <p>
+
      * It follows the contract defined by the Object hashCode() method.
-     * <p>
+
      *
      * @return the hashcode of the bean object.
      *
@@ -190,7 +189,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the String representation for the object.
-     * <p>
+
      *
      * @return String representation for the object.
      *
@@ -202,14 +201,14 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry URI.
-     * <p>
+
      * How the entry URI maps to a concrete feed type (RSS or Atom) depends on the concrete feed
      * type. This is explained in detail in Rome documentation, <a
      * href="http://wiki.java.net/bin/edit/Javawsxml/Rome04URIMapping">Feed and entry URI
      * mapping</a>.
-     * <p>
+
      * The returned URI is a normalized URI as specified in RFC 2396bis.
-     * <p>
+
      *
      * @return the entry URI, <b>null</b> if none.
      *
@@ -221,12 +220,12 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry URI.
-     * <p>
+
      * How the entry URI maps to a concrete feed type (RSS or Atom) depends on the concrete feed
      * type. This is explained in detail in Rome documentation, <a
      * href="http://wiki.java.net/bin/edit/Javawsxml/Rome04URIMapping">Feed and entry URI
      * mapping</a>.
-     * <p>
+
      *
      * @param uri the entry URI to set, <b>null</b> if none.
      *
@@ -238,7 +237,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry title.
-     * <p>
+
      *
      * @return the entry title, <b>null</b> if none.
      *
@@ -253,7 +252,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry title.
-     * <p>
+
      *
      * @param title the entry title to set, <b>null</b> if none.
      *
@@ -268,7 +267,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry title as a text construct.
-     * <p>
+
      *
      * @return the entry title, <b>null</b> if none.
      *
@@ -280,7 +279,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry title as a text construct.
-     * <p>
+
      *
      * @param title the entry title to set, <b>null</b> if none.
      *
@@ -292,7 +291,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry link.
-     * <p>
+
      *
      * @return the entry link, <b>null</b> if none.
      *
@@ -304,7 +303,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry link.
-     * <p>
+
      *
      * @param link the entry link to set, <b>null</b> if none.
      *
@@ -316,7 +315,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry description.
-     * <p>
+
      *
      * @return the entry description, <b>null</b> if none.
      *
@@ -328,7 +327,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry description.
-     * <p>
+
      *
      * @param description the entry description to set, <b>null</b> if none.
      *
@@ -340,7 +339,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry contents.
-     * <p>
+
      *
      * @return a list of SyndContentImpl elements with the entry contents, an empty list if none.
      *
@@ -352,7 +351,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry contents.
-     * <p>
+
      *
      * @param contents the list of SyndContentImpl elements with the entry contents to set, an empty
      *            list or <b>null</b> if none.
@@ -365,7 +364,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry enclosures.
-     * <p>
+
      *
      * @return a list of SyndEnclosure elements with the entry enclosures, an empty list if none.
      *
@@ -377,7 +376,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry enclosures.
-     * <p>
+
      *
      * @param enclosures the list of SyndEnclosure elements with the entry enclosures to set, an
      *            empty list or <b>null</b> if none.
@@ -390,9 +389,9 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry published date.
-     * <p>
+
      * This method is a convenience method, it maps to the Dublin Core module date.
-     * <p>
+
      *
      * @return the entry published date, <b>null</b> if none.
      *
@@ -404,9 +403,9 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry published date.
-     * <p>
+
      * This method is a convenience method, it maps to the Dublin Core module date.
-     * <p>
+
      *
      * @param publishedDate the entry published date to set, <b>null</b> if none.
      *
@@ -418,7 +417,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry categories.
-     * <p>
+
      *
      * @return a list of SyndCategoryImpl elements with the entry categories, an empty list if none.
      *
@@ -430,9 +429,9 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry categories.
-     * <p>
+
      * This method is a convenience method, it maps to the Dublin Core module subjects.
-     * <p>
+
      *
      * @param categories the list of SyndCategoryImpl elements with the entry categories to set, an
      *            empty list or <b>null</b> if none.
@@ -445,7 +444,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the entry modules.
-     * <p>
+
      *
      * @return a list of ModuleImpl elements with the entry modules, an empty list if none.
      *
@@ -461,7 +460,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry modules.
-     * <p>
+
      *
      * @param modules the list of ModuleImpl elements with the entry modules to set, an empty list
      *            or <b>null</b> if none.
@@ -474,7 +473,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the module identified by a given URI.
-     * <p>
+
      *
      * @param uri the URI of the ModuleImpl.
      * @return The module with the given URI, <b>null</b> if none.
@@ -506,7 +505,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the links
-     * <p>
+
      *
      * @return Returns the links.
      */
@@ -517,7 +516,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Set the links
-     * <p>
+
      *
      * @param links The links to set.
      */
@@ -528,7 +527,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns the updatedDate
-     * <p>
+
      *
      * @return Returns the updatedDate.
      */
@@ -539,7 +538,7 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Set the updatedDate
-     * <p>
+
      *
      * @param updatedDate The updatedDate to set.
      */
@@ -581,9 +580,9 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Sets the entry author.
-     * <p>
+
      * This method is a convenience method, it maps to the Dublin Core module creator.
-     * <p>
+
      *
      * @param author the entry author to set, <b>null</b> if none.
      *
@@ -621,26 +620,26 @@ public class SyndEntryImpl implements Serializable, SyndEntry {
 
     /**
      * Returns foreign markup found at channel level.
-     * <p>
+
      *
      * @return list of JDOM nodes containing channel-level foreign markup, an empty list if none.
      *
      */
     @Override
-    public List<Element> getForeignMarkup() {
+    public List<WireFeedForeignMarkup> getForeignMarkup() {
         return foreignMarkup = Lists.createWhenNull(foreignMarkup);
     }
 
     /**
      * Sets foreign markup found at channel level.
-     * <p>
+
      *
      * @param foreignMarkup list of JDOM nodes containing channel-level foreign markup, an empty
      *            list if none.
      *
      */
     @Override
-    public void setForeignMarkup(final List<Element> foreignMarkup) {
+    public void setForeignMarkup(final List<WireFeedForeignMarkup> foreignMarkup) {
         this.foreignMarkup = foreignMarkup;
     }
 

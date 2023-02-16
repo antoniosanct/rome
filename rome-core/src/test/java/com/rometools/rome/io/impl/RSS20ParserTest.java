@@ -18,12 +18,14 @@ package com.rometools.rome.io.impl;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.rometools.rome.io.WireFeedParser;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.rometools.rome.io.WireFeedParser;
 
 public class RSS20ParserTest {
 
@@ -33,36 +35,50 @@ public class RSS20ParserTest {
     @Before
     public void setUp() throws Exception {
         parser = new RSS20Parser();
-        document = new Document();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+        dbf.setNamespaceAware(true);
+        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+    	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        document = dbf.newDocumentBuilder().newDocument();
     }
 
     @Test
     public void testIsMyType() {
-        document.setRootElement(new Element("rss").setAttribute("version", "2.0"));
+    	Element e = document.createElement("rss");
+    	e.setAttribute("version", "2.0");
+    	document.appendChild(e);
         assertTrue(parser.isMyType(document));
     }
 
     @Test
     public void testIsMyTypeNotMyType() {
-        document.setRootElement(new Element("rss").setAttribute("version", "1.0"));
+    	Element e = document.createElement("rss");
+    	e.setAttribute("version", "1.0");
+    	document.appendChild(e);
         assertFalse(parser.isMyType(document));
     }
 
     @Test
     public void testIsMyTypeVersionWithSpaces() {
-        document.setRootElement(new Element("rss").setAttribute("version", " 2.0 "));
+    	Element e = document.createElement("rss");
+    	e.setAttribute("version", " 2.0 ");
+    	document.appendChild(e);
         assertTrue(parser.isMyType(document));
     }
 
     @Test
     public void testIsMyTypeVersionWithTrailingText() {
-        document.setRootElement(new Element("rss").setAttribute("version", "2.0test"));
+    	Element e = document.createElement("rss");
+    	e.setAttribute("version", "2.0test");
+    	document.appendChild(e);
         assertTrue(parser.isMyType(document));
     }
 
     @Test
     public void testIsMyTypeVersionAbsent() {
-        document.setRootElement(new Element("rss"));
+    	Element e = document.createElement("rss");
+    	document.appendChild(e);
         assertTrue(parser.isMyType(document));
     }
 }

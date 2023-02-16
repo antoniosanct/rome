@@ -19,7 +19,7 @@ package com.rometools.rome.io.impl;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Element;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.rss.Channel;
@@ -46,19 +46,19 @@ public class RSS094Parser extends RSS093Parser {
 
         final Channel channel = (Channel) super.parseChannel(rssRoot, locale);
 
-        final Element eChannel = rssRoot.getChild("channel", getRSSNamespace());
-
-        final List<Element> categories = eChannel.getChildren("category", getRSSNamespace());
-        channel.setCategories(parseCategories(categories));
-
-        final Element ttl = eChannel.getChild("ttl", getRSSNamespace());
-        if (ttl != null && ttl.getText() != null) {
-            final Integer ttlValue = NumberParser.parseInt(ttl.getText());
-            if (ttlValue != null) {
-                channel.setTtl(ttlValue);
-            }
+        final Element eChannel = super.getChild(rssRoot, "channel");
+        if (null != eChannel) {
+        	List<Element> categories = super.getChildren(eChannel, "category");
+	        channel.setCategories(parseCategories(categories));
+	
+	        final Element ttl = super.getChild(eChannel, "ttl");
+	        if (ttl != null) {
+	            final Integer ttlValue = NumberParser.parseInt(ttl.getTextContent());
+	            if (ttlValue != null) {
+	                channel.setTtl(ttlValue);
+	            }
+	        }
         }
-
         return channel;
     }
 
@@ -69,31 +69,30 @@ public class RSS094Parser extends RSS093Parser {
 
         item.setExpirationDate(null);
 
-        final Element author = eItem.getChild("author", getRSSNamespace());
+        final Element author = super.getChild(eItem, "author", getRSSNamespace());
         if (author != null) {
-            item.setAuthor(author.getText());
+            item.setAuthor(author.getTextContent());
         }
 
-        final Element eGuid = eItem.getChild("guid", getRSSNamespace());
+        final Element eGuid = super.getChild(eItem, "guid", getRSSNamespace());
         if (eGuid != null) {
 
             final Guid guid = new Guid();
 
-            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-            final String att = eGuid.getAttributeValue("isPermaLink");
+            final String att = eGuid.getAttribute("isPermaLink");
             if (att != null) {
                 guid.setPermaLink(att.equalsIgnoreCase("true"));
             }
 
-            guid.setValue(eGuid.getText());
+            guid.setValue(eGuid.getTextContent());
 
             item.setGuid(guid);
 
         }
 
-        final Element comments = eItem.getChild("comments", getRSSNamespace());
+        final Element comments = super.getChild(eItem, "comments", getRSSNamespace());
         if (comments != null) {
-            item.setComments(comments.getText());
+            item.setComments(comments.getTextContent());
         }
 
         return item;

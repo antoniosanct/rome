@@ -15,6 +15,8 @@
 
 package com.rometools.modules.georss.geometries;
 
+import java.util.Objects;
+
 /**
  * Point object, contains a position
  */
@@ -41,6 +43,14 @@ public final class Point extends AbstractGeometricPrimitive {
     }
 
     @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(pos);
+		return result;
+	}
+
+    @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
@@ -51,7 +61,7 @@ public final class Point extends AbstractGeometricPrimitive {
         return getPosition().equals(((Point) obj).getPosition());
     }
 
-    /**
+	/**
      * Get the position
      *
      * @return the position

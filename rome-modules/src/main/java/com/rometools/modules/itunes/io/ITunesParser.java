@@ -17,20 +17,18 @@
 package com.rometools.modules.itunes.io;
 
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import org.jdom2.Content;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.output.XMLOutputter;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.itunes.AbstractITunesObject;
 import com.rometools.modules.itunes.EntryInformationImpl;
@@ -38,17 +36,18 @@ import com.rometools.modules.itunes.FeedInformationImpl;
 import com.rometools.modules.itunes.types.Category;
 import com.rometools.modules.itunes.types.Duration;
 import com.rometools.modules.itunes.types.Subcategory;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 import com.rometools.rome.io.WireFeedParser;
 
-public class ITunesParser implements ModuleParser {
+public class ITunesParser extends ChildNavigator implements ModuleParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(ITunesParser.class);
 
     private static final List<String> EXPLICIT_TRUE = Arrays.asList("yes", "explicit", "true");
     private static final List<String> EXPLICIT_FALSE = Arrays.asList("clean", "no", "false");
 
-    Namespace ns = Namespace.getNamespace(AbstractITunesObject.URI);
+    Namespace ns = XMLEventFactory.newDefaultFactory().createNamespace(AbstractITunesObject.URI);
 
     public ITunesParser() {
     }
@@ -65,40 +64,40 @@ public class ITunesParser implements ModuleParser {
     public com.rometools.rome.feed.module.Module parse(final Element element, final Locale locale) {
         AbstractITunesObject module = null;
 
-        if (element.getName().equals("channel")) {
+        if (element.getLocalName().equals("channel")) {
             final FeedInformationImpl feedInfo = new FeedInformationImpl();
             module = feedInfo;
 
             // Now I am going to get the channel specific tags
-            final Element owner = element.getChild("owner", ns);
+            final Element owner = super.getChild(element, "owner", ns);
 
             if (owner != null) {
-                final Element name = owner.getChild("name", ns);
+                final Element name = super.getChild(owner, "name", ns);
 
                 if (name != null) {
-                    feedInfo.setOwnerName(name.getValue().trim());
+                    feedInfo.setOwnerName(name.getTextContent());
                 }
 
-                final Element email = owner.getChild("email", ns);
+                final Element email = super.getChild(owner, "email", ns);
 
                 if (email != null) {
-                    feedInfo.setOwnerEmailAddress(email.getValue().trim());
+                    feedInfo.setOwnerEmailAddress(email.getTextContent());
                 }
             }
 
-            final List<Element> categories = element.getChildren("category", ns);
+            final List<Element> categories = super.getChildren(element, "category", ns);
             for (final Element element2 : categories) {
                 final Element category = element2;
                 if (category != null && category.getAttribute("text") != null) {
                     final Category cat = new Category();
-                    cat.setName(category.getAttribute("text").getValue().trim());
+                    cat.setName(category.getAttribute("text").trim());
 
-                    final List<Element> subCategories = category.getChildren("category", ns);
+                    final List<Element> subCategories = super.getChildren(category, "category", ns);
 
                     for (Element subCategory : subCategories) {
                         if (subCategory.getAttribute("text") != null) {
                             final Subcategory subcat = new Subcategory();
-                            subcat.setName(subCategory.getAttribute("text").getValue().trim());
+                            subcat.setName(subCategory.getAttribute("text"));
                             cat.addSubcategory(subcat);
                         }
                     }
@@ -108,107 +107,108 @@ public class ITunesParser implements ModuleParser {
                 }
             }
 
-            final Element complete = element.getChild("complete", ns);
+            final Element complete = super.getChild(element, "complete", ns);
             if (complete != null) {
-                feedInfo.setComplete("yes".equals(complete.getTextTrim().toLowerCase()));
+                feedInfo.setComplete("yes".equals(complete.getTextContent().toLowerCase()));
             }
 
-            final Element newFeedUrl = element.getChild("new-feed-url", ns);
+            final Element newFeedUrl = super.getChild(element, "new-feed-url", ns);
             if (newFeedUrl != null) {
-                feedInfo.setNewFeedUrl(newFeedUrl.getTextTrim());
+                feedInfo.setNewFeedUrl(newFeedUrl.getTextContent());
             }
 
-            final Element type = element.getChild("type", ns);
+            final Element type = super.getChild(element, "type", ns);
             if (type != null) {
-                feedInfo.setType(type.getTextTrim());
+                feedInfo.setType(type.getTextContent());
             }
 
-        } else if (element.getName().equals("item")) {
+        } else if (element.getLocalName().equals("item")) {
             final EntryInformationImpl entryInfo = new EntryInformationImpl();
             module = entryInfo;
 
             // Now I am going to get the item specific tags
 
-            final Element duration = element.getChild("duration", ns);
+            final Element duration = super.getChild(element, "duration", ns);
 
-            if (duration != null && duration.getValue() != null) {
+            if (duration != null && duration.getTextContent() != null &&
+            		!"".equals(duration.getTextContent().trim())) {
                 try {
-                    final Duration dur = new Duration(duration.getValue().trim());
+                    final Duration dur = new Duration(duration.getTextContent().trim());
                     entryInfo.setDuration(dur);
                 } catch (Exception e) {
-                    LOG.warn("Failed to parse duration: {}", duration.getValue());
+                    LOG.warn("Failed to parse duration: {}", duration.getTextContent());
                 }
             }
 
-            final Element closedCaptioned = element.getChild("isClosedCaptioned", ns);
+            final Element closedCaptioned = super.getChild(element, "isClosedCaptioned", ns);
 
-            if (closedCaptioned != null && closedCaptioned.getValue() != null && closedCaptioned.getValue().trim().equalsIgnoreCase("yes")) {
+            if (closedCaptioned != null && closedCaptioned.getTextContent() != null && closedCaptioned.getTextContent().trim().equalsIgnoreCase("yes")) {
                 entryInfo.setClosedCaptioned(true);
             }
 
-            final Element order = element.getChild("order", ns);
+            final Element order = super.getChild(element, "order", ns);
 
-            if (order != null && order.getValue() != null) {
+            if (order != null && order.getTextContent() != null) {
                 try {
-                    entryInfo.setOrder(Integer.valueOf(order.getValue().trim()));
+                    entryInfo.setOrder(Integer.valueOf(order.getTextContent().trim()));
                 } catch (NumberFormatException e) {
-                    LOG.warn("Failed to parse order: {}", order.getValue());
+                    LOG.warn("Failed to parse order: {}", order.getTextContent());
                 }
             }
 
-            final Element season = element.getChild("season", ns);
+            final Element season = super.getChild(element, "season", ns);
 
-            if (season != null && season.getValue() != null) {
+            if (season != null && season.getTextContent() != null) {
                 try {
-                    entryInfo.setSeason(Integer.valueOf(season.getValue().trim()));
+                    entryInfo.setSeason(Integer.valueOf(season.getTextContent().trim()));
                 } catch (NumberFormatException e) {
-                    LOG.warn("Failed to parse season: {}", season.getValue());
+                    LOG.warn("Failed to parse season: {}", season.getTextContent());
                 }
             }
 
-            final Element episode = element.getChild("episode", ns);
+            final Element episode = super.getChild(element, "episode", ns);
 
-            if (episode != null && episode.getValue() != null) {
+            if (episode != null && episode.getTextContent() != null) {
                 try {
-                    entryInfo.setEpisode(Integer.valueOf(episode.getValue().trim()));
+                    entryInfo.setEpisode(Integer.valueOf(episode.getTextContent().trim()));
                 } catch (NumberFormatException e) {
-                    LOG.warn("Failed to parse episode: {}", episode.getValue());
+                    LOG.warn("Failed to parse episode: {}", episode.getTextContent());
                 }
             }
 
-            final Element episodeType = element.getChild("episodeType", ns);
+            final Element episodeType = super.getChild(element, "episodeType", ns);
 
-            if (episodeType != null && episodeType.getValue() != null) {
-                entryInfo.setEpisodeType(episodeType.getTextTrim());
+            if (episodeType != null && episodeType.getTextContent() != null) {
+                entryInfo.setEpisodeType(episodeType.getTextContent());
             }
 
-            final Element title = element.getChild("title", ns);
+            final Element title = super.getChild(element, "title", ns);
 
-            if (title != null && title.getValue() != null) {
-                entryInfo.setTitle(title.getValue().trim());
+            if (title != null && title.getTextContent() != null) {
+                entryInfo.setTitle(title.getTextContent().trim());
             }
         }
         if (module != null) {
             // All these are common to both Channel and Item
-            final Element author = element.getChild("author", ns);
+            final Element author = super.getChild(element, "author", ns);
 
-            if (author != null && author.getText() != null) {
-                module.setAuthor(author.getText());
+            if (author != null && author.getTextContent() != null) {
+                module.setAuthor(author.getTextContent());
             }
 
-            final Element block = element.getChild("block", ns);
+            final Element block = super.getChild(element, "block", ns);
 
             // Ignore case of the value, assuming that any kind of "yes" clearly shows the intent.
             if (block != null
-                    && block.getValue() != null
-                    && block.getValue().trim().equalsIgnoreCase("Yes")) {
+                    && block.getTextContent() != null
+                    && block.getTextContent().trim().equalsIgnoreCase("Yes")) {
                 module.setBlock(true);
             }
 
-            final Element explicit = element.getChild("explicit", ns);
+            final Element explicit = super.getChild(element, "explicit", ns);
 
-            if (explicit != null && explicit.getValue() != null) {
-                String explicitValue = explicit.getValue().trim().toLowerCase();
+            if (explicit != null && explicit.getTextContent() != null) {
+                String explicitValue = explicit.getTextContent().trim().toLowerCase();
 
                 if (EXPLICIT_TRUE.contains(explicitValue)) {
                     module.setExplicit(true);
@@ -219,10 +219,10 @@ public class ITunesParser implements ModuleParser {
                 }
             }
 
-            final Element keywords = element.getChild("keywords", ns);
+            final Element keywords = super.getChild(element, "keywords", ns);
 
-            if (keywords != null) {
-                final StringTokenizer tok = new StringTokenizer(getXmlInnerText(keywords).trim(), ",");
+            if (null != keywords && null != keywords.getTextContent()) {
+                final StringTokenizer tok = new StringTokenizer(keywords.getTextContent().trim(), ",");
                 final String[] keywordsArray = new String[tok.countTokens()];
 
                 for (int i = 0; tok.hasMoreTokens(); i++) {
@@ -232,40 +232,33 @@ public class ITunesParser implements ModuleParser {
                 module.setKeywords(keywordsArray);
             }
 
-            final Element subtitle = element.getChild("subtitle", ns);
+            final Element subtitle = super.getChild(element, "subtitle", ns);
 
             if (subtitle != null) {
-                module.setSubtitle(subtitle.getTextTrim());
+                module.setSubtitle(subtitle.getTextContent());
             }
 
-            final Element summary = element.getChild("summary", ns);
+            final Element summary = super.getChild(element, "summary", ns);
 
             if (summary != null) {
-                module.setSummary(summary.getTextTrim());
+                module.setSummary(summary.getTextContent());
             }
 
-            final Element image = element.getChild("image", ns);
+            final Element image = super.getChild(element, "image", ns);
 
-            if (image != null && image.getAttributeValue("href") != null) {
+            if (image != null && super.getAttributeNotBlank("href", image) != null) {
                 try {
-                    final URL imageURL = new URL(image.getAttributeValue("href").trim());
+                    final URL imageURL = new URL(image.getAttribute("href").trim());
                     module.setImage(imageURL);
                 } catch (final MalformedURLException e) {
-                    LOG.warn("Malformed URL Exception reading itunes:image tag: {}", image.getAttributeValue("href"));
+                    LOG.warn("Malformed URL Exception reading itunes:image tag: {}", image.getAttribute("href"));
                 }
 
-                module.setImageUri(image.getAttributeValue("href").trim());
+                module.setImageUri(image.getAttribute("href").trim());
             }
         }
 
         return module;
     }
 
-    protected String getXmlInnerText(final Element e) {
-        final StringBuffer sb = new StringBuffer();
-        final XMLOutputter xo = new XMLOutputter();
-        final List<Content> children = e.getContent();
-        sb.append(xo.outputString(children));
-        return sb.toString();
-    }
 }

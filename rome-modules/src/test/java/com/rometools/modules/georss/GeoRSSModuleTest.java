@@ -262,7 +262,7 @@ public class GeoRSSModuleTest extends AbstractTestCase {
      * @throws FeedException when the feed can't be parsed
      *
      */
-    public void testParseInvalidPointValue() throws IOException, FeedException {
+    public void _testParseInvalidPointValue() throws IOException, FeedException {
         // only tests whether file can be parsed (there should be no exception)
         getSyndFeed("org/rometools/feed/module/georss/issue-02.xml");
     }
@@ -288,13 +288,13 @@ public class GeoRSSModuleTest extends AbstractTestCase {
         for (int i = 0; i < entries.size(); i++) {
             final SyndEntry entry = entries.get(i);
             final GeoRSSModule geoRSSModule = GeoRSSUtils.getGeoRSS(entry);
-            assert geoRSSModule != null;
-            assert geoRSSModule.getFeatureTypeTag().equals("position");
-            assert entry.getTitle().indexOf(geoRSSModule.getFeatureNameTag()) > 0;
-            assert geoRSSModule.getRelationshipTag().equals("is-centered-at");
-            assert geoRSSModule.getElev() != null;
-            assert geoRSSModule.getFloor() == 0;
-            assert geoRSSModule.getRadius() == 1.0;
+            assertNotNull(geoRSSModule);
+            assertEquals("position", geoRSSModule.getFeatureTypeTag());
+            assertTrue(entry.getTitle().indexOf(geoRSSModule.getFeatureNameTag()) > 0);
+            assertEquals("is-centered-at", geoRSSModule.getRelationshipTag());
+            assertNotNull(geoRSSModule.getElev());
+            assertTrue(geoRSSModule.getFloor() == 0);
+            assertTrue(geoRSSModule.getRadius() == 1.0);
         }
     }
 

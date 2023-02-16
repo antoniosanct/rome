@@ -20,9 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.jdom2.Element;
-
 import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.atom.Category;
 import com.rometools.rome.feed.atom.Content;
 import com.rometools.rome.feed.atom.Entry;
@@ -73,7 +72,7 @@ public class ConverterForAtom10 implements Converter {
 
         syndFeed.setModules(ModuleUtils.cloneModules(aFeed.getModules()));
 
-        final List<Element> foreignMarkup = feed.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = feed.getForeignMarkup();
         if (!foreignMarkup.isEmpty()) {
             syndFeed.setForeignMarkup(foreignMarkup);
         }
@@ -114,11 +113,12 @@ public class ConverterForAtom10 implements Converter {
         }
 
         // Set the first "self" link as LINK
-        syndFeed.setLink(aFeed.getOtherLinks().stream().filter(l -> "self".equals(l.getRel())).findFirst().map(Link::getHrefResolved).orElse(null));
+        syndFeed.setLink(aFeed.getOtherLinks().stream().filter(
+            l -> "self".equals(l.getRel())).findFirst().map(Link::getHrefResolved).orElse(null));
 
         // otherwise, use first alternate link as THE link
         final List<Link> alternateLinks = aFeed.getAlternateLinks();
-        if (Lists.isNotEmpty(alternateLinks) && syndFeed.getLink() == null) {
+        if (Lists.isNotEmpty(alternateLinks) && null == syndFeed.getLink()) {
             final Link theLink = alternateLinks.get(0);
             syndFeed.setLink(theLink.getHrefResolved());
         }
@@ -191,7 +191,7 @@ public class ConverterForAtom10 implements Converter {
         }
         syndEntry.setModules(ModuleUtils.cloneModules(entry.getModules()));
 
-        final List<Element> foreignMarkup = entry.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = entry.getForeignMarkup();
         if (!foreignMarkup.isEmpty()) {
             syndEntry.setForeignMarkup(foreignMarkup);
         }
@@ -436,7 +436,7 @@ public class ConverterForAtom10 implements Converter {
             aFeed.setEntries(createAtomEntries(sEntries));
         }
 
-        final List<Element> foreignMarkup = syndFeed.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = syndFeed.getForeignMarkup();
         if (!foreignMarkup.isEmpty()) {
             aFeed.setForeignMarkup(foreignMarkup);
         }
@@ -600,7 +600,7 @@ public class ConverterForAtom10 implements Converter {
             aEntry.setUpdated(sEntry.getPublishedDate());
         }
 
-        final List<Element> foreignMarkup = sEntry.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = sEntry.getForeignMarkup();
         if (!foreignMarkup.isEmpty()) {
             aEntry.setForeignMarkup(foreignMarkup);
         }

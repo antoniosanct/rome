@@ -19,6 +19,16 @@
  */
 package com.rometools.modules.itunes;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.rometools.modules.AbstractTestCase;
 import com.rometools.modules.itunes.types.Category;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -27,15 +37,9 @@ import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.XmlReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ITunesGeneratorTest extends AbstractTestCase {
 
@@ -107,9 +111,15 @@ public class ITunesGeneratorTest extends AbstractTestCase {
         feed.getModules().add(fi);
 
         final SyndFeedOutput output = new SyndFeedOutput();
-        final StringWriter writer = new StringWriter();
-        output.output(feed, writer);
-        LOG.debug("{}", writer);
+        final StringWriter sw = new StringWriter();
+        output.output(feed, sw);
+        LOG.debug("{}", sw);
+        
+        final SyndFeedInput input = new SyndFeedInput();
+        final SyndFeed feed2 = input.build(new StringReader(sw.toString()));
+        FeedInformation i = (FeedInformation) feed2.getModule(ITunes.URI);
+        assertEquals(fi, i);
+        
     }
 
     public void testImage() throws Exception {

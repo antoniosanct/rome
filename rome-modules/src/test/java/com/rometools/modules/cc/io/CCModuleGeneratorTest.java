@@ -22,9 +22,6 @@ package com.rometools.modules.cc.io;
 
 import java.io.File;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +31,9 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.SyndFeedOutput;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class CCModuleGeneratorTest extends AbstractTestCase {
 
@@ -61,31 +61,23 @@ public class CCModuleGeneratorTest extends AbstractTestCase {
             }
             LOG.debug(testFiles[h].getName());
             final SyndFeed feed = input.build(testFiles[h]);
-            // if( !feed.getFeedType().equals("rss_1.0"))
-            {
-                feed.setFeedType("rss_2.0");
-                if (feed.getDescription() == null) {
-                    feed.setDescription("test file");
-                }
-                output.output(feed, new File("target/" + testFiles[h].getName()));
-                final SyndFeed feed2 = input.build(new File("target/" + testFiles[h].getName()));
-                for (int i = 0; i < feed.getEntries().size(); i++) {
-                    // FIXME
-                    // final SyndEntry entry = feed.getEntries().get(i);
-                    final SyndEntry entry2 = feed2.getEntries().get(i);
-                    // / FIXME
-                    // final CreativeCommons base = (CreativeCommons)
-                    // entry.getModule(CreativeCommons.URI);
-                    final CreativeCommons base2 = (CreativeCommons) entry2.getModule(CreativeCommons.URI);
-                    LOG.debug("{}", base2);
-                    // FIXME
-                    // if( base != null)
-                    // this.assertEquals( testFiles[h].getName(), base.getLicenses(),
-                    // base2.getLicenses() );
-                }
+            feed.setFeedType("rss_2.0");
+            if (feed.getDescription() == null) {
+                feed.setDescription("test file");
+            }
+            output.output(feed, new File("target/" + testFiles[h].getName()));
+            final SyndFeed feed2 = input.build(new File("target/" + testFiles[h].getName()));
+            assertEquals(feed.getFeedType(), feed2.getFeedType());
+            for (int i = 0; i < feed.getEntries().size(); i++) {
+            	final SyndEntry entry = feed.getEntries().get(i);
+//            	final CreativeCommons base = (CreativeCommons) entry.getModule(CreativeCommons.URI);
+            	entry.getModule(CreativeCommons.URI);
+                final SyndEntry entry2 = feed2.getEntries().get(i);
+//                final CreativeCommons base2 = (CreativeCommons) entry2.getModule(CreativeCommons.URI);
+                entry2.getModule(CreativeCommons.URI);
+//                assertEquals(base, base2);
             }
         }
 
     }
-
 }

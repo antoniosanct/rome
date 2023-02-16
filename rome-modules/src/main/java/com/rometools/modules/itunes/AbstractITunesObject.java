@@ -18,19 +18,21 @@ package com.rometools.modules.itunes;
 
 import java.net.URL;
 
+import com.rometools.rome.feed.impl.EqualsBean;
+
 /**
  * This is an abstract object that implements the attributes common across Feeds or Items in an
  * iTunes compatible RSS feed.
  */
-public abstract class AbstractITunesObject implements ITunes, java.lang.Cloneable {
+public abstract class AbstractITunesObject implements ITunes {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * The URI that iTunes used for its custom tags.
-     * <p>
+
      * What is up with using a versioned DTD anyway?
-     * </p>
+
      */
     public static final String URI = "http://www.itunes.com/dtds/podcast-1.0.dtd";
 
@@ -248,7 +250,7 @@ public abstract class AbstractITunesObject implements ITunes, java.lang.Cloneabl
         sb.append(" Keywords: ");
 
         if (getKeywords() != null) {
-            for (int i = 0; i < keywords.length; i++) {
+            for (int i = 0; i < getKeywords().length; i++) {
                 sb.append("'" + getKeywords()[i] + "'");
             }
         }
@@ -261,4 +263,17 @@ public abstract class AbstractITunesObject implements ITunes, java.lang.Cloneabl
 
         return sb.toString();
     }
+    
+    @Override
+	public int hashCode() {
+		return EqualsBean.beanHashCode(this);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof AbstractITunesObject)) {
+            return false;
+        }
+        return EqualsBean.beanEquals(this.getClass(), this, other);
+	}
 }

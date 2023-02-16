@@ -20,13 +20,11 @@
 package com.rometools.modules.content;
 
 import java.io.File;
-import java.io.StringWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rometools.modules.AbstractTestCase;
-import com.rometools.modules.content.ContentModule;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
@@ -57,6 +55,8 @@ public class ContentModuleGeneratorTest extends AbstractTestCase {
 
     /**
      * Test of generate method, of class com.totsp.xml.syndication.content.ContentModuleGenerator.
+     * 
+     * @throws Exception any exception thrown.
      */
     public void testGenerate() throws Exception {
 
@@ -67,10 +67,10 @@ public class ContentModuleGeneratorTest extends AbstractTestCase {
         final SyndEntry entry = feed.getEntries().get(0);
         entry.getModule(ContentModule.URI);
         final SyndFeedOutput output = new SyndFeedOutput();
-        final StringWriter writer = new StringWriter();
-        output.output(feed, writer);
-
-        LOG.debug("{}", writer);
-
+        output.output(feed, new File("target/test-rdf-testGenerate.xml"));
+        final SyndFeed feed2 = input.build(new File("target/test-rdf-testGenerate.xml"));
+        final SyndEntry entry2 = feed2.getEntries().get(0);
+        final ContentModule cm2 = (ContentModule) entry2.getModule(ContentModule.URI);
+        assertNotNull(cm2);
     }
 }

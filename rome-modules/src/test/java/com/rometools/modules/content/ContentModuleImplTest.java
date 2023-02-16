@@ -20,17 +20,22 @@
 
 package com.rometools.modules.content;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import com.rometools.modules.content.ContentItem;
-import com.rometools.modules.content.ContentModule;
-import com.rometools.modules.content.ContentModuleImpl;
+import junit.framework.TestCase;
 
 public class ContentModuleImplTest extends TestCase {
 
@@ -40,33 +45,47 @@ public class ContentModuleImplTest extends TestCase {
     public static ArrayList<ContentItem> contentItems = new ArrayList<ContentItem>();
 
     static {
-        ContentItem item = new ContentItem();
-        item.setContentFormat("http://www.w3.org/1999/xhtml");
-        item.setContentEncoding("http://www.w3.org/TR/REC-xml#dt-wellformed");
-        // item.setContentValueNamespaces("http://www.w3.org/1999/xhtml");
-        item.setContentValue("<em>This is <strong>very</strong></em> <strong>cool</strong>.");
-        item.setContentValueParseType("Literal");
+    	try {
+    		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        	dbf.setNamespaceAware(true);
+        	DocumentBuilder db = dbf.newDocumentBuilder();
+			ContentItem item = new ContentItem();
+	        item.setContentFormat("http://www.w3.org/1999/xhtml");
+	        item.setContentEncoding("http://www.w3.org/TR/REC-xml#dt-wellformed");
+	        item.setContentValueDOM((Element) db.parse(new InputSource(new StringReader("<rdf:value xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" rdf:parseType=\"Literal\" xmlns=\"http://www.w3.org/1999/xhtml\">\r\n"
+	        		+ "          <em>This is <strong>very</strong></em> <strong>cool</strong>.\r\n"
+	        		+ "        </rdf:value>"))).getFirstChild());
+	        item.setContentValue("\r\n"
+	        		+ "          <em>This is <strong>very</strong></em> <strong>cool</strong>.\r\n"
+	        		+ "        ");
+	        item.setContentValueParseType("Literal");
 
-        contentItems.add(item);
+	        contentItems.add(item);
 
-        item = new ContentItem();
-        item.setContentFormat("http://www.w3.org/TR/html4/");
-        item.setContentValue("<em>This is<strong>very</em> cool</strong>.");
+	        item = new ContentItem();
+	        item.setContentFormat("http://www.w3.org/TR/html4/");
+	        item.setContentValueDOM((Element) db.parse(new InputSource(new StringReader("<rdf:value xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"><![CDATA[<em>This is<strong>very</em> cool</strong>.]]></rdf:value>"))).getFirstChild());
+	        item.setContentValue("<em>This is<strong>very</em> cool</strong>.");
+	        
+	        contentItems.add(item);
 
-        contentItems.add(item);
+	        item = new ContentItem();
+	        item.setContentAbout("http://example.org/item/content-here.txt");
+	        item.setContentFormat("http://www.isi.edu/in-notes/iana/assignments/media-types/text/plain");
+	        item.setContentValueDOM((Element) db.parse(new InputSource(new StringReader("<rdf:value xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">This is &gt;very cool&lt;.</rdf:value>"))).getFirstChild());
+	        item.setContentValue("This is >very cool<.");
 
-        item = new ContentItem();
-        item.setContentAbout("http://example.org/item/content-here.txt");
-        item.setContentFormat("http://www.isi.edu/in-notes/iana/assignments/media-types/text/plain");
-        item.setContentValue("This is &gt;very cool&lt;.");
+	        contentItems.add(item);
 
-        contentItems.add(item);
+	        item = new ContentItem();
+	        item.setContentAbout("http://example.org/item/content.svg");
+	        item.setContentFormat("http://www.w3.org/2000/svg");
 
-        item = new ContentItem();
-        item.setContentAbout("http://example.org/item/content.svg");
-        item.setContentResource("http://www.w3.org/2000/svg");
-
-        contentItems.add(item);
+	        contentItems.add(item);
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			LOG.error("Error!", e);
+		}
+        
     }
 
     public ContentModuleImplTest(final String testName) {

@@ -17,29 +17,32 @@
  */
 package com.rometools.modules.content.io;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom2.Attribute;
-import org.jdom2.CDATA;
-import org.jdom2.Content;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.rometools.modules.content.ContentItem;
 import com.rometools.modules.content.ContentModule;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ModuleGenerator;
 
-public class ContentModuleGenerator implements com.rometools.rome.io.ModuleGenerator {
+public class ContentModuleGenerator implements ModuleGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContentModuleGenerator.class);
 
-    private static final Namespace CONTENT_NS = Namespace.getNamespace("content", ContentModule.URI);
-    private static final Namespace RDF_NS = Namespace.getNamespace("rdf", ContentModule.RDF_URI);
+    private static final Namespace CONTENT_NS = XMLEventFactory.newDefaultFactory().createNamespace("content", ContentModule.URI);
+    private static final Namespace RDF_NS = XMLEventFactory.newDefaultFactory().createNamespace("rdf", ContentModule.RDF_URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {
@@ -52,15 +55,17 @@ public class ContentModuleGenerator implements com.rometools.rome.io.ModuleGener
     }
 
     @Override
-    public void generate(final com.rometools.rome.feed.module.Module module, final org.jdom2.Element element) {
+    public void generate(final Module module, final Element element) {
         // this is not necessary, it is done to avoid the namespace definition in every item.
         Element root = element;
 
-        while (root.getParent() != null && root.getParent() instanceof Element) {
-            root = (Element) root.getParent();
+        while (root.getParentNode() != null && root.getParentNode() instanceof Element) {
+            root = (Element) root.getParentNode();
         }
 
-        root.addNamespaceDeclaration(CONTENT_NS);
+//        root.addNamespaceDeclaration(CONTENT_NS);
+        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + CONTENT_NS.getPrefix(), CONTENT_NS.getNamespaceURI());
+        
 
         if (!(module instanceof ContentModule)) {
             return;
@@ -73,88 +78,86 @@ public class ContentModuleGenerator implements com.rometools.rome.io.ModuleGener
         if (encodeds != null) {
             LOG.debug("{}", cm.getEncodeds().size());
             for (int i = 0; i < encodeds.size(); i++) {
-                element.addContent(generateCDATAElement("encoded", encodeds.get(i).toString()));
+                element.appendChild(generateCDATAElement("encoded", encodeds.get(i).toString(), element.getOwnerDocument()));
             }
         }
 
         final List<ContentItem> contentItems = cm.getContentItems();
 
         if (contentItems != null && !contentItems.isEmpty()) {
-            final Element items = new Element("items", CONTENT_NS);
-            final Element bag = new Element("Bag", RDF_NS);
-            items.addContent(bag);
+            final Element items = element.getOwnerDocument().createElementNS(CONTENT_NS.getNamespaceURI(), "items");
+            items.setPrefix(CONTENT_NS.getPrefix());
+            final Element bag = element.getOwnerDocument().createElementNS(RDF_NS.getNamespaceURI(), "Bag");
+            bag.setPrefix(RDF_NS.getPrefix());
+            items.appendChild(bag);
 
             for (int i = 0; i < contentItems.size(); i++) {
                 final ContentItem contentItem = contentItems.get(i);
-                final Element li = new Element("li", RDF_NS);
-                final Element item = new Element("item", CONTENT_NS);
-
+                final Element li = element.getOwnerDocument().createElementNS(RDF_NS.getNamespaceURI(), "li");
+                li.setPrefix(RDF_NS.getPrefix());
+                final Element item = element.getOwnerDocument().createElementNS(CONTENT_NS.getNamespaceURI(), "item");
+                item.setPrefix(CONTENT_NS.getPrefix());
+                
                 if (contentItem.getContentAbout() != null) {
-                    final Attribute about = new Attribute("about", contentItem.getContentAbout(), RDF_NS);
-                    item.setAttribute(about);
+                    item.setAttributeNS(RDF_NS.getNamespaceURI(), "about", contentItem.getContentAbout());
                 }
 
                 if (contentItem.getContentFormat() != null) {
-                    final Element format = new Element("format", CONTENT_NS);
-                    final Attribute formatResource = new Attribute("resource", contentItem.getContentFormat(), RDF_NS);
-                    format.setAttribute(formatResource);
-
-                    item.addContent(format);
+                    final Element format = element.getOwnerDocument().createElementNS(CONTENT_NS.getNamespaceURI(), "format");
+                    format.setPrefix(CONTENT_NS.getPrefix());
+                    format.setAttributeNS(RDF_NS.getNamespaceURI(), "resource", contentItem.getContentFormat());
+                    item.appendChild(format);
                 }
 
                 if (contentItem.getContentEncoding() != null) {
-                    final Element encoding = new Element("encoding", CONTENT_NS);
-                    final Attribute encodingResource = new Attribute("resource", contentItem.getContentEncoding(), RDF_NS);
-                    encoding.setAttribute(encodingResource);
-                    item.addContent(encoding);
+                    final Element encoding = element.getOwnerDocument().createElementNS(CONTENT_NS.getNamespaceURI(), "encoding");
+                    encoding.setPrefix(CONTENT_NS.getPrefix());
+                    encoding.setAttributeNS(RDF_NS.getNamespaceURI(), "resource", contentItem.getContentEncoding());
+                    item.appendChild(encoding);
                 }
 
-                if (contentItem.getContentValue() != null) {
-                    final Element value = new Element("value", RDF_NS);
-
+                if (null != contentItem.getContentValueDOM()) {
+                	Node newN = element.getOwnerDocument().adoptNode(contentItem.getContentValueDOM().cloneNode(true));
+                	item.appendChild(newN);
+                } else {
+                    final Element value = element.getOwnerDocument().createElementNS(RDF_NS.getNamespaceURI(), "value");
+                    value.setPrefix(RDF_NS.getPrefix());
+                    
                     if (contentItem.getContentValueParseType() != null) {
-                        final Attribute parseType = new Attribute("parseType", contentItem.getContentValueParseType(), RDF_NS);
-                        value.setAttribute(parseType);
+                    	value.setAttributeNS(RDF_NS.getNamespaceURI(), "parseType", contentItem.getContentValueParseType());
                     }
 
                     if (contentItem.getContentValueNamespaces() != null) {
                         final List<Namespace> namespaces = contentItem.getContentValueNamespaces();
 
                         for (int ni = 0; ni < namespaces.size(); ni++) {
-                            value.addNamespaceDeclaration(namespaces.get(ni));
+                        	value.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + namespaces.get(ni).getPrefix(), namespaces.get(ni).getNamespaceURI());
                         }
                     }
-
-                    final List<Content> detached = new ArrayList<Content>();
-
-                    for (int c = 0; c < contentItem.getContentValueDOM().size(); c++) {
-                        detached.add(contentItem.getContentValueDOM().get(c).clone().detach());
-                    }
-
-                    value.setContent(detached);
-                    item.addContent(value);
+                	value.setTextContent(contentItem.getContentValue());
+                    item.appendChild(value);
                 } // end value
 
-                li.addContent(item);
-                bag.addContent(li);
+                li.appendChild(item);
+                bag.appendChild(li);
             } // end contentItems loop
 
-            element.addContent(items);
+            element.appendChild(items);
         }
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, CONTENT_NS);
-        element.addContent(value);
-
+    protected Element generateSimpleElement(final String name, final String value, final Document doc) {
+        final Element element = doc.createElementNS(CONTENT_NS.getNamespaceURI(), name);
+        element.setPrefix(CONTENT_NS.getPrefix());
+        element.setTextContent(value);
         return element;
     }
 
-    protected Element generateCDATAElement(final String name, final String value) {
-        final Element element = new Element(name, CONTENT_NS);
-        final CDATA cdata = new CDATA(value);
-        element.addContent(cdata);
-
+    protected Element generateCDATAElement(final String name, final String value, final Document doc) {
+        final Element element = doc.createElementNS(CONTENT_NS.getNamespaceURI(), name);
+        element.setPrefix(CONTENT_NS.getPrefix());
+        final CDATASection cdata = doc.createCDATASection(value);
+        element.appendChild(cdata);
         return element;
     }
 

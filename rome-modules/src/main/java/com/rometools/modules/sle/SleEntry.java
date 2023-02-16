@@ -17,7 +17,7 @@
  */
 package com.rometools.modules.sle;
 
-import com.rometools.modules.sle.io.ModuleParser;
+import com.rometools.modules.sle.io.SleModuleParser;
 import com.rometools.modules.sle.types.EntryValue;
 import com.rometools.modules.sle.types.Group;
 import com.rometools.modules.sle.types.Sort;
@@ -32,7 +32,7 @@ public interface SleEntry extends Module {
     /**
      * A bogus namespace used for temporarily storing values during parsing.
      */
-    public static final String URI = ModuleParser.TEMP.getURI();
+    public static final String URI = SleModuleParser.TEMP.getNamespaceURI();
 
     /**
      * Returns an EntryValue for the given element name.
@@ -60,7 +60,7 @@ public interface SleEntry extends Module {
     /**
      * Returns an array of EntryValues for the fields declared in the heading.
      *
-     * <b>NB:</b><br />
+     * <b>NB:</b>
      * Right now the parser will take any default=true field and change it to an integer value
      * representing the default order in the field. You should not rely on these values data display
      * to a user!

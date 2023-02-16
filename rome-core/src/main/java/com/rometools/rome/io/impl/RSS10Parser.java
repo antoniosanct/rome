@@ -18,9 +18,10 @@ package com.rometools.rome.io.impl;
 
 import java.util.Locale;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.rss.Channel;
@@ -31,7 +32,7 @@ import com.rometools.rome.feed.rss.Item;
 public class RSS10Parser extends RSS090Parser {
 
     private static final String RSS_URI = "http://purl.org/rss/1.0/";
-    private static final Namespace RSS_NS = Namespace.getNamespace(RSS_URI);
+    private static final Namespace RSS_NS = BaseWireFeedParser.createNamespace(RSS_URI);
 
     public RSS10Parser() {
         this("rss_1.0", RSS_NS);
@@ -43,7 +44,7 @@ public class RSS10Parser extends RSS090Parser {
 
     /**
      * Indicates if a JDom document is an RSS instance that can be parsed with the parser.
-     * <p/>
+     * 
      * It checks for RDF ("http://www.w3.org/1999/02/22-rdf-syntax-ns#") namespace being defined in
      * the root element and for the RSS 1.0 ("http://purl.org/rss/1.0/") namespace in the channel
      * element.
@@ -53,28 +54,29 @@ public class RSS10Parser extends RSS090Parser {
      */
     @Override
     public boolean isMyType(final Document document) {
-        final Element rssRoot = document.getRootElement();
-        final Namespace defaultNS = rssRoot.getNamespace();
-        return defaultNS != null && defaultNS.equals(getRDFNamespace()) && rssRoot.getChild("channel", getRSSNamespace()) != null;
+        final Element rssRoot = document.getDocumentElement();
+        final String defaultNS = rssRoot.getNamespaceURI();
+        return defaultNS != null && defaultNS.equals(getRDFNamespace().getNamespaceURI()) 
+        		&& null != super.getChild(rssRoot, "channel");
     }
 
     /**
      * Returns the namespace used by RSS elements in document of the RSS 1.0
-     * <P>
+
      *
      * @return returns "http://purl.org/rss/1.0/".
      */
     @Override
     protected Namespace getRSSNamespace() {
-        return Namespace.getNamespace(RSS_URI);
+        return super.createNamespace(RSS_URI);
     }
 
     /**
      * Parses an item element of an RSS document looking for item information.
-     * <p/>
+     * 
      * It first invokes super.parseItem and then parses and injects the description property if
      * present.
-     * <p/>
+     * 
      *
      * @param rssRoot the root element of the RSS document in case it's needed for context.
      * @param eItem the item element to parse.
@@ -85,20 +87,20 @@ public class RSS10Parser extends RSS090Parser {
 
         final Item item = super.parseItem(rssRoot, eItem, locale);
 
-        final Element description = eItem.getChild("description", getRSSNamespace());
+        final Element description = super.getChild(eItem, "description");
         if (description != null) {
-            item.setDescription(parseItemDescription(rssRoot, description));
+            item.setDescription(parseItemDescription(description));
         }
 
-        final Element encoded = eItem.getChild("encoded", getContentNamespace());
+        final Element encoded = super.getChild(eItem, "encoded");
         if (encoded != null) {
             final Content content = new Content();
             content.setType(Content.HTML);
-            content.setValue(encoded.getText());
+            content.setValue(encoded.getTextContent());
             item.setContent(content);
         }
 
-        final String about = eItem.getAttributeValue("about", getRDFNamespace());
+        final String about = eItem.getAttributeNS(getRDFNamespace().getNamespaceURI(), "about");
         if (about != null) {
             item.setUri(about);
         }
@@ -108,22 +110,21 @@ public class RSS10Parser extends RSS090Parser {
 
     @Override
     protected WireFeed parseChannel(final Element rssRoot, final Locale locale) {
-
         final Channel channel = (Channel) super.parseChannel(rssRoot, locale);
-
-        final Element eChannel = rssRoot.getChild("channel", getRSSNamespace());
-        final String uri = eChannel.getAttributeValue("about", getRDFNamespace());
-        if (uri != null) {
-            channel.setUri(uri);
+        final Element eChannel = super.getChild(rssRoot, "channel");
+        if (null != eChannel) {
+	        final String uri = eChannel.getAttributeNS(getRDFNamespace().getNamespaceURI(), "about");
+	        if (uri != null) {
+	            channel.setUri(uri);
+	        }
         }
-
         return channel;
     }
 
-    protected Description parseItemDescription(final Element rssRoot, final Element eDesc) {
+    protected Description parseItemDescription(final Element eDesc) {
         final Description desc = new Description();
         desc.setType("text/plain");
-        desc.setValue(eDesc.getText());
+        desc.setValue(eDesc.getTextContent());
         return desc;
     }
 

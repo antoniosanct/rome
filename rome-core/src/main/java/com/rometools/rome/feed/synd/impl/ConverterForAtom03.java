@@ -20,10 +20,11 @@ package com.rometools.rome.feed.synd.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.jdom2.Element;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.feed.WireFeedForeignMarkup;
 import com.rometools.rome.feed.atom.Content;
 import com.rometools.rome.feed.atom.Entry;
 import com.rometools.rome.feed.atom.Feed;
@@ -44,7 +45,6 @@ import com.rometools.rome.feed.synd.SyndLink;
 import com.rometools.rome.feed.synd.SyndLinkImpl;
 import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.rome.feed.synd.SyndPersonImpl;
-import com.rometools.utils.Alternatives;
 import com.rometools.utils.Lists;
 import com.rometools.utils.Strings;
 
@@ -72,7 +72,7 @@ public class ConverterForAtom03 implements Converter {
 
         syndFeed.setModules(ModuleUtils.cloneModules(aFeed.getModules()));
 
-        final List<Element> foreignMarkup = feed.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = feed.getForeignMarkup();
         if (Lists.isNotEmpty(foreignMarkup)) {
             syndFeed.setForeignMarkup(foreignMarkup);
         }
@@ -188,7 +188,7 @@ public class ConverterForAtom03 implements Converter {
 
         syndEntry.setModules(ModuleUtils.cloneModules(entry.getModules()));
 
-        final List<Element> foreignMarkup = entry.getForeignMarkup();
+        final List<WireFeedForeignMarkup> foreignMarkup = entry.getForeignMarkup();
         if (Lists.isNotEmpty(foreignMarkup)) {
             syndEntry.setForeignMarkup(foreignMarkup);
         }
@@ -272,7 +272,8 @@ public class ConverterForAtom03 implements Converter {
 
         Date date = entry.getModified();
         if (date == null) {
-            date = Alternatives.firstNotNull(entry.getIssued(), entry.getCreated());
+            //date = Alternatives.firstNotNull(entry.getIssued(), entry.getCreated());
+        	date = Stream.of(new Date[] {entry.getIssued(), entry.getCreated()}).filter(Objects::nonNull).findFirst().orElse(null);
         }
 
         if (date != null) {

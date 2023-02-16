@@ -19,8 +19,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.opml.feed.opml.Opml;
 import com.rometools.opml.feed.opml.Outline;
@@ -35,6 +35,9 @@ import com.rometools.rome.io.impl.DateParser;
  */
 public class OPML20Generator extends OPML10Generator {
 
+	/**
+	 * Public constructor
+	 */
     public OPML20Generator() {
     }
 
@@ -50,10 +53,10 @@ public class OPML20Generator extends OPML10Generator {
     }
 
     /**
-     * Creates an XML document (JDOM) for the given feed bean.
+     * Creates an XML document (W3C) for the given feed bean.
      *
      * @param feed the feed bean to generate the XML document from.
-     * @return the generated XML document (JDOM).
+     * @return the generated XML document (W3C).
      * @throws IllegalArgumentException thrown if the type of the given feed bean does not match with the type of the
      *             WireFeedGenerator.
      * @throws FeedException thrown if the XML Document could not be created.
@@ -61,26 +64,26 @@ public class OPML20Generator extends OPML10Generator {
     @Override
     public Document generate(final WireFeed feed) throws IllegalArgumentException, FeedException {
         final Document document = super.generate(feed);
-        document.getRootElement().setAttribute("version", "2.0");
+        document.getDocumentElement().setAttribute("version", "2.0");
         return document;
     }
 
     @Override
-    protected Element generateHead(final Opml opml) {
-
-        final Element docsElement = new Element("docs");
-        docsElement.setText(opml.getDocs());
-
-        final Element headElement = super.generateHead(opml);
-        headElement.addContent(docsElement);
+    protected Element generateHead(final Opml opml, final Document doc) {
+        final Element headElement = super.generateHead(opml, doc);
+		if (null != headElement && null != opml.getDocs()) {
+			final Element docsElement = doc.createElement("docs");
+            docsElement.setTextContent(opml.getDocs());
+            headElement.appendChild(docsElement);
+		}
         return headElement;
 
     }
 
     @Override
-    protected Element generateOutline(final Outline outline) {
+    protected Element generateOutline(final Outline outline, final Element elem) {
 
-        final Element outlineElement = super.generateOutline(outline);
+        final Element outlineElement = super.generateOutline(outline, elem);
 
         if (outline.getCreated() != null) {
             outlineElement.setAttribute("created", DateParser.formatRFC822(outline.getCreated(), Locale.US));

@@ -21,20 +21,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Attribute;
-import org.jdom2.Content;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.output.XMLOutputter;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.content.ContentItem;
 import com.rometools.modules.content.ContentModule;
 import com.rometools.modules.content.ContentModuleImpl;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
+import com.rometools.rome.io.ModuleParser;
+import com.rometools.utils.DOMNodes;
 
-public class ContentModuleParser implements com.rometools.rome.io.ModuleParser {
-    private static final Namespace CONTENT_NS = Namespace.getNamespace("content", ContentModule.URI);
-    private static final Namespace RDF_NS = Namespace.getNamespace("rdf", ContentModule.RDF_URI);
-
+public class ContentModuleParser extends ChildNavigator implements ModuleParser {
+    private static final Namespace CONTENT_NS = XMLEventFactory.newDefaultFactory().createNamespace("content", ContentModule.URI);
+    private static final Namespace RDF_NS = XMLEventFactory.newDefaultFactory().createNamespace("rdf", ContentModule.RDF_URI);
+    
     public ContentModuleParser() {
     }
 
@@ -44,66 +48,66 @@ public class ContentModuleParser implements com.rometools.rome.io.ModuleParser {
     }
 
     @Override
-    public com.rometools.rome.feed.module.Module parse(final Element element, final Locale locale) {
+    public Module parse(final Element element, final Locale locale) {
         boolean foundSomething = false;
         final ContentModule cm = new ContentModuleImpl();
-        final List<Element> encodeds = element.getChildren("encoded", CONTENT_NS);
-        final ArrayList<String> contentStrings = new ArrayList<String>();
-        final ArrayList<String> encodedStrings = new ArrayList<String>();
+        final List<Element> encodeds = super.getChildren(element, "encoded", CONTENT_NS);
+        final List<String> contentStrings = new ArrayList<>(1);
+        final List<String> encodedStrings = new ArrayList<>(1);
 
         if (!encodeds.isEmpty()) {
             foundSomething = true;
 
             for (int i = 0; i < encodeds.size(); i++) {
                 final Element encodedElement = encodeds.get(i);
-                encodedStrings.add(encodedElement.getText());
-                contentStrings.add(encodedElement.getText());
+                encodedStrings.add(encodedElement.getTextContent());
+                contentStrings.add(encodedElement.getTextContent());
             }
         }
 
         final ArrayList<ContentItem> contentItems = new ArrayList<ContentItem>();
-        final List<Element> items = element.getChildren("items", CONTENT_NS);
+        final List<Element> items = super.getChildren(element, "items", CONTENT_NS);
 
         for (int i = 0; i < items.size(); i++) {
             foundSomething = true;
 
-            final List<Element> lis = items.get(i).getChild("Bag", RDF_NS).getChildren("li", RDF_NS);
+            final List<Element> lis = super.getChildren(super.getChild(items.get(i), "Bag", RDF_NS), "li", RDF_NS);
 
             for (int j = 0; j < lis.size(); j++) {
                 final ContentItem ci = new ContentItem();
                 final Element li = lis.get(j);
-                final Element item = li.getChild("item", CONTENT_NS);
-                final Element format = item.getChild("format", CONTENT_NS);
-                final Element encoding = item.getChild("encoding", CONTENT_NS);
-                final Element value = item.getChild("value", RDF_NS);
+                final Element item = super.getChild(li, "item", CONTENT_NS);
+                final Element format = super.getChild(item, "format", CONTENT_NS);
+                final Element encoding = super.getChild(item, "encoding", CONTENT_NS);
+                final Element value = super.getChild(item, "value", RDF_NS);
 
                 if (value != null) {
-                    if (value.getAttributeValue("parseType", RDF_NS) != null) {
-                        ci.setContentValueParseType(value.getAttributeValue("parseType", RDF_NS));
+                    if (super.getAttributeNotBlank("parseType", value, RDF_NS) != null) {
+                        ci.setContentValueParseType(super.getAttributeNotBlank("parseType", value, RDF_NS));
                     }
 
                     if (ci.getContentValueParseType() != null && ci.getContentValueParseType().equals("Literal")) {
-                        ci.setContentValue(getXmlInnerText(value));
-                        contentStrings.add(getXmlInnerText(value));
-                        ci.setContentValueNamespaces(value.getAdditionalNamespaces());
+                		ci.setContentValue(getXmlInnerText(value));
+                		contentStrings.add(getXmlInnerText(value));
+//                        ci.setContentValueNamespaces(value.getAdditionalNamespaces());
                     } else {
-                        ci.setContentValue(value.getText());
-                        contentStrings.add(value.getText());
+                        ci.setContentValue(value.getTextContent());
+                        contentStrings.add(value.getTextContent());
                     }
 
-                    ci.setContentValueDOM(value.clone().getContent());
+                    ci.setContentValueDOM(value);
                 }
 
                 if (format != null) {
-                    ci.setContentFormat(format.getAttribute("resource", RDF_NS).getValue());
+                    ci.setContentFormat(format.getAttributeNS(RDF_NS.getNamespaceURI(), "resource"));
                 }
 
                 if (encoding != null) {
-                    ci.setContentEncoding(encoding.getAttribute("resource", RDF_NS).getValue());
+                    ci.setContentEncoding(encoding.getAttributeNS(RDF_NS.getNamespaceURI(), "resource"));
                 }
 
                 if (item != null) {
-                    final Attribute about = item.getAttribute("about", RDF_NS);
+                    final Attr about = item.getAttributeNodeNS(RDF_NS.getNamespaceURI(), "about");
 
                     if (about != null) {
                         ci.setContentAbout(about.getValue());
@@ -121,12 +125,13 @@ public class ContentModuleParser implements com.rometools.rome.io.ModuleParser {
         return foundSomething ? cm : null;
     }
 
-    protected String getXmlInnerText(final Element e) {
-        final StringBuffer sb = new StringBuffer();
-        final XMLOutputter xo = new XMLOutputter();
-        final List<Content> children = e.getContent();
-        sb.append(xo.outputString(children));
-
-        return sb.toString();
+    private String getXmlInnerText(Element e) {
+    	StringBuilder sb = new StringBuilder();
+    	for (int i = 0; i < e.getChildNodes().getLength(); i++) {
+    		sb.append(DOMNodes.nodeToString(e.getChildNodes().item(i)));
+    	}
+    	return sb.toString();
+    	
     }
+    
 }

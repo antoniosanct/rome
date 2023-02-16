@@ -23,8 +23,9 @@ package com.rometools.opml;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 
-import com.rometools.opml.test.NullWriter;
 import com.rometools.opml.test.TestUtil;
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -32,12 +33,21 @@ import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.io.WireFeedInput;
 import com.rometools.rome.io.WireFeedOutput;
 
+/**
+ * TestOpsOPML10links class
+ */
 public class TestOpsOPML10links extends FeedOpsTest {
 
+	/**
+	 * Public constructor.
+	 */
     public TestOpsOPML10links() {
         super("opml_1.0_links");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     // 1.6
     @Override
     public void testWireFeedSyndFeedConversion() throws Exception {
@@ -54,6 +64,10 @@ public class TestOpsOPML10links extends FeedOpsTest {
         assertEquals(sFeed2.createWireFeed(), sFeed1.createWireFeed());
     }
 
+    /**
+     * testTemp
+     * @throws Exception any exception
+     */
     public void testTemp() throws Exception {
         final WireFeedInput input = new WireFeedInput();
         final WireFeed wf = input.build(TestUtil.loadFile("/opml_1.0_links.xml"));
@@ -64,7 +78,10 @@ public class TestOpsOPML10links extends FeedOpsTest {
         sf.setDescription("");
         sf.setLink("http://foo.com");
         sf.setFeedType("opml_1.0");
-        output.output(sf.createWireFeed(), new NullWriter());
+        StringWriter sw = new StringWriter();
+        output.output(sf.createWireFeed(), sw);
+        WireFeed wf2 = input.build(new StringReader(sw.toString()));
+        assertEquals(sf.getFeedType(), wf2.getFeedType());
     }
 
 }

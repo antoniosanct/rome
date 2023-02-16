@@ -24,12 +24,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.XMLOutputter;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.events.Namespace;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.atom.Category;
@@ -45,15 +56,19 @@ import com.rometools.utils.Lists;
 
 /**
  * Feed Generator for Atom
- * <p/>
+ * 
  */
 public class Atom10Generator extends BaseWireFeedGenerator {
 
     private static final String ATOM_10_URI = "http://www.w3.org/2005/Atom";
-    private static final Namespace ATOM_NS = Namespace.getNamespace(ATOM_10_URI);
+    
+    private static final Namespace ATOM_NS = BaseWireFeedParser.createNamespace(ATOM_10_URI);
 
     private final String version;
 
+    /**
+     * Public constructor.
+     */
     public Atom10Generator() {
         this("atom_1.0", "1.0");
     }
@@ -71,31 +86,36 @@ public class Atom10Generator extends BaseWireFeedGenerator {
         return ATOM_NS;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Document generate(final WireFeed wFeed) throws FeedException {
-        final Feed feed = (Feed) wFeed;
-        final Element root = createRootElement(feed);
-        populateFeed(feed, root);
-        purgeUnusedNamespaceDeclarations(root);
-        return createDocument(root);
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+			dbf.setNamespaceAware(true);
+			dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+			Document doc = dbf.newDocumentBuilder().newDocument();
+			final Feed feed = (Feed) wFeed;
+	        final Element root = createRootElement(feed, doc);
+	        populateFeed(feed, root, doc);
+	        purgeUnusedNamespaceDeclarations(root);
+	        doc.appendChild(root);
+	        return doc;
+		} catch (ParserConfigurationException e) {
+			throw new FeedException("Failed creating document", e);
+		}
     }
 
-    protected Document createDocument(final Element root) {
-        return new Document(root);
-    }
+    protected Element createRootElement(final Feed feed, final Document doc) {
 
-    protected Element createRootElement(final Feed feed) {
-
-        final Element root = new Element("feed", getFeedNamespace());
-
-        root.addNamespaceDeclaration(getFeedNamespace());
-
-        // Attribute version = new Attribute("version", getVersion());
-        // root.setAttribute(version);
+        final Element root = doc.createElementNS(getFeedNamespace().getNamespaceURI(), "feed");
 
         final String xmlBase = feed.getXmlBase();
         if (xmlBase != null) {
-            root.setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);
+            root.setAttributeNS(XMLConstants.XML_NS_URI, "base", xmlBase);
         }
 
         generateModuleNamespaceDefs(root);
@@ -104,225 +124,225 @@ public class Atom10Generator extends BaseWireFeedGenerator {
 
     }
 
-    protected void populateFeed(final Feed feed, final Element parent) throws FeedException {
-        addFeed(feed, parent);
-        addEntries(feed, parent);
+    protected void populateFeed(final Feed feed, final Element parent, final Document doc) throws FeedException {
+        addFeed(feed, parent, doc);
+        addEntries(feed, parent, doc);
     }
 
-    protected void addFeed(final Feed feed, final Element parent) throws FeedException {
+    protected void addFeed(final Feed feed, final Element parent, final Document doc) throws FeedException {
         final Element eFeed = parent;
-        populateFeedHeader(feed, eFeed);
-        generateForeignMarkup(eFeed, feed.getForeignMarkup());
+        populateFeedHeader(feed, eFeed, doc);
+        generateForeignMarkup(eFeed, feed.getForeignMarkup(), parent);
         checkFeedHeaderConstraints(eFeed);
         generateFeedModules(feed.getModules(), eFeed);
     }
 
-    protected void addEntries(final Feed feed, final Element parent) throws FeedException {
+    protected void addEntries(final Feed feed, final Element parent, final Document doc) throws FeedException {
         final List<Entry> items = feed.getEntries();
         for (final Entry entry : items) {
-            addEntry(entry, parent);
+            addEntry(entry, parent, doc);
         }
         checkEntriesConstraints(parent);
     }
 
-    protected void addEntry(final Entry entry, final Element parent) throws FeedException {
+    protected void addEntry(final Entry entry, final Element parent, final Document doc) throws FeedException {
 
-        final Element eEntry = new Element("entry", getFeedNamespace());
+        final Element eEntry = parent.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "entry");
 
         final String xmlBase = entry.getXmlBase();
         if (xmlBase != null) {
-            eEntry.setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);
+            eEntry.setAttributeNS(XMLConstants.XML_NS_URI, "base", xmlBase);
         }
 
-        populateEntry(entry, eEntry);
-        generateForeignMarkup(eEntry, entry.getForeignMarkup());
+        populateEntry(entry, eEntry, doc);
+        generateForeignMarkup(eEntry, entry.getForeignMarkup(), parent);
         checkEntryConstraints(eEntry);
         generateItemModules(entry.getModules(), eEntry);
-        parent.addContent(eEntry);
+        parent.appendChild(eEntry);
 
     }
 
-    protected void populateFeedHeader(final Feed feed, final Element eFeed) throws FeedException {
+    protected void populateFeedHeader(final Feed feed, final Element eFeed, final Document doc) throws FeedException {
 
         final Content titleEx = feed.getTitleEx();
         if (titleEx != null) {
-            final Element titleElement = new Element("title", getFeedNamespace());
-            fillContentElement(titleElement, titleEx);
-            eFeed.addContent(titleElement);
+            final Element titleElement = eFeed.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "title");
+            fillContentElement(titleElement, titleEx, doc);
+            eFeed.appendChild(titleElement);
         }
 
         final List<Link> alternateLinks = feed.getAlternateLinks();
         if (alternateLinks != null) {
             for (final Link link : alternateLinks) {
-                eFeed.addContent(generateLinkElement(link));
+                eFeed.appendChild(generateLinkElement(link, eFeed));
             }
         }
 
         final List<Link> otherLinks = feed.getOtherLinks();
         if (otherLinks != null) {
             for (final Link link : otherLinks) {
-                eFeed.addContent(generateLinkElement(link));
+                eFeed.appendChild(generateLinkElement(link, eFeed));
             }
         }
 
         final List<Category> cats = feed.getCategories();
         if (cats != null) {
             for (final Category category : cats) {
-                eFeed.addContent(generateCategoryElement(category));
+                eFeed.appendChild(generateCategoryElement(category, eFeed));
             }
         }
 
         final List<SyndPerson> authors = feed.getAuthors();
         if (Lists.isNotEmpty(authors)) {
             for (final SyndPerson author : authors) {
-                final Element authorElement = new Element("author", getFeedNamespace());
+                final Element authorElement = eFeed.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "author");
                 fillPersonElement(authorElement, author);
-                eFeed.addContent(authorElement);
+                eFeed.appendChild(authorElement);
             }
         }
 
         final List<SyndPerson> contributors = feed.getContributors();
         if (Lists.isNotEmpty(contributors)) {
             for (final SyndPerson contributor : contributors) {
-                final Element contributorElement = new Element("contributor", getFeedNamespace());
+                final Element contributorElement = eFeed.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "contributor");
                 fillPersonElement(contributorElement, contributor);
-                eFeed.addContent(contributorElement);
+                eFeed.appendChild(contributorElement);
             }
         }
 
         final Content subtitle = feed.getSubtitle();
         if (subtitle != null) {
-            final Element subtitleElement = new Element("subtitle", getFeedNamespace());
-            fillContentElement(subtitleElement, subtitle);
-            eFeed.addContent(subtitleElement);
+            final Element subtitleElement = eFeed.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "subtitle");
+            fillContentElement(subtitleElement, subtitle, doc);
+            eFeed.appendChild(subtitleElement);
         }
 
         final String id = feed.getId();
         if (id != null) {
-            eFeed.addContent(generateSimpleElement("id", id));
+            eFeed.appendChild(generateSimpleElement("id", id, eFeed));
         }
 
         final Generator generator = feed.getGenerator();
         if (generator != null) {
-            eFeed.addContent(generateGeneratorElement(generator));
+            eFeed.appendChild(generateGeneratorElement(generator, eFeed));
         }
 
         final String rights = feed.getRights();
         if (rights != null) {
-            eFeed.addContent(generateSimpleElement("rights", rights));
+            eFeed.appendChild(generateSimpleElement("rights", rights, eFeed));
         }
 
         final String icon = feed.getIcon();
         if (icon != null) {
-            eFeed.addContent(generateSimpleElement("icon", icon));
+            eFeed.appendChild(generateSimpleElement("icon", icon, eFeed));
         }
 
         final String logo = feed.getLogo();
         if (logo != null) {
-            eFeed.addContent(generateSimpleElement("logo", logo));
+            eFeed.appendChild(generateSimpleElement("logo", logo, eFeed));
         }
 
         final Date updated = feed.getUpdated();
         if (updated != null) {
-            final Element updatedElement = new Element("updated", getFeedNamespace());
-            updatedElement.addContent(DateParser.formatW3CDateTime(updated, Locale.US));
-            eFeed.addContent(updatedElement);
+            final Element updatedElement = eFeed.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "updated");
+            updatedElement.setTextContent(DateParser.formatW3CDateTime(updated, Locale.US));
+            eFeed.appendChild(updatedElement);
         }
 
     }
 
-    protected void populateEntry(final Entry entry, final Element eEntry) throws FeedException {
+    protected void populateEntry(final Entry entry, final Element eEntry, final Document doc) throws FeedException {
 
         final Content titleEx = entry.getTitleEx();
         if (titleEx != null) {
-            final Element titleElement = new Element("title", getFeedNamespace());
-            fillContentElement(titleElement, titleEx);
-            eEntry.addContent(titleElement);
+            final Element titleElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "title");
+            fillContentElement(titleElement, titleEx, doc);
+            eEntry.appendChild(titleElement);
         }
 
         final List<Link> alternateLinks = entry.getAlternateLinks();
         if (alternateLinks != null) {
             for (final Link link : alternateLinks) {
-                eEntry.addContent(generateLinkElement(link));
+                eEntry.appendChild(generateLinkElement(link, eEntry));
             }
         }
 
         final List<Link> otherLinks = entry.getOtherLinks();
         if (otherLinks != null) {
             for (final Link link : otherLinks) {
-                eEntry.addContent(generateLinkElement(link));
+                eEntry.appendChild(generateLinkElement(link, eEntry));
             }
         }
 
         final List<Category> cats = entry.getCategories();
         if (cats != null) {
             for (final Category category : cats) {
-                eEntry.addContent(generateCategoryElement(category));
+                eEntry.appendChild(generateCategoryElement(category, eEntry));
             }
         }
 
         final List<SyndPerson> authors = entry.getAuthors();
         if (Lists.isNotEmpty(authors)) {
             for (final SyndPerson author : authors) {
-                final Element authorElement = new Element("author", getFeedNamespace());
+                final Element authorElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "author");
                 fillPersonElement(authorElement, author);
-                eEntry.addContent(authorElement);
+                eEntry.appendChild(authorElement);
             }
         }
 
         final List<SyndPerson> contributors = entry.getContributors();
         if (Lists.isNotEmpty(contributors)) {
             for (final SyndPerson contributor : contributors) {
-                final Element contributorElement = new Element("contributor", getFeedNamespace());
+                final Element contributorElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "contributor");
                 fillPersonElement(contributorElement, contributor);
-                eEntry.addContent(contributorElement);
+                eEntry.appendChild(contributorElement);
             }
         }
 
         final String id = entry.getId();
         if (id != null) {
-            eEntry.addContent(generateSimpleElement("id", id));
+            eEntry.appendChild(generateSimpleElement("id", id, eEntry));
         }
 
         final Date updated = entry.getUpdated();
         if (updated != null) {
-            final Element updatedElement = new Element("updated", getFeedNamespace());
-            updatedElement.addContent(DateParser.formatW3CDateTime(updated, Locale.US));
-            eEntry.addContent(updatedElement);
+            final Element updatedElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "updated");
+            updatedElement.setTextContent(DateParser.formatW3CDateTime(updated, Locale.US));
+            eEntry.appendChild(updatedElement);
         }
 
         final Date published = entry.getPublished();
         if (published != null) {
-            final Element publishedElement = new Element("published", getFeedNamespace());
-            publishedElement.addContent(DateParser.formatW3CDateTime(published, Locale.US));
-            eEntry.addContent(publishedElement);
+            final Element publishedElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "published");
+            publishedElement.setTextContent(DateParser.formatW3CDateTime(published, Locale.US));
+            eEntry.appendChild(publishedElement);
         }
 
         final List<Content> contents = entry.getContents();
         if (Lists.isNotEmpty(contents)) {
-            final Element contentElement = new Element("content", getFeedNamespace());
+            final Element contentElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "content");
             final Content content = contents.get(0);
-            fillContentElement(contentElement, content);
-            eEntry.addContent(contentElement);
+            fillContentElement(contentElement, content, doc);
+            eEntry.appendChild(contentElement);
         }
 
         final Content summary = entry.getSummary();
         if (summary != null) {
-            final Element summaryElement = new Element("summary", getFeedNamespace());
-            fillContentElement(summaryElement, summary);
-            eEntry.addContent(summaryElement);
+            final Element summaryElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "summary");
+            fillContentElement(summaryElement, summary, doc);
+            eEntry.appendChild(summaryElement);
         }
 
         final Feed source = entry.getSource();
         if (source != null) {
-            final Element sourceElement = new Element("source", getFeedNamespace());
-            populateFeedHeader(source, sourceElement);
-            eEntry.addContent(sourceElement);
+            final Element sourceElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "source");
+            populateFeedHeader(source, sourceElement, doc);
+            eEntry.appendChild(sourceElement);
         }
 
         final String rights = entry.getRights();
         if (rights != null) {
-            eEntry.addContent(generateSimpleElement("rights", rights));
+            eEntry.appendChild(generateSimpleElement("rights", rights, eEntry));
         }
 
     }
@@ -336,71 +356,62 @@ public class Atom10Generator extends BaseWireFeedGenerator {
     protected void checkEntryConstraints(final Element eEntry) throws FeedException {
     }
 
-    protected Element generateCategoryElement(final Category cat) {
+    protected Element generateCategoryElement(final Category cat, final Element eEntry) {
 
         final Namespace namespace = getFeedNamespace();
-        final Element catElement = new Element("category", namespace);
+        final Element catElement = eEntry.getOwnerDocument().createElementNS(namespace.getNamespaceURI(), "category");
 
         final String term = cat.getTerm();
         if (term != null) {
-            final Attribute termAttribute = new Attribute("term", term);
-            catElement.setAttribute(termAttribute);
+            catElement.setAttribute("term", term);
         }
 
         final String label = cat.getLabel();
         if (label != null) {
-            final Attribute labelAttribute = new Attribute("label", label);
-            catElement.setAttribute(labelAttribute);
+            catElement.setAttribute("label", label);
         }
 
         final String scheme = cat.getScheme();
         if (scheme != null) {
-            final Attribute schemeAttribute = new Attribute("scheme", scheme);
-            catElement.setAttribute(schemeAttribute);
+            catElement.setAttribute("scheme", scheme);
         }
 
         return catElement;
 
     }
 
-    protected Element generateLinkElement(final Link link) {
+    protected Element generateLinkElement(final Link link, final Element eEntry) {
 
         final Namespace namespace = getFeedNamespace();
-        final Element linkElement = new Element("link", namespace);
+        final Element linkElement = eEntry.getOwnerDocument().createElementNS(namespace.getNamespaceURI(), "link");
 
         final String rel = link.getRel();
         if (rel != null) {
-            final Attribute relAttribute = new Attribute("rel", rel);
-            linkElement.setAttribute(relAttribute);
+            linkElement.setAttribute("rel", rel);
         }
 
         final String type = link.getType();
         if (type != null) {
-            final Attribute typeAttribute = new Attribute("type", type);
-            linkElement.setAttribute(typeAttribute);
+            linkElement.setAttribute("type", type);
         }
 
         final String href = link.getHref();
         if (href != null) {
-            final Attribute hrefAttribute = new Attribute("href", href);
-            linkElement.setAttribute(hrefAttribute);
+            linkElement.setAttribute("href", href);
         }
 
         final String hreflang = link.getHreflang();
         if (hreflang != null) {
-            final Attribute hreflangAttribute = new Attribute("hreflang", hreflang);
-            linkElement.setAttribute(hreflangAttribute);
+            linkElement.setAttribute("hreflang", hreflang);
         }
 
         final String linkTitle = link.getTitle();
         if (linkTitle != null) {
-            final Attribute title = new Attribute("title", linkTitle);
-            linkElement.setAttribute(title);
+            linkElement.setAttribute("title", linkTitle);
         }
 
         if (link.getLength() != 0) {
-            final Attribute lenght = new Attribute("length", Long.toString(link.getLength()));
-            linkElement.setAttribute(lenght);
+            linkElement.setAttribute("length", Long.toString(link.getLength()));
         }
 
         return linkElement;
@@ -411,43 +422,42 @@ public class Atom10Generator extends BaseWireFeedGenerator {
 
         final String name = person.getName();
         if (name != null) {
-            element.addContent(generateSimpleElement("name", name));
+            element.appendChild(generateSimpleElement("name", name, element));
         }
 
         final String uri = person.getUri();
         if (uri != null) {
-            element.addContent(generateSimpleElement("uri", uri));
+            element.appendChild(generateSimpleElement("uri", uri, element));
         }
 
         final String email = person.getEmail();
         if (email != null) {
-            element.addContent(generateSimpleElement("email", email));
+            element.appendChild(generateSimpleElement("email", email, element));
         }
 
         generatePersonModules(person.getModules(), element);
 
     }
 
-    protected Element generateTagLineElement(final Content tagline) {
+    protected Element generateTagLineElement(final Content tagline, final Element eEntry) {
 
-        final Element taglineElement = new Element("subtitle", getFeedNamespace());
+        final Element taglineElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "subtitle");
 
         final String type = tagline.getType();
         if (type != null) {
-            final Attribute typeAttribute = new Attribute("type", type);
-            taglineElement.setAttribute(typeAttribute);
+            taglineElement.setAttribute("type", type);
         }
 
         final String value = tagline.getValue();
         if (value != null) {
-            taglineElement.addContent(value);
+            taglineElement.setTextContent(value);
         }
 
         return taglineElement;
 
     }
 
-    protected void fillContentElement(final Element contentElement, final Content content) throws FeedException {
+    protected void fillContentElement(final Element contentElement, final Content content, final Document doc) throws FeedException {
 
         final String type = content.getType();
 
@@ -464,14 +474,12 @@ public class Atom10Generator extends BaseWireFeedGenerator {
                 atomType = Content.XHTML;
             }
 
-            final Attribute typeAttribute = new Attribute("type", atomType);
-            contentElement.setAttribute(typeAttribute);
+            contentElement.setAttribute("type", atomType);
         }
 
         final String href = content.getSrc();
         if (href != null) {
-            final Attribute srcAttribute = new Attribute("src", href);
-            contentElement.setAttribute(srcAttribute);
+            contentElement.setAttribute("src", href);
         }
 
         final String value = content.getValue();
@@ -485,58 +493,65 @@ public class Atom10Generator extends BaseWireFeedGenerator {
                 final StringReader tmpDocReader = new StringReader(tmpDocString.toString());
                 Document tmpDoc;
                 try {
-                    final SAXBuilder saxBuilder = new SAXBuilder();
-                    tmpDoc = saxBuilder.build(tmpDocReader);
+                	DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+                	dbf.setNamespaceAware(true);
+                	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+                	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        			DocumentBuilder db = dbf.newDocumentBuilder();
+                    tmpDoc = db.parse(new InputSource(tmpDocReader));
                 } catch (final Exception ex) {
                     throw new FeedException("Invalid XML", ex);
                 }
-                final List<org.jdom2.Content> children = tmpDoc.getRootElement().removeContent();
-                contentElement.addContent(children);
-
+                Node newN = doc.importNode(tmpDoc.getDocumentElement(), true);
+                contentElement.appendChild(newN.getFirstChild());
             } else {
 
                 // must be type html, text or some other non-XML format
                 // JDOM will escape property for XML
-                contentElement.addContent(value);
+                contentElement.setTextContent(value);
 
             }
 
         }
     }
 
-    protected Element generateGeneratorElement(final Generator generator) {
+    protected Element generateGeneratorElement(final Generator generator, final Element eEntry) {
 
-        final Element generatorElement = new Element("generator", getFeedNamespace());
+        final Element generatorElement = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "generator");
 
         final String url = generator.getUrl();
         if (url != null) {
-            final Attribute urlAttribute = new Attribute("uri", url);
-            generatorElement.setAttribute(urlAttribute);
+            generatorElement.setAttribute("uri", url);
         }
 
         final String version2 = generator.getVersion();
         if (version2 != null) {
-            final Attribute versionAttribute = new Attribute("version", version2);
-            generatorElement.setAttribute(versionAttribute);
+            generatorElement.setAttribute("version", version2);
         }
 
         final String value = generator.getValue();
         if (value != null) {
-            generatorElement.addContent(value);
+            generatorElement.setTextContent(value);
         }
 
         return generatorElement;
 
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, getFeedNamespace());
-        element.addContent(value);
+    protected Element generateSimpleElement(final String name, final String value, final Element eEntry) {
+        final Element element = eEntry.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), name);
+        element.setTextContent(value);
         return element;
     }
 
     /**
      * Utility method to serialize an entry to writer.
+     * @param entry the entry to serialize
+     * @param writer the writer to commit entry
+     * @throws IllegalArgumentException any illegal argument exception
+     * @throws FeedException any feed exception
+     * @throws IOException any I/O exception
      */
     public static void serializeEntry(final Entry entry, final Writer writer) throws IllegalArgumentException, FeedException, IOException {
 
@@ -549,13 +564,24 @@ public class Atom10Generator extends BaseWireFeedGenerator {
 
         // Get Rome to output feed as a JDOM document
         final WireFeedOutput wireFeedOutput = new WireFeedOutput();
-        final Document feedDoc = wireFeedOutput.outputJDom(feed1);
+        final Document feedDoc = wireFeedOutput.outputDom(feed1);
 
         // Grab entry element from feed and get JDOM to serialize it
-        final Element entryElement = feedDoc.getRootElement().getChildren().get(0);
+        final Element entryElement = (Element) feedDoc.getDocumentElement().getChildNodes().item(0);
 
-        final XMLOutputter outputter = new XMLOutputter();
-        outputter.output(entryElement, writer);
+		try {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+			Transformer t = tf.newTransformer();
+			t.setOutputProperty(OutputKeys.METHOD, "xml");
+			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+	        StreamResult result = new StreamResult(writer);
+	        DOMSource source = new DOMSource(entryElement);
+	        t.transform(source, result);
+		} catch (TransformerException | TransformerFactoryConfigurationError e) {
+			throw new FeedException("Error outputting feed", e);
+		}
     }
 
 }

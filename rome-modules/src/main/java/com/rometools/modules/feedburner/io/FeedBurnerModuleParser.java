@@ -18,19 +18,22 @@ package com.rometools.modules.feedburner.io;
 
 import java.util.Locale;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.feedburner.FeedBurner;
 import com.rometools.modules.feedburner.FeedBurnerImpl;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 
 /**
  * ModuleParser implementation for the FeedBurner RSS extension.
  */
-public class FeedBurnerModuleParser implements ModuleParser {
-    private static final Namespace NS = Namespace.getNamespace(FeedBurner.URI);
+public class FeedBurnerModuleParser extends ChildNavigator implements ModuleParser {
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(FeedBurner.URI);
 
     @Override
     public String getNamespaceUri() {
@@ -41,24 +44,24 @@ public class FeedBurnerModuleParser implements ModuleParser {
     public Module parse(final Element element, final Locale locale) {
         final FeedBurnerImpl fbi = new FeedBurnerImpl();
         boolean returnObj = false;
-        Element tag = element.getChild("awareness", FeedBurnerModuleParser.NS);
+        Element tag = super.getChild(element, "awareness", FeedBurnerModuleParser.NS);
 
         if (tag != null) {
-            fbi.setAwareness(tag.getText().trim());
+            fbi.setAwareness(tag.getTextContent().trim());
             returnObj = true;
         }
 
-        tag = element.getChild("origLink", FeedBurnerModuleParser.NS);
+        tag = super.getChild(element, "origLink", FeedBurnerModuleParser.NS);
 
         if (tag != null) {
-            fbi.setOrigLink(tag.getText().trim());
+            fbi.setOrigLink(tag.getTextContent().trim());
             returnObj = true;
         }
 
-        tag = element.getChild("origEnclosureLink", FeedBurnerModuleParser.NS);
+        tag = super.getChild(element, "origEnclosureLink", FeedBurnerModuleParser.NS);
 
         if (tag != null) {
-            fbi.setOrigEnclosureLink(tag.getText().trim());
+            fbi.setOrigEnclosureLink(tag.getTextContent().trim());
             returnObj = true;
         }
 

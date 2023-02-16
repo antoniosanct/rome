@@ -11,11 +11,14 @@
  */
 package com.rometools.modules.sse.modules;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +38,7 @@ public abstract class SSEModule implements Module {
 
     // a default prefix to use for sse tags
     public static final String PREFIX = "sx";
-    public static final Namespace SSE_NS = Namespace.getNamespace(PREFIX, SSE_SCHEMA_URI);
+    public static final Namespace SSE_NS = XMLEventFactory.newDefaultFactory().createNamespace(PREFIX, SSE_SCHEMA_URI);
 
     public static final Set<Namespace> NAMESPACES;
 
@@ -59,14 +62,14 @@ public abstract class SSEModule implements Module {
     public Object clone() {
         SSEModule clone = null;
         try {
-            clone = this.getClass().newInstance();
-            clone.copyFrom(this);
-        } catch (final InstantiationException e) {
-            LOG.error("Error", e);
-        } catch (final IllegalAccessException e) {
-            LOG.error("Error", e);
-        }
+			clone = this.getClass().getDeclaredConstructor().newInstance();
+			clone.copyFrom(this);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			LOG.error("Error", e);
+		}
         return clone;
+        
     }
 
     @Override

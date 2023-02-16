@@ -20,19 +20,19 @@ import com.rometools.rome.feed.CopyFrom;
 
 /**
  * <pre>
- * <sx:sharing>
+ * &lt;sx:sharing&gt;
  * </pre>
  *
  * Element within RSS
  *
  * <pre>
- * <channel>
+ * &lt;channel&gt;
  * </pre>
  *
  * or OPML
  *
  * <pre>
- * <head>
+ * &lt;head&gt;
  * </pre>
  *
  * .
@@ -48,7 +48,7 @@ public class Sharing extends SSEModule {
     public static final String WINDOW_ATTRIBUTE = "window";
     public static final String VERSION_ATTRIBUTE = "version";
 
-    public static final String VERSION = "0.91";
+    public static final String SSEVERSION = "0.91";
 
     // whether subscribers MUST treat the item list as an ordered set
     private Boolean ordered;

@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.junit.Assert;
+
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.io.impl.DateParser;
 
@@ -96,12 +98,12 @@ public class TestSyndFeedAtom03 extends SyndFeedTest {
 
     @Override
     public void testLanguage() throws Exception {
-        // not supported
+        Assert.assertNull(null);
     }
 
     @Override
     public void testImage() throws Exception {
-        // not supported
+    	Assert.assertNull(null);
     }
 
     @Override

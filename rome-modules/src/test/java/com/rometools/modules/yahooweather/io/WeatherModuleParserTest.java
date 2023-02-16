@@ -23,9 +23,6 @@ package com.rometools.modules.yahooweather.io;
 import java.io.File;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +31,12 @@ import com.rometools.modules.cc.io.CCModuleGenerator;
 import com.rometools.modules.yahooweather.YWeatherEntryModule;
 import com.rometools.modules.yahooweather.YWeatherModule;
 import com.rometools.modules.yahooweather.YWeatherModuleImpl;
-import com.rometools.modules.yahooweather.io.WeatherModuleParser;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class WeatherModuleParserTest extends AbstractTestCase {
 
@@ -68,19 +67,16 @@ public class WeatherModuleParserTest extends AbstractTestCase {
             if (!testFiles[h].getName().endsWith(".xml")) {
                 continue;
             }
-
+            LOG.debug(testFiles[h].getName());
+            
             final SyndFeed feed = input.build(testFiles[h]);
             final List<SyndEntry> entries = feed.getEntries();
             for (int i = 0; i < entries.size(); i++) {
                 final SyndEntry entry = entries.get(i);
-                LOG.debug("{}", entry.getModules().size());
                 for (int j = 0; j < entry.getModules().size(); j++) {
-                    LOG.debug("{}", entry.getModules().get(j).getClass());
                     if (entry.getModules().get(j) instanceof YWeatherModule) {
                         final YWeatherModule base = (YWeatherModule) entry.getModules().get(j);
                         assertTrue(((YWeatherEntryModule) base).getForecasts().length > 0);
-                        LOG.debug(testFiles[h].getName());
-
                         final YWeatherEntryModule module2 = new YWeatherModuleImpl();
                         module2.copyFrom(base);
                         assertEquals(((YWeatherEntryModule) base).getForecasts().length, module2.getForecasts().length);

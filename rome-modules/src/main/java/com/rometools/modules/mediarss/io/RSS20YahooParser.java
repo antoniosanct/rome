@@ -23,9 +23,11 @@ package com.rometools.modules.mediarss.io;
 
 import java.util.Locale;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.io.impl.RSS20Parser;
@@ -45,7 +47,6 @@ public class RSS20YahooParser extends RSS20Parser {
 
     /**
      * Indicates if a JDom document is an RSS instance that can be parsed with the parser.
-     * <p/>
      * It checks for RDF ("http://www.w3.org/1999/02/22-rdf-syntax-ns#") and RSS
      * ("http://purl.org/rss/1.0/") namespaces being defined in the root element.
      *
@@ -56,8 +57,8 @@ public class RSS20YahooParser extends RSS20Parser {
     public boolean isMyType(final Document document) {
         boolean ok = false;
 
-        final Element rssRoot = document.getRootElement();
-        final Namespace defaultNS = rssRoot.getNamespace();
+        final Element rssRoot = (Element) document.getFirstChild();
+        final Namespace defaultNS = XMLEventFactory.newDefaultFactory().createNamespace(rssRoot.getNamespaceURI());
 
         ok = defaultNS != null && defaultNS.equals(getRSSNamespace());
 
@@ -66,13 +67,13 @@ public class RSS20YahooParser extends RSS20Parser {
 
     /**
      * Returns the namespace used by RSS elements in document of the RSS 1.0
-     * <P>
+
      *
      * @return returns "http://purl.org/rss/1.0/".
      */
     @Override
     protected Namespace getRSSNamespace() {
-        return Namespace.getNamespace(RSS_URI);
+        return XMLEventFactory.newDefaultFactory().createNamespace(RSS_URI);
     }
 
     /**

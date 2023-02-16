@@ -18,7 +18,7 @@ package com.rometools.rome.io.impl;
 
 import java.util.List;
 
-import org.jdom2.Element;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.rss.Category;
 import com.rometools.rome.feed.rss.Channel;
@@ -27,7 +27,7 @@ import com.rometools.rome.feed.rss.Item;
 
 /**
  * Feed Generator for RSS 2.0
- * <p/>
+ * 
  */
 public class RSS20Generator extends RSS094Generator {
 
@@ -46,50 +46,50 @@ public class RSS20Generator extends RSS094Generator {
 
         final String generator = channel.getGenerator();
         if (generator != null) {
-            eChannel.addContent(generateSimpleElement("generator", generator));
+            eChannel.appendChild(generateSimpleElement("generator", generator, eChannel));
         }
 
         final int ttl = channel.getTtl();
         if (ttl > -1) {
-            eChannel.addContent(generateSimpleElement("ttl", String.valueOf(ttl)));
+            eChannel.appendChild(generateSimpleElement("ttl", String.valueOf(ttl), eChannel));
         }
 
         final List<Category> categories = channel.getCategories();
         for (final Category category : categories) {
-            eChannel.addContent(generateCategoryElement(category));
+            eChannel.appendChild(generateCategoryElement(category, eChannel));
         }
 
-        generateForeignMarkup(eChannel, channel.getForeignMarkup());
+        generateForeignMarkup(eChannel, channel.getForeignMarkup(), eChannel.getOwnerDocument().getDocumentElement());
 
     }
 
     @Override
-    public void populateItem(final Item item, final Element eItem, final int index) {
+    public void populateItem(final Item item, final Element eItem, final int index, final Element parent) {
 
-        super.populateItem(item, eItem, index);
+        super.populateItem(item, eItem, index, parent);
 
-        final Element description = eItem.getChild("description", getFeedNamespace());
-        if (description != null) {
-            description.removeAttribute("type");
+        final Element description = super.getChild(eItem, "description");
+        if (null != description) {
+        	description.removeAttribute("type");
         }
 
         final String author = item.getAuthor();
         if (author != null) {
-            eItem.addContent(generateSimpleElement("author", author));
+            eItem.appendChild(generateSimpleElement("author", author, eItem));
         }
 
         final String comments = item.getComments();
         if (comments != null) {
-            eItem.addContent(generateSimpleElement("comments", comments));
+            eItem.appendChild(generateSimpleElement("comments", comments, eItem));
         }
 
         final Guid guid = item.getGuid();
         if (guid != null) {
-            final Element eGuid = generateSimpleElement("guid", guid.getValue());
+            final Element eGuid = generateSimpleElement("guid", guid.getValue(), eItem);
             if (!guid.isPermaLink()) {
                 eGuid.setAttribute("isPermaLink", "false");
             }
-            eItem.addContent(eGuid);
+            eItem.appendChild(eGuid);
         }
     }
 

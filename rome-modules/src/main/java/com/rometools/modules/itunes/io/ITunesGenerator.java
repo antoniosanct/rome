@@ -16,25 +16,28 @@
  */
 package com.rometools.modules.itunes.io;
 
-import com.rometools.modules.itunes.types.Subcategory;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.itunes.AbstractITunesObject;
 import com.rometools.modules.itunes.EntryInformationImpl;
 import com.rometools.modules.itunes.FeedInformationImpl;
 import com.rometools.modules.itunes.types.Category;
+import com.rometools.modules.itunes.types.Subcategory;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleGenerator;
 
 public class ITunesGenerator implements ModuleGenerator {
 
     private static final HashSet<Namespace> NAMESPACES = new HashSet<Namespace>();
-    private static final Namespace NAMESPACE = Namespace.getNamespace(AbstractITunesObject.PREFIX, AbstractITunesObject.URI);
+    private static final Namespace NAMESPACE = XMLEventFactory.newDefaultFactory().createNamespace(AbstractITunesObject.PREFIX, AbstractITunesObject.URI);
 
     static {
         NAMESPACES.add(NAMESPACE);
@@ -47,11 +50,12 @@ public class ITunesGenerator implements ModuleGenerator {
     public void generate(final Module module, final Element element) {
         Element root = element;
 
-        while (root.getParent() != null && root.getParent() instanceof Element) {
-            root = (Element) root.getParent();
+        while (root.getParentNode() != null && root.getParentNode() instanceof Element) {
+            root = (Element) root.getParentNode();
         }
 
-        root.addNamespaceDeclaration(NAMESPACE);
+//        root.addNamespaceDeclaration(NAMESPACE);
+        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + NAMESPACE.getPrefix(), NAMESPACE.getNamespaceURI());
 
         if (!(module instanceof AbstractITunesObject)) {
             return;
@@ -62,91 +66,91 @@ public class ITunesGenerator implements ModuleGenerator {
         if (itunes instanceof FeedInformationImpl) {
             // Do Channel Specific Stuff.
             final FeedInformationImpl info = (FeedInformationImpl) itunes;
-            final Element owner = generateSimpleElement("owner", "");
-            final Element email = generateSimpleElement("email", info.getOwnerEmailAddress());
-            owner.addContent(email);
+            final Element owner = generateSimpleElement("owner", "", element.getOwnerDocument());
+            final Element email = generateSimpleElement("email", info.getOwnerEmailAddress(), element.getOwnerDocument());
+            owner.appendChild(email);
 
-            final Element name = generateSimpleElement("name", info.getOwnerName());
-            owner.addContent(name);
-            element.addContent(owner);
+            final Element name = generateSimpleElement("name", info.getOwnerName(), element.getOwnerDocument());
+            owner.appendChild(name);
+            element.appendChild(owner);
 
             final List<Category> categories = info.getCategories();
             for (final Category cat : categories) {
 
-                final Element category = generateSimpleElement("category", "");
+                final Element category = generateSimpleElement("category", "", element.getOwnerDocument());
                 category.setAttribute("text", cat.getName());
 
                 for (Subcategory subcategory : cat.getSubcategories()) {
-                    final Element subcat = generateSimpleElement("category", "");
+                    final Element subcat = generateSimpleElement("category", "", element.getOwnerDocument());
                     subcat.setAttribute("text", subcategory.getName());
-                    category.addContent(subcat);
+                    category.appendChild(subcat);
                 }
 
-                element.addContent(category);
+                element.appendChild(category);
             }
 
             if (info.getType() != null) {
-                element.addContent(generateSimpleElement("type",info.getType()));
+                element.appendChild(generateSimpleElement("type",info.getType(), element.getOwnerDocument()));
             }
 
             if (info.getComplete()) {
-                element.addContent(generateSimpleElement("complete", "yes"));
+                element.appendChild(generateSimpleElement("complete", "yes", element.getOwnerDocument()));
             }
 
             if (info.getNewFeedUrl() != null) {
-                element.addContent(generateSimpleElement("new-feed-url", info.getNewFeedUrl()));
+                element.appendChild(generateSimpleElement("new-feed-url", info.getNewFeedUrl(), element.getOwnerDocument()));
             }
 
         } else if (itunes instanceof EntryInformationImpl) {
             final EntryInformationImpl info = (EntryInformationImpl) itunes;
 
             if (info.getDuration() != null) {
-                element.addContent(generateSimpleElement("duration", info.getDuration().toString()));
+                element.appendChild(generateSimpleElement("duration", info.getDuration().toString(), element.getOwnerDocument()));
             }
             if (info.getClosedCaptioned()) {
-                element.addContent(generateSimpleElement("isClosedCaptioned", "yes"));
+                element.appendChild(generateSimpleElement("isClosedCaptioned", "yes", element.getOwnerDocument()));
             }
             if (info.getOrder() != null) {
-                element.addContent(generateSimpleElement("order", info.getOrder().toString()));
+                element.appendChild(generateSimpleElement("order", info.getOrder().toString(), element.getOwnerDocument()));
             }
             if (info.getEpisodeType() != null) {
-                element.addContent(generateSimpleElement("episodeType", info.getEpisodeType()));
+                element.appendChild(generateSimpleElement("episodeType", info.getEpisodeType(), element.getOwnerDocument()));
             }
             if (info.getSeason() != null && info.getSeason() > 0) {
-                element.addContent(generateSimpleElement("season", info.getSeason().toString()));
+                element.appendChild(generateSimpleElement("season", info.getSeason().toString(), element.getOwnerDocument()));
             }
             if (info.getEpisode() != null && info.getEpisode() > 0) {
-                element.addContent(generateSimpleElement("episode", info.getEpisode().toString()));
+                element.appendChild(generateSimpleElement("episode", info.getEpisode().toString(), element.getOwnerDocument()));
             }
             if (info.getTitle() != null) {
-                element.addContent(generateSimpleElement("title", info.getTitle()));
+                element.appendChild(generateSimpleElement("title", info.getTitle(), element.getOwnerDocument()));
             }
         }
 
         if (itunes.getAuthor() != null) {
-            element.addContent(generateSimpleElement("author", itunes.getAuthor()));
+            element.appendChild(generateSimpleElement("author", itunes.getAuthor(), element.getOwnerDocument()));
         }
 
         if (itunes.getBlock()) {
-            element.addContent(generateSimpleElement("block", "Yes"));
+            element.appendChild(generateSimpleElement("block", "Yes", element.getOwnerDocument()));
         }
 
         if (itunes.getExplicitNullable() != null) {
             if (itunes.getExplicitNullable()) {
-                element.addContent(generateSimpleElement("explicit", "yes"));
+                element.appendChild(generateSimpleElement("explicit", "yes", element.getOwnerDocument()));
             } else {
-                element.addContent(generateSimpleElement("explicit", "no"));
+                element.appendChild(generateSimpleElement("explicit", "no", element.getOwnerDocument()));
             }
         }
 
         if (itunes.getImage() != null) {
-            final Element image = generateSimpleElement("image", "");
+            final Element image = generateSimpleElement("image", "", element.getOwnerDocument());
             image.setAttribute("href", itunes.getImage().toString());
-            element.addContent(image);
+            element.appendChild(image);
         } else if (itunes.getImageUri() != null) {
-            final Element image = generateSimpleElement("image", "");
+            final Element image = generateSimpleElement("image", "", element.getOwnerDocument());
             image.setAttribute("href", itunes.getImageUri().toString());
-            element.addContent(image);
+            element.appendChild(image);
         }
 
         if (itunes.getKeywords() != null) {
@@ -159,16 +163,17 @@ public class ITunesGenerator implements ModuleGenerator {
 
                 sb.append(itunes.getKeywords()[i]);
             }
-
-            element.addContent(generateSimpleElement("keywords", sb.toString()));
+            if (!"".equals(sb.toString())) {
+            	element.appendChild(generateSimpleElement("keywords", sb.toString(), element.getOwnerDocument()));
+            }
         }
 
         if (itunes.getSubtitle() != null) {
-            element.addContent(generateSimpleElement("subtitle", itunes.getSubtitle()));
+            element.appendChild(generateSimpleElement("subtitle", itunes.getSubtitle(), element.getOwnerDocument()));
         }
 
         if (itunes.getSummary() != null) {
-            element.addContent(generateSimpleElement("summary", itunes.getSummary()));
+            element.appendChild(generateSimpleElement("summary", itunes.getSummary(), element.getOwnerDocument()));
         }
     }
 
@@ -192,9 +197,10 @@ public class ITunesGenerator implements ModuleGenerator {
         return AbstractITunesObject.URI;
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, NAMESPACE);
-        element.addContent(value);
+    protected Element generateSimpleElement(final String name, final String value, final Document doc) {
+        final Element element = doc.createElementNS(NAMESPACE.getNamespaceURI(), name);
+        element.setPrefix(NAMESPACE.getPrefix());
+        element.setTextContent(value);
 
         return element;
     }

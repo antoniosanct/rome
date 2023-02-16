@@ -16,25 +16,29 @@
  */
 package com.rometools.modules.psc.io;
 
-import com.rometools.modules.psc.types.SimpleChapter;
-import com.rometools.modules.psc.modules.PodloveSimpleChapterModule;
-import com.rometools.modules.psc.modules.PodloveSimpleChapterModuleImpl;
-import com.rometools.rome.feed.module.Module;
-import com.rometools.rome.io.ModuleParser;
-import org.jdom2.Attribute;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+
+import com.rometools.modules.psc.modules.PodloveSimpleChapterModule;
+import com.rometools.modules.psc.modules.PodloveSimpleChapterModuleImpl;
+import com.rometools.modules.psc.types.SimpleChapter;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
+import com.rometools.rome.io.ModuleParser;
+
 /**
  * The ModuleParser implementation for the Podlove Simple Chapter plug in.
  */
-public class PodloveSimpleChapterParser implements ModuleParser {
+public class PodloveSimpleChapterParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace NS = Namespace.getNamespace(PodloveSimpleChapterModule.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(PodloveSimpleChapterModule.URI);
 
     @Override
     public String getNamespaceUri() {
@@ -43,10 +47,10 @@ public class PodloveSimpleChapterParser implements ModuleParser {
 
     @Override
     public Module parse(final Element element, final Locale locale) {
-        final Element chaptersElement = element.getChild(PodloveSimpleChapterAttribute.CHAPTERS, NS);
+        final Element chaptersElement = super.getChild(element, PodloveSimpleChapterAttribute.CHAPTERS, NS);
         if (chaptersElement != null) {
             final PodloveSimpleChapterModuleImpl m = new PodloveSimpleChapterModuleImpl();
-            final List<Element> es = chaptersElement.getChildren(PodloveSimpleChapterAttribute.CHAPTER, NS);
+            final List<Element> es = super.getChildren(chaptersElement, PodloveSimpleChapterAttribute.CHAPTER, NS);
             if (!es.isEmpty()) {
                 final List<SimpleChapter> result = new LinkedList<SimpleChapter>();
                 for (Element e : es) {
@@ -88,9 +92,9 @@ public class PodloveSimpleChapterParser implements ModuleParser {
     }
 
     protected String getAttributeValue(final Element e, final String attributeName) {
-        Attribute attr = e.getAttribute(attributeName);
+        Attr attr = e.getAttributeNode(attributeName);
         if (attr == null) {
-            attr = e.getAttribute(attributeName, NS);
+            attr = e.getAttributeNodeNS(NS.getNamespaceURI(), attributeName);
         }
         if (attr != null) {
             return attr.getValue();

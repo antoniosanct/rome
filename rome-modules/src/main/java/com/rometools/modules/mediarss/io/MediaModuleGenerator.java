@@ -25,10 +25,14 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.georss.GMLGenerator;
+import com.rometools.modules.georss.GeoRSSModule;
 import com.rometools.modules.mediarss.MediaEntryModule;
 import com.rometools.modules.mediarss.MediaModule;
 import com.rometools.modules.mediarss.types.Category;
@@ -51,19 +55,23 @@ import com.rometools.modules.mediarss.types.Text;
 import com.rometools.modules.mediarss.types.Thumbnail;
 import com.rometools.modules.mediarss.types.UrlReference;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 /**
  * Generator for MediaRSS module.
  *
  */
-public class MediaModuleGenerator implements ModuleGenerator {
+public class MediaModuleGenerator extends ChildNavigator implements ModuleGenerator {
 
-    private static final Namespace NS = Namespace.getNamespace("media", MediaModule.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("media", MediaModule.URI);
     private static final Set<Namespace> NAMESPACES = new HashSet<Namespace>();
 
     static {
         NAMESPACES.add(NS);
+        NAMESPACES.add(GeoRSSModule.SIMPLE_NS);
+        NAMESPACES.add(GeoRSSModule.W3CGEO_NS);
+        NAMESPACES.add(GeoRSSModule.GML_NS);
     }
 
     @Override
@@ -96,7 +104,8 @@ public class MediaModuleGenerator implements ModuleGenerator {
     }
 
     public void generateContent(final MediaContent c, final Element e) {
-        final Element mc = new Element("content", NS);
+        final Element mc = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "content");
+        mc.setPrefix(NS.getPrefix());
         addNotNullAttribute(mc, "medium", c.getMedium());
         addNotNullAttribute(mc, "channels", c.getAudioChannels());
         addNotNullAttribute(mc, "bitrate", c.getBitrate());
@@ -122,11 +131,11 @@ public class MediaModuleGenerator implements ModuleGenerator {
         }
 
         generateMetadata(c.getMetadata(), mc);
-        e.addContent(mc);
+        e.appendChild(mc);
     }
 
     public void generateGroup(final MediaGroup g, final Element e) {
-        final Element t = new Element("group", NS);
+        final Element t = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "group");
         final MediaContent[] c = g.getContents();
 
         for (final MediaContent element : c) {
@@ -134,7 +143,7 @@ public class MediaModuleGenerator implements ModuleGenerator {
         }
 
         generateMetadata(g.getMetadata(), t);
-        e.addContent(t);
+        e.appendChild(t);
     }
 
     public void generateMetadata(final Metadata m, final Element e) {
@@ -145,10 +154,11 @@ public class MediaModuleGenerator implements ModuleGenerator {
         final Category[] cats = m.getCategories();
 
         for (final Category cat : cats) {
-            final Element c = generateSimpleElement("category", cat.getValue());
+            final Element c = generateSimpleElement("category", cat.getValue(), e.getOwnerDocument());
+            c.setPrefix(NS.getPrefix());
             addNotNullAttribute(c, "scheme", cat.getScheme());
             addNotNullAttribute(c, "label", cat.getLabel());
-            e.addContent(c);
+            e.appendChild(c);
         }
 
         final Element copyright = addNotNullElement(e, "copyright", m.getCopyright());
@@ -157,10 +167,11 @@ public class MediaModuleGenerator implements ModuleGenerator {
         final Credit[] creds = m.getCredits();
 
         for (final Credit cred : creds) {
-            final Element c = generateSimpleElement("credit", cred.getName());
+            final Element c = generateSimpleElement("credit", cred.getName(), e.getOwnerDocument());
+            c.setPrefix(NS.getPrefix());
             addNotNullAttribute(c, "role", cred.getRole());
             addNotNullAttribute(c, "scheme", cred.getScheme());
-            e.addContent(c);
+            e.appendChild(c);
         }
 
         final Element desc = addNotNullElement(e, "description", m.getDescription());
@@ -224,9 +235,10 @@ public class MediaModuleGenerator implements ModuleGenerator {
             addNotNullAttribute(res, "relationship", element.getRelationship());
         }
         if (m.getRights() != null) {
-            final Element rights = new Element("rights", NS);
+            final Element rights = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "rights");
+            rights.setPrefix(NS.getPrefix());
             rights.setAttribute("status", m.getRights().name());
-            e.addContent(rights);
+            e.appendChild(rights);
         }
         generateScenes(m, e);
         generateStatus(m, e);
@@ -242,12 +254,13 @@ public class MediaModuleGenerator implements ModuleGenerator {
      */
     private void generateThumbails(final Metadata m, final Element e) {
         for (final Thumbnail thumb : m.getThumbnail()) {
-            final Element t = new Element("thumbnail", NS);
+            final Element t = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "thumbnail");
+            t.setPrefix(NS.getPrefix());
             addNotNullAttribute(t, "url", thumb.getUrl());
             addNotNullAttribute(t, "width", thumb.getWidth());
             addNotNullAttribute(t, "height", thumb.getHeight());
             addNotNullAttribute(t, "time", thumb.getTime());
-            e.addContent(t);
+            e.appendChild(t);
         }
     }
 
@@ -258,12 +271,13 @@ public class MediaModuleGenerator implements ModuleGenerator {
      * @param e element to attach new element to
      */
     private void generateBackLinks(final Metadata m, final Element e) {
-        final Element backLinksElements = new Element("backLinks", NS);
+        final Element backLinksElements = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "backLinks");
+        backLinksElements.setPrefix(NS.getPrefix());
         for (final URL backLink : m.getBackLinks()) {
             addNotNullElement(backLinksElements, "backLink", backLink);
         }
-        if (!backLinksElements.getChildren().isEmpty()) {
-            e.addContent(backLinksElements);
+        if (!super.getChildren(backLinksElements).isEmpty()) {
+            e.appendChild(backLinksElements);
         }
     }
 
@@ -274,12 +288,13 @@ public class MediaModuleGenerator implements ModuleGenerator {
      * @param e element to attach new element to
      */
     private void generateComments(final Metadata m, final Element e) {
-        final Element commentsElements = new Element("comments", NS);
+        final Element commentsElements = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "comments");
+        commentsElements.setPrefix(NS.getPrefix());
         for (final String comment : m.getComments()) {
             addNotNullElement(commentsElements, "comment", comment);
         }
-        if (!commentsElements.getChildren().isEmpty()) {
-            e.addContent(commentsElements);
+        if (!super.getChildren(commentsElements).isEmpty()) {
+            e.appendChild(commentsElements);
         }
     }
 
@@ -293,45 +308,51 @@ public class MediaModuleGenerator implements ModuleGenerator {
         if (m.getCommunity() == null) {
             return;
         }
-        final Element communityElement = new Element("community", NS);
+        final Element communityElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "community");
+        communityElement.setPrefix(NS.getPrefix());
         if (m.getCommunity().getStarRating() != null) {
-            final Element starRatingElement = new Element("starRating", NS);
+            final Element starRatingElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "starRating");
+            starRatingElement.setPrefix(NS.getPrefix());
             addNotNullAttribute(starRatingElement, "average", m.getCommunity().getStarRating().getAverage());
             addNotNullAttribute(starRatingElement, "count", m.getCommunity().getStarRating().getCount());
             addNotNullAttribute(starRatingElement, "min", m.getCommunity().getStarRating().getMin());
             addNotNullAttribute(starRatingElement, "max", m.getCommunity().getStarRating().getMax());
             if (starRatingElement.hasAttributes()) {
-                communityElement.addContent(starRatingElement);
+            	communityElement.appendChild(starRatingElement);
             }
         }
         if (m.getCommunity().getStatistics() != null) {
-            final Element statisticsElement = new Element("statistics", NS);
+            final Element statisticsElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "statistics");
+            statisticsElement.setPrefix(NS.getPrefix());
             addNotNullAttribute(statisticsElement, "views", m.getCommunity().getStatistics().getViews());
             addNotNullAttribute(statisticsElement, "favorites", m.getCommunity().getStatistics().getFavorites());
             if (statisticsElement.hasAttributes()) {
-                communityElement.addContent(statisticsElement);
+            	communityElement.appendChild(statisticsElement);
             }
         }
         if (m.getCommunity().getTags() != null && !m.getCommunity().getTags().isEmpty()) {
-            final Element tagsElement = new Element("tags", NS);
+            final Element tagsElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "tags");
+            tagsElement.setPrefix(NS.getPrefix());
+            StringBuffer sb = new StringBuffer("");
             for (final Tag tag : m.getCommunity().getTags()) {
-                if (!tagsElement.getTextTrim().isEmpty()) {
-                    tagsElement.addContent(", ");
+                if (!"".equals(sb.toString())) {
+                	sb.append(", ");
                 }
                 if (tag.getWeight() == null) {
-                    tagsElement.addContent(tag.getName());
+                	sb.append(tag.getName());
                 } else {
-                    tagsElement.addContent(tag.getName());
-                    tagsElement.addContent(":");
-                    tagsElement.addContent(String.valueOf(tag.getWeight()));
+                	sb.append(tag.getName());
+                	sb.append(": ");
+                    sb.append(String.valueOf(tag.getWeight()));
                 }
             }
-            if (!tagsElement.getTextTrim().isEmpty()) {
-                communityElement.addContent(tagsElement);
+            tagsElement.setTextContent(sb.toString());
+            if (!tagsElement.getTextContent().isEmpty()) {
+            	communityElement.appendChild(tagsElement);
             }
         }
-        if (!communityElement.getChildren().isEmpty()) {
-            e.addContent(communityElement);
+        if (!super.getChildren(communityElement).isEmpty()) {
+            e.appendChild(communityElement);
         }
     }
 
@@ -345,7 +366,8 @@ public class MediaModuleGenerator implements ModuleGenerator {
         if (m.getEmbed() == null) {
             return;
         }
-        final Element embedElement = new Element("embed", NS);
+        final Element embedElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "embed");
+        embedElement.setPrefix(NS.getPrefix());
         addNotNullAttribute(embedElement, "url", m.getEmbed().getUrl());
         addNotNullAttribute(embedElement, "width", m.getEmbed().getWidth());
         addNotNullAttribute(embedElement, "height", m.getEmbed().getHeight());
@@ -355,8 +377,8 @@ public class MediaModuleGenerator implements ModuleGenerator {
                 addNotNullAttribute(paramElement, "name", param.getName());
             }
         }
-        if (embedElement.hasAttributes() || !embedElement.getChildren().isEmpty()) {
-            e.addContent(embedElement);
+        if (embedElement.hasAttributes() || !super.getChildren(embedElement).isEmpty()) {
+            e.appendChild(embedElement);
         }
     }
 
@@ -367,19 +389,21 @@ public class MediaModuleGenerator implements ModuleGenerator {
      * @param e element to attach new element to
      */
     private void generateScenes(final Metadata m, final Element e) {
-        final Element scenesElement = new Element("scenes", NS);
+        final Element scenesElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "scenes");
+        scenesElement.setPrefix(NS.getPrefix());
         for (final Scene scene : m.getScenes()) {
-            final Element sceneElement = new Element("scene", NS);
+            final Element sceneElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "scene");
+            sceneElement.setPrefix(NS.getPrefix());
             addNotNullElement(sceneElement, "sceneTitle", scene.getTitle());
             addNotNullElement(sceneElement, "sceneDescription", scene.getDescription());
             addNotNullElement(sceneElement, "sceneStartTime", scene.getStartTime());
             addNotNullElement(sceneElement, "sceneEndTime", scene.getEndTime());
-            if (!sceneElement.getChildren().isEmpty()) {
-                scenesElement.addContent(sceneElement);
+            if (!super.getChildren(sceneElement).isEmpty()) {
+            	scenesElement.appendChild(sceneElement);
             }
         }
-        if (!scenesElement.getChildren().isEmpty()) {
-            e.addContent(scenesElement);
+        if (!super.getChildren(scenesElement).isEmpty()) {
+            e.appendChild(scenesElement);
         }
     }
 
@@ -392,15 +416,16 @@ public class MediaModuleGenerator implements ModuleGenerator {
     private void generateLocations(final Metadata m, final Element e) {
         final GMLGenerator geoRssGenerator = new GMLGenerator();
         for (final Location location : m.getLocations()) {
-            final Element locationElement = new Element("location", NS);
+            final Element locationElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "location");
+            locationElement.setPrefix(NS.getPrefix());
             addNotNullAttribute(locationElement, "description", location.getDescription());
             addNotNullAttribute(locationElement, "start", location.getStart());
             addNotNullAttribute(locationElement, "end", location.getEnd());
             if (location.getGeoRss() != null) {
                 geoRssGenerator.generate(location.getGeoRss(), locationElement);
             }
-            if (locationElement.hasAttributes() || !locationElement.getChildren().isEmpty()) {
-                e.addContent(locationElement);
+            if (locationElement.hasAttributes() || !super.getChildren(locationElement).isEmpty()) {
+                e.appendChild(locationElement);
             }
         }
     }
@@ -413,11 +438,12 @@ public class MediaModuleGenerator implements ModuleGenerator {
      */
     private void generatePeerLinks(final Metadata m, final Element e) {
         for (final PeerLink peerLink : m.getPeerLinks()) {
-            final Element peerLinkElement = new Element("peerLink", NS);
+            final Element peerLinkElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "peerLink");
+            peerLinkElement.setPrefix(NS.getPrefix());
             addNotNullAttribute(peerLinkElement, "type", peerLink.getType());
             addNotNullAttribute(peerLinkElement, "href", peerLink.getHref());
             if (peerLinkElement.hasAttributes()) {
-                e.addContent(peerLinkElement);
+                e.appendChild(peerLinkElement);
             }
         }
     }
@@ -430,12 +456,13 @@ public class MediaModuleGenerator implements ModuleGenerator {
      */
     private void generateSubTitles(final Metadata m, final Element e) {
         for (final SubTitle subTitle : m.getSubTitles()) {
-            final Element subTitleElement = new Element("subTitle", NS);
+            final Element subTitleElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "subTitle");
+            subTitleElement.setPrefix(NS.getPrefix());
             addNotNullAttribute(subTitleElement, "type", subTitle.getType());
             addNotNullAttribute(subTitleElement, "lang", subTitle.getLang());
             addNotNullAttribute(subTitleElement, "href", subTitle.getHref());
             if (subTitleElement.hasAttributes()) {
-                e.addContent(subTitleElement);
+                e.appendChild(subTitleElement);
             }
         }
     }
@@ -448,14 +475,15 @@ public class MediaModuleGenerator implements ModuleGenerator {
      */
     private void generateLicenses(final Metadata m, final Element e) {
         for (final License license : m.getLicenses()) {
-            final Element licenseElement = new Element("license", NS);
+            final Element licenseElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "license");
+            licenseElement.setPrefix(NS.getPrefix());
             addNotNullAttribute(licenseElement, "type", license.getType());
             addNotNullAttribute(licenseElement, "href", license.getHref());
             if (license.getValue() != null) {
-                licenseElement.addContent(license.getValue());
+            	licenseElement.setTextContent(license.getValue());
             }
-            if (licenseElement.hasAttributes() || !licenseElement.getTextTrim().isEmpty()) {
-                e.addContent(licenseElement);
+            if (licenseElement.hasAttributes() || !licenseElement.getTextContent().isEmpty()) {
+                e.appendChild(licenseElement);
             }
         }
     }
@@ -471,7 +499,8 @@ public class MediaModuleGenerator implements ModuleGenerator {
             if (price == null) {
                 continue;
             }
-            final Element priceElement = new Element("price", NS);
+            final Element priceElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "price");
+            priceElement.setPrefix(NS.getPrefix());
             if (price.getType() != null) {
                 priceElement.setAttribute("type", price.getType().name().toLowerCase());
             }
@@ -479,7 +508,7 @@ public class MediaModuleGenerator implements ModuleGenerator {
             addNotNullAttribute(priceElement, "price", price.getPrice());
             addNotNullAttribute(priceElement, "currency", price.getCurrency());
             if (priceElement.hasAttributes()) {
-                e.addContent(priceElement);
+                e.appendChild(priceElement);
             }
         }
     }
@@ -494,11 +523,12 @@ public class MediaModuleGenerator implements ModuleGenerator {
         if (m.getResponses() == null || m.getResponses().length == 0) {
             return;
         }
-        final Element responsesElements = new Element("responses", NS);
+        final Element responsesElements = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "responses");
+        responsesElements.setPrefix(NS.getPrefix());
         for (final String response : m.getResponses()) {
             addNotNullElement(responsesElements, "response", response);
         }
-        e.addContent(responsesElements);
+        e.appendChild(responsesElements);
     }
 
     /**
@@ -511,13 +541,14 @@ public class MediaModuleGenerator implements ModuleGenerator {
         if (m.getStatus() == null) {
             return;
         }
-        final Element statusElement = new Element("status", NS);
+        final Element statusElement = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "status");
+        statusElement.setPrefix(NS.getPrefix());
         if (m.getStatus().getState() != null) {
             statusElement.setAttribute("state", m.getStatus().getState().name());
         }
         addNotNullAttribute(statusElement, "reason", m.getStatus().getReason());
         if (statusElement.hasAttributes()) {
-            e.addContent(statusElement);
+            e.appendChild(statusElement);
         }
     }
 
@@ -526,15 +557,16 @@ public class MediaModuleGenerator implements ModuleGenerator {
             return;
         }
 
-        final Element t = new Element("player", NS);
+        final Element t = e.getOwnerDocument().createElementNS(NS.getNamespaceURI(), "player");
+        t.setPrefix(NS.getPrefix());
         addNotNullAttribute(t, "url", p.getUrl());
         addNotNullAttribute(t, "width", p.getWidth());
         addNotNullAttribute(t, "height", p.getHeight());
-        e.addContent(t);
+        e.appendChild(t);
     }
 
     protected void addNotNullAttribute(final Element target, final String name, final Object value) {
-        if (target == null || value == null) {
+        if (target == null || value == null || "".equals(value)) {
             return;
         } else {
             target.setAttribute(name, value.toString());
@@ -545,16 +577,17 @@ public class MediaModuleGenerator implements ModuleGenerator {
         if (value == null) {
             return null;
         } else {
-            final Element e = generateSimpleElement(name, value.toString());
-            target.addContent(e);
+            final Element e = generateSimpleElement(name, value.toString(), target.getOwnerDocument());
+            target.appendChild(e);
 
             return e;
         }
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, NS);
-        element.addContent(value);
+    protected Element generateSimpleElement(final String name, final String value, final Document parent) {
+        final Element element = parent.createElementNS(NS.getNamespaceURI(), name);
+        element.setPrefix(NS.getPrefix());
+        element.setTextContent(value);
 
         return element;
     }

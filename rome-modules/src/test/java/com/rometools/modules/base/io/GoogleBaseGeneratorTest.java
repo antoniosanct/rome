@@ -122,7 +122,9 @@ public class GoogleBaseGeneratorTest extends AbstractTestCase {
         feed.setEntries(entries);
 
         final SyndFeedOutput output = new SyndFeedOutput();
-        LOG.debug(output.outputString(feed));
+        final String result = output.outputString(feed);
+        assertNotNull(result);
+        LOG.debug(result);
 
     }
 }

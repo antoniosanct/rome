@@ -16,15 +16,22 @@
  */
 package com.rometools.rome.io.impl;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Content;
-import org.jdom2.Element;
-import org.jdom2.output.XMLOutputter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.xml.XMLConstants;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.rss.Category;
@@ -37,8 +44,6 @@ import com.rometools.rome.feed.rss.Source;
 import com.rometools.utils.Strings;
 
 public class RSS092Parser extends RSS091UserlandParser {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RSS092Parser.class);
 
     public RSS092Parser() {
         this("rss_0.92");
@@ -58,44 +63,45 @@ public class RSS092Parser extends RSS091UserlandParser {
 
         final Channel channel = (Channel) super.parseChannel(rssRoot, locale);
 
-        final Element eChannel = rssRoot.getChild("channel", getRSSNamespace());
-
-        final Element eCloud = eChannel.getChild("cloud", getRSSNamespace());
-
-        if (eCloud != null) {
-            final Cloud cloud = new Cloud();
-
-            final String domain = eCloud.getAttributeValue("domain");
-            if (domain != null) {
-                cloud.setDomain(domain);
-            }
-
-            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-            final String port = eCloud.getAttributeValue("port");
-            if (port != null) {
-                cloud.setPort(Integer.parseInt(port.trim()));
-            }
-
-            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-            final String path = eCloud.getAttributeValue("path");
-            if (path != null) {
-                cloud.setPath(path);
-            }
-
-            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-            final String registerProcedure = eCloud.getAttributeValue("registerProcedure");
-            if (registerProcedure != null) {
-                cloud.setRegisterProcedure(registerProcedure);
-            }
-
-            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-            final String protocol = eCloud.getAttributeValue("protocol");
-            if (protocol != null) {
-                cloud.setProtocol(protocol);
-            }
-
-            channel.setCloud(cloud);
-
+        final Element eChannel = super.getChild(rssRoot, "channel", getRSSNamespace());
+        if (null != eChannel) {
+	        final Element eCloud = super.getChild(eChannel, "cloud", getRSSNamespace());
+	
+	        if (eCloud != null) {
+	            final Cloud cloud = new Cloud();
+	            final Element e = (Element) eCloud;
+	            final String domain = e.getAttribute("domain");
+	            if (domain != null) {
+	                cloud.setDomain(domain);
+	            }
+	
+	            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
+	            final String port = e.getAttribute("port");
+	            if (port != null) {
+	                cloud.setPort(Integer.parseInt(port.trim()));
+	            }
+	
+	            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
+	            final String path = e.getAttribute("path");
+	            if (path != null) {
+	                cloud.setPath(path);
+	            }
+	
+	            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
+	            final String registerProcedure = e.getAttribute("registerProcedure");
+	            if (registerProcedure != null) {
+	                cloud.setRegisterProcedure(registerProcedure);
+	            }
+	
+	            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
+	            final String protocol = e.getAttribute("protocol");
+	            if (protocol != null) {
+	                cloud.setProtocol(protocol);
+	            }
+	
+	            channel.setCloud(cloud);
+	
+	        }
         }
         return channel;
     }
@@ -104,39 +110,34 @@ public class RSS092Parser extends RSS091UserlandParser {
     protected Item parseItem(final Element rssRoot, final Element eItem, final Locale locale) {
         final Item item = super.parseItem(rssRoot, eItem, locale);
 
-        final Element eSource = eItem.getChild("source", getRSSNamespace());
+        final Element eSource = super.getChild(eItem, "source", getRSSNamespace());
         if (eSource != null) {
             final Source source = new Source();
-            // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-            final String url = eSource.getAttributeValue("url");
+            final String url = eSource.getAttribute("url");
             source.setUrl(url);
-            source.setValue(eSource.getText());
+            source.setValue(eSource.getTextContent());
             item.setSource(source);
         }
 
         // 0.92 allows one enclosure occurrence, 0.93 multiple just saving to write some code.
-        // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-        final List<Element> eEnclosures = eItem.getChildren("enclosure");
+        final List<Element> eEnclosures = super.getChildren(eItem, "enclosure");
 
-        if (!eEnclosures.isEmpty()) {
+        if (null != eEnclosures) {
 
-            final List<Enclosure> enclosures = new ArrayList<Enclosure>();
+            final List<Enclosure> enclosures = new ArrayList<>(1);
 
-            for (final Element eEnclosure : eEnclosures) {
+            for (Element e: eEnclosures) {
 
                 final Enclosure enclosure = new Enclosure();
-                // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-                final String url = eEnclosure.getAttributeValue("url");
+                final String url = e.getAttribute("url");
                 if (url != null) {
                     enclosure.setUrl(url);
                 }
 
-                // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-                final String length = eEnclosure.getAttributeValue("length");
+                final String length = e.getAttribute("length");
                 enclosure.setLength(NumberParser.parseLong(length, 0L));
 
-                // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-                final String type = eEnclosure.getAttributeValue("type");
+                final String type = e.getAttribute("type");
                 if (type != null) {
                     enclosure.setType(type);
                 }
@@ -147,9 +148,8 @@ public class RSS092Parser extends RSS091UserlandParser {
 
             item.setEnclosures(enclosures);
         }
-
-        // getRSSNamespace()); DONT KNOW WHY DOESN'T WORK
-        final List<Element> categories = eItem.getChildren("category");
+        
+        final List<Element> categories = super.getChildren(eItem, "category");
         item.setCategories(parseCategories(categories));
 
         return item;
@@ -160,22 +160,22 @@ public class RSS092Parser extends RSS091UserlandParser {
         final List<Category> cats = new ArrayList<Category>();
 
         for (final Element eCat : eCats) {
-
+        	
             // skip categories without value
-            final String text = eCat.getText();
+            final String text = eCat.getTextContent();
             if(Strings.isBlank(text)) {
                 continue;
             }
 
             final Category cat = new Category();               
-            final String domain = eCat.getAttributeValue("domain");
+            final String domain = eCat.getAttribute("domain");
             if (domain != null) {
                 cat.setDomain(domain);
             }
             cat.setValue(text);
 
             cats.add(cat);
-
+            
         }
         
         if(cats.isEmpty()) {
@@ -190,19 +190,31 @@ public class RSS092Parser extends RSS091UserlandParser {
     protected Description parseItemDescription(final Element rssRoot, final Element eDesc) {
         final Description desc = new Description();
         final StringBuilder sb = new StringBuilder();
-        final XMLOutputter xmlOut = new XMLOutputter();
-        for (final Content c : eDesc.getContent()) {
-            switch (c.getCType()) {
-                case Text:
-                case CDATA:
-                    sb.append(c.getValue());
+        for (int i = 0; i < eDesc.getChildNodes().getLength(); i++) {
+        	final Node n = eDesc.getChildNodes().item(i); 
+            switch (n.getNodeType()) {
+                case Node.TEXT_NODE:
+                case Node.CDATA_SECTION_NODE:
+                case Node.ENTITY_REFERENCE_NODE:
+                    sb.append(n.getTextContent());
                     break;
-                case EntityRef:
-                    LOG.debug("Entity: {}", c.getValue());
-                    sb.append(c.getValue());
-                    break;
-                case Element:
-                    sb.append(xmlOut.outputString((Element) c));
+                case Node.ELEMENT_NODE:
+            		try {
+            			TransformerFactory tf = TransformerFactory.newInstance();
+            			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            			Transformer t = tf.newTransformer();
+            			t.setOutputProperty(OutputKeys.METHOD, "xml");
+            			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            			StringWriter buffer = new StringWriter();
+            	        StreamResult result = new StreamResult(buffer);
+            	        DOMSource source = new DOMSource(n);
+            	        t.transform(source, result);
+            	        sb.append(buffer.toString());
+            		} catch (TransformerException | TransformerFactoryConfigurationError e) {
+//            			throw new FeedException("Error outputting feed", e);
+            		}
+                    sb.append(n.getTextContent());
                     break;
                 default:
                     // ignore
@@ -210,7 +222,7 @@ public class RSS092Parser extends RSS091UserlandParser {
             }
         }
         desc.setValue(sb.toString());
-        String att = eDesc.getAttributeValue("type");
+        String att = eDesc.getAttribute("type");
         if (att == null) {
             att = "text/html";
         }

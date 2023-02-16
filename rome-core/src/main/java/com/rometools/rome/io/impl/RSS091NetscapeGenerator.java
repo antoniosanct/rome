@@ -16,13 +16,19 @@
  */
 package com.rometools.rome.io.impl;
 
-import org.jdom2.DocType;
-import org.jdom2.Document;
-import org.jdom2.Element;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.Element;
+
+import com.rometools.rome.io.FeedException;
 
 /**
  * Feed Generator for RSS 0.91
- * <p/>
+ * 
  */
 public class RSS091NetscapeGenerator extends RSS091UserlandGenerator {
 
@@ -34,12 +40,25 @@ public class RSS091NetscapeGenerator extends RSS091UserlandGenerator {
         super(type, version);
     }
 
-    @Override
-    protected Document createDocument(final Element root) {
-        final Document doc = new Document(root);
-        final DocType docType = new DocType(RSS091NetscapeParser.ELEMENT_NAME, RSS091NetscapeParser.PUBLIC_ID, RSS091NetscapeParser.SYSTEM_ID);
-        doc.setDocType(docType);
-        return doc;
+    protected Document createDocument(final Element root) throws FeedException {
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+    		dbf.setNamespaceAware(true);
+    		dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+    		final Document doc = dbf.newDocumentBuilder().newDocument();
+			DOMImplementation domImpl = doc.getImplementation();
+	        DocumentType doctype = domImpl.createDocumentType(RSS091NetscapeParser.ELEMENT_NAME,
+	        		RSS091NetscapeParser.PUBLIC_ID,
+	        		RSS091NetscapeParser.SYSTEM_ID);
+	        doc.appendChild(doctype);
+	        doc.appendChild(root);
+	        return doc;
+		} catch (ParserConfigurationException e) {
+			throw new FeedException("Document builder failed", e);
+		}
+        
     }
 
     @Override

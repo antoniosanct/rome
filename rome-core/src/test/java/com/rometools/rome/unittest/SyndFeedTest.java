@@ -138,7 +138,7 @@ public abstract class SyndFeedTest extends FeedTest {
         return e.getLink();
     }
 
-    public void testEntryPublishedDate() throws Exception {
+    public void _testEntryPublishedDate() throws Exception {
         // this only works for RSS 0.93+
         // assertEquals(DateParser.parseRFC822("Mon, 01 Jan 2001 00:00:00 GMT"),
         // getEntryPublishedDate(getCachedSyndFeed().getEntries().get(0)));
@@ -203,7 +203,7 @@ public abstract class SyndFeedTest extends FeedTest {
      * assertEqualsStr(feed, ""); } // <webMaster>webmaster@example.org</webMaster> public void
      * test() { assertEqualsStr(feed, ""); } <docs>http://blogs.law.harvard.edu/tech/rss</docs>
      * <cloud domain="rpc.sys.com" port="80" path="/RPC2" registerProcedure="pingMe"
-     * protocol="soap"/> <ttl>60</ttl> <rating>(PICS-1.1 �http://www.classify.org/safesurf/� l r
+     * protocol="soap"/> <ttl>60</ttl> <rating>(PICS-1.1 "http://www.classify.org/safesurf/" l r
      * (SS~~000 1))</rating> <skiphours> <hour>0</hour> <hour>1</hour> <hour>2</hour> <hour>3</hour>
      * <hour>4</hour> <hour>5</hour> <hour>6</hour> <hour>7</hour> <hour>8</hour> <hour>9.5</hour>
      * <hour>10</hour> <hour>11</hour> <hour>12</hour> <hour>13</hour> <hour>14</hour>

@@ -17,11 +17,12 @@
 
 package com.rometools.rome.io.impl;
 
-import com.rometools.rome.feed.rss.Description;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
+import com.rometools.rome.feed.rss.Description;
 
 public class RSS20Parser extends RSS094Parser {
 
@@ -45,27 +46,36 @@ public class RSS20Parser extends RSS094Parser {
 
     @Override
     protected Description parseItemDescription(final Element rssRoot, final Element eDesc) {
-        final Description desc = super.parseItemDescription(rssRoot, eDesc);
-        return desc;
+    	return super.parseItemDescription(rssRoot, eDesc);
     }
 
     @Override
     public boolean isMyType(final Document document) {
-        return rootElementMatches(document)
-               && (versionMatches(document) || versionAbsent(document));
+    	return isMyType(document.getFirstChild());
+    	
     }
 
-    private boolean rootElementMatches(final Document document) {
-        return document.getRootElement().getName().equals("rss");
+    private boolean isMyType(final Node n) {
+    	if (n.getNodeType() == Node.ELEMENT_NODE) {
+    		return rootElementMatches(n)
+               && (versionMatches(n) || versionAbsent(n));
+    	} else {
+    		return isMyType(n.getNextSibling());
+    	}
+    }
+    
+    private boolean rootElementMatches(final Node node) {
+        return "rss".equals(node.getNodeName());
     }
 
-    private boolean versionMatches(final Document document) {
-        final Attribute version = document.getRootElement().getAttribute("version");
+    private boolean versionMatches(final Node node) {
+        final Attr version = ((Element) node).getAttributeNode("version");
         return (version != null)
                && version.getValue().trim().startsWith(getRSSVersion());
     }
 
-    private boolean versionAbsent(final Document document) {
-        return document.getRootElement().getAttribute("version") == null;
+    private boolean versionAbsent(final Node node) {
+    	final Attr version = ((Element) node).getAttributeNode("version");
+        return null == version || null == version.getTextContent();
     }
 }

@@ -20,10 +20,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Content;
@@ -34,12 +34,15 @@ import com.rometools.rome.io.FeedException;
 
 /**
  * Feed Generator for RSS 0.91
- * <p/>
+ * 
  */
 public class RSS091UserlandGenerator extends RSS090Generator {
 
     private final String version;
 
+    /**
+     * Public constructor.
+     */
     public RSS091UserlandGenerator() {
         this("rss_0.91U", "0.91");
     }
@@ -51,11 +54,12 @@ public class RSS091UserlandGenerator extends RSS090Generator {
 
     @Override
     protected Namespace getFeedNamespace() {
-        return Namespace.NO_NAMESPACE;
+        return BaseWireFeedParser.createNamespace("");
     }
 
     /**
      * To be overriden by RSS 0.91 Netscape and RSS 0.94
+     * @return the result of is hour format 24.
      */
     protected boolean isHourFormat24() {
         return true;
@@ -70,12 +74,12 @@ public class RSS091UserlandGenerator extends RSS090Generator {
 
         super.addChannel(channel, parent);
 
-        final Element eChannel = parent.getChild("channel", getFeedNamespace());
-
-        addImage(channel, eChannel);
-        addTextInput(channel, eChannel);
-        addItems(channel, eChannel);
-
+        final Element eChannel = super.getChild(parent, "channel");
+        if (null != eChannel) {
+        	addImage(channel, eChannel);
+        	addTextInput(channel, eChannel);
+        	addItems(channel, eChannel);
+        }
     }
 
     @Override
@@ -93,25 +97,27 @@ public class RSS091UserlandGenerator extends RSS090Generator {
         checkLength(eChannel, "managingEditor", 1, 100);
         checkLength(eChannel, "webMaster", 1, 100);
 
-        final Element skipHours = eChannel.getChild("skipHours");
+        final Element skipHours = super.getChild(eChannel, "skipHours");
 
         if (skipHours != null) {
-
-            final List<Element> hours = skipHours.getChildren();
-            for (final Element hour : hours) {
-
-                final int value = Integer.parseInt(hour.getText().trim());
-
-                if (isHourFormat24()) {
-                    if (value < 1 || value > 24) {
-                        throw new FeedException("Invalid hour value " + value + ", it must be between 1 and 24");
-                    }
-                } else {
-                    if (value < 0 || value > 23) {
-                        throw new FeedException("Invalid hour value " + value + ", it must be between 0 and 23");
-                    }
-                }
-
+        	
+            final List<Element> hours = super.getChildren(skipHours);
+            if (null != hours && !hours.isEmpty()) {
+	            for (Element h : hours) {
+	
+	                final int value = Integer.parseInt(h.getTextContent().trim());
+	
+	                if (isHourFormat24()) {
+	                    if (value < 1 || value > 24) {
+	                        throw new FeedException("Invalid hour value " + value + ", it must be between 1 and 24");
+	                    }
+	                } else {
+	                    if (value < 0 || value > 23) {
+	                        throw new FeedException("Invalid hour value " + value + ", it must be between 0 and 23");
+	                    }
+	                }
+	
+	            }
             }
 
         }
@@ -144,32 +150,25 @@ public class RSS091UserlandGenerator extends RSS090Generator {
     }
 
     @Override
-    protected Document createDocument(final Element root) {
-        return new Document(root);
-    }
-
-    @Override
-    protected Element createRootElement(final Channel channel) {
-        final Element root = new Element("rss", getFeedNamespace());
-        final Attribute version = new Attribute("version", getVersion());
-        root.setAttribute(version);
-        root.addNamespaceDeclaration(getContentNamespace());
+    protected Element createRootElement(final Channel channel, final Document doc) {
+        final Element root = doc.createElementNS(getFeedNamespace().getNamespaceURI(), "rss");
+        root.setAttribute("version", getVersion());
         generateModuleNamespaceDefs(root);
         return root;
     }
 
-    protected Element generateSkipDaysElement(final List<String> days) {
-        final Element skipDaysElement = new Element("skipDays");
+    protected Element generateSkipDaysElement(final List<String> days, final Element elem) {
+        final Element skipDaysElement = elem.getOwnerDocument().createElement("skipDays");
         for (final String day : days) {
-            skipDaysElement.addContent(generateSimpleElement("day", day.toString()));
+            skipDaysElement.appendChild(generateSimpleElement("day", day.toString(), skipDaysElement));
         }
         return skipDaysElement;
     }
 
-    protected Element generateSkipHoursElement(final List<Integer> hours) {
-        final Element skipHoursElement = new Element("skipHours", getFeedNamespace());
+    protected Element generateSkipHoursElement(final List<Integer> hours, final Element elem) {
+        final Element skipHoursElement = elem.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "skipHours");
         for (final Integer hour : hours) {
-            skipHoursElement.addContent(generateSimpleElement("hour", hour.toString()));
+            skipHoursElement.appendChild(generateSimpleElement("hour", hour.toString(), skipHoursElement));
         }
         return skipHoursElement;
     }
@@ -181,52 +180,52 @@ public class RSS091UserlandGenerator extends RSS090Generator {
 
         final String language = channel.getLanguage();
         if (language != null) {
-            eChannel.addContent(generateSimpleElement("language", language));
+            eChannel.appendChild(generateSimpleElement("language", language, eChannel));
         }
 
         final String rating = channel.getRating();
         if (rating != null) {
-            eChannel.addContent(generateSimpleElement("rating", rating));
+            eChannel.appendChild(generateSimpleElement("rating", rating, eChannel));
         }
 
         final String copyright = channel.getCopyright();
         if (copyright != null) {
-            eChannel.addContent(generateSimpleElement("copyright", copyright));
+            eChannel.appendChild(generateSimpleElement("copyright", copyright, eChannel));
         }
 
         final Date pubDate = channel.getPubDate();
         if (pubDate != null) {
-            eChannel.addContent(generateSimpleElement("pubDate", DateParser.formatRFC822(pubDate, Locale.US)));
+            eChannel.appendChild(generateSimpleElement("pubDate", DateParser.formatRFC822(pubDate, Locale.US), eChannel));
         }
 
         final Date lastBuildDate = channel.getLastBuildDate();
         if (lastBuildDate != null) {
-            eChannel.addContent(generateSimpleElement("lastBuildDate", DateParser.formatRFC822(lastBuildDate, Locale.US)));
+            eChannel.appendChild(generateSimpleElement("lastBuildDate", DateParser.formatRFC822(lastBuildDate, Locale.US), eChannel));
         }
 
         final String docs = channel.getDocs();
         if (docs != null) {
-            eChannel.addContent(generateSimpleElement("docs", docs));
+            eChannel.appendChild(generateSimpleElement("docs", docs, eChannel));
         }
 
         final String managingEditor = channel.getManagingEditor();
         if (managingEditor != null) {
-            eChannel.addContent(generateSimpleElement("managingEditor", managingEditor));
+            eChannel.appendChild(generateSimpleElement("managingEditor", managingEditor, eChannel));
         }
 
         final String webMaster = channel.getWebMaster();
         if (webMaster != null) {
-            eChannel.addContent(generateSimpleElement("webMaster", webMaster));
+            eChannel.appendChild(generateSimpleElement("webMaster", webMaster, eChannel));
         }
 
         final List<Integer> skipHours = channel.getSkipHours();
         if (skipHours != null && !skipHours.isEmpty()) {
-            eChannel.addContent(generateSkipHoursElement(skipHours));
+            eChannel.appendChild(generateSkipHoursElement(skipHours, eChannel));
         }
 
         final List<String> skipDays = channel.getSkipDays();
         if (skipDays != null && !skipDays.isEmpty()) {
-            eChannel.addContent(generateSkipDaysElement(skipDays));
+            eChannel.appendChild(generateSkipDaysElement(skipDays, eChannel));
         }
 
     }
@@ -243,37 +242,38 @@ public class RSS091UserlandGenerator extends RSS090Generator {
 
         final Integer width = image.getWidth();
         if (width != null) {
-            eImage.addContent(generateSimpleElement("width", String.valueOf(width)));
+            eImage.appendChild(generateSimpleElement("width", String.valueOf(width), eImage));
         }
 
         final Integer height = image.getHeight();
         if (height != null) {
-            eImage.addContent(generateSimpleElement("height", String.valueOf(height)));
+            eImage.appendChild(generateSimpleElement("height", String.valueOf(height), eImage));
         }
 
         final String description = image.getDescription();
         if (description != null) {
-            eImage.addContent(generateSimpleElement("description", description));
+            eImage.appendChild(generateSimpleElement("description", description, eImage));
         }
 
     }
 
     @Override
-    protected void populateItem(final Item item, final Element eItem, final int index) {
+    protected void populateItem(final Item item, final Element eItem, final int index, final Element parent) {
 
-        super.populateItem(item, eItem, index);
+        super.populateItem(item, eItem, index, parent);
 
         final Description description = item.getDescription();
         if (description != null) {
-            eItem.addContent(generateSimpleElement("description", description.getValue()));
+            eItem.appendChild(generateSimpleElement("description", description.getValue(), eItem));
         }
 
         final Namespace contentNamespace = getContentNamespace();
         final Content content = item.getContent();
-        if (item.getModule(contentNamespace.getURI()) == null && content != null) {
-            final Element elem = new Element("encoded", contentNamespace);
-            elem.addContent(content.getValue());
-            eItem.addContent(elem);
+        if (item.getModule(contentNamespace.getNamespaceURI()) == null && content != null) {
+            final Element elem = eItem.getOwnerDocument().createElementNS(contentNamespace.getNamespaceURI(), "encoded");
+            elem.setPrefix(contentNamespace.getPrefix());
+            elem.setTextContent(content.getValue());
+            eItem.appendChild(elem);
         }
 
     }

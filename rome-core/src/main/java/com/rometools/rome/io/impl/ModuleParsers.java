@@ -19,8 +19,9 @@ package com.rometools.rome.io.impl;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleParser;
@@ -47,7 +48,7 @@ public class ModuleParsers extends PluginManager<ModuleParser> {
         List<Module> modules = null;
         for (final ModuleParser parser : parsers) {
             final String namespaceUri = parser.getNamespaceUri();
-            final Namespace namespace = Namespace.getNamespace(namespaceUri);
+            final Namespace namespace = BaseWireFeedParser.createNamespace(namespaceUri);
             if (hasElementsFrom(root, namespace)) {
                 final Module module = parser.parse(root, locale);
                 if (module != null) {
@@ -61,12 +62,15 @@ public class ModuleParsers extends PluginManager<ModuleParser> {
 
     private boolean hasElementsFrom(final Element root, final Namespace namespace) {
         boolean hasElements = false;
-        for (final Element child : root.getChildren()) {
-            final Namespace childNamespace = child.getNamespace();
-            if (namespace.equals(childNamespace)) {
-                hasElements = true;
-                break;
-            }
+        final List<Element> childs = super.getChildren(root);
+        for (Element c : childs) {
+        	if (null != c.getNamespaceURI()) {
+	            final Namespace childNamespace = BaseWireFeedParser.createNamespace(c.getNamespaceURI());
+	            if (namespace.getNamespaceURI().equals(childNamespace.getNamespaceURI())) {
+	                hasElements = true;
+	                break;
+	            }
+        	}
         }
         return hasElements;
     }

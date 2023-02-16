@@ -20,9 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom2.Attribute;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.opensearch.OpenSearchModule;
 import com.rometools.modules.opensearch.RequiredAttributeMissingException;
@@ -33,7 +34,7 @@ import com.rometools.rome.io.ModuleGenerator;
 
 public class OpenSearchModuleGenerator implements ModuleGenerator {
 
-    private static final Namespace OS_NS = Namespace.getNamespace("opensearch", OpenSearchModule.URI);
+    private static final Namespace OS_NS = XMLEventFactory.newDefaultFactory().createNamespace("opensearch", OpenSearchModule.URI);
 
     @Override
     public String getNamespaceUri() {
@@ -50,10 +51,9 @@ public class OpenSearchModuleGenerator implements ModuleGenerator {
 
     /**
      * Returns a set with all the URIs (JDOM Namespace elements) this module generator uses.
-     * <p/>
+     * 
      * It is used by the the feed generators to add their namespace definition in the root element
      * of the generated document (forward-missing of Java 5.0 Generics).
-     * <p/>
      *
      * @return a set with all the URIs (JDOM Namespace elements) this module generator uses.
      */
@@ -68,15 +68,15 @@ public class OpenSearchModuleGenerator implements ModuleGenerator {
         final OpenSearchModule osm = (OpenSearchModule) module;
 
         if (osm.getItemsPerPage() > -1) {
-            element.addContent(generateSimpleElement("itemsPerPage", Integer.toString(osm.getItemsPerPage())));
+            element.appendChild(generateSimpleElement("itemsPerPage", Integer.toString(osm.getItemsPerPage()), element));
         }
 
         if (osm.getTotalResults() > -1) {
-            element.addContent(generateSimpleElement("totalResults", Integer.toString(osm.getTotalResults())));
+            element.appendChild(generateSimpleElement("totalResults", Integer.toString(osm.getTotalResults()), element));
         }
 
         final int startIndex = osm.getStartIndex() > 0 ? osm.getStartIndex() : 1;
-        element.addContent(generateSimpleElement("startIndex", Integer.toString(startIndex)));
+        element.appendChild(generateSimpleElement("startIndex", Integer.toString(startIndex), element));
 
         if (osm.getQueries() != null) {
 
@@ -84,83 +84,77 @@ public class OpenSearchModuleGenerator implements ModuleGenerator {
 
             for (final OSQuery query : queries) {
                 if (query != null) {
-                    element.addContent(generateQueryElement(query));
+                    element.appendChild(generateQueryElement(query, element));
                 }
             }
         }
 
         if (osm.getLink() != null) {
-            element.addContent(generateLinkElement(osm.getLink()));
+            element.appendChild(generateLinkElement(osm.getLink(), element));
         }
     }
 
-    protected Element generateQueryElement(final OSQuery query) {
+    protected Element generateQueryElement(final OSQuery query, final Element parent) {
 
-        final Element qElement = new Element("Query", OS_NS);
+        final Element qElement = parent.getOwnerDocument().createElementNS(OS_NS.getNamespaceURI(), "Query");
 
         if (query.getRole() != null) {
-            final Attribute roleAttribute = new Attribute("role", query.getRole());
-            qElement.setAttribute(roleAttribute);
+            qElement.setAttribute("role", query.getRole());
         } else {
             throw new RequiredAttributeMissingException("If declaring a Query element, the field 'role' must be be specified");
         }
 
         if (query.getOsd() != null) {
-            final Attribute osd = new Attribute("osd", query.getOsd());
-            qElement.setAttribute(osd);
+            qElement.setAttribute("osd", query.getOsd());
         }
 
         if (query.getSearchTerms() != null) {
-            final Attribute searchTerms = new Attribute("searchTerms", query.getSearchTerms());
-            qElement.setAttribute(searchTerms);
+            qElement.setAttribute("searchTerms", query.getSearchTerms());
         }
 
         if (query.getStartPage() > -1) {
             final int startPage = query.getStartPage() != 0 ? query.getStartPage() : 1;
-            final Attribute sp = new Attribute("startPage", Integer.toString(startPage));
-            qElement.setAttribute(sp);
+            qElement.setAttribute("startPage", Integer.toString(startPage));
         }
 
         if (query.getTitle() != null) {
-            qElement.setAttribute(new Attribute("title", query.getTitle()));
+            qElement.setAttribute("title", query.getTitle());
         }
 
         if (query.getTotalResults() > -1) {
-            qElement.setAttribute(new Attribute("totalResults", Integer.toString(query.getTotalResults())));
+            qElement.setAttribute("totalResults", Integer.toString(query.getTotalResults()));
         }
 
         return qElement;
     }
 
-    protected Element generateLinkElement(final Link link) {
-        final Element linkElement = new Element("link", OS_NS);
+    protected Element generateLinkElement(final Link link, final Element parent) {
+        final Element linkElement = parent.getOwnerDocument().createElementNS(OS_NS.getNamespaceURI(), "link");
 
         if (link.getRel() != null) {
-            final Attribute relAttribute = new Attribute("rel", "search");
-            linkElement.setAttribute(relAttribute);
+            linkElement.setAttribute("rel", "search");
         }
 
         if (link.getType() != null) {
-            final Attribute typeAttribute = new Attribute("type", link.getType());
-            linkElement.setAttribute(typeAttribute);
+            linkElement.setAttribute("type", link.getType());
         }
 
         if (link.getHref() != null) {
-            final Attribute hrefAttribute = new Attribute("href", link.getHref());
-            linkElement.setAttribute(hrefAttribute);
+            linkElement.setAttribute("href", link.getHref());
         }
 
         if (link.getHreflang() != null) {
-            final Attribute hreflangAttribute = new Attribute("hreflang", link.getHreflang());
-            linkElement.setAttribute(hreflangAttribute);
+            linkElement.setAttribute("hreflang", link.getHreflang());
         }
+        linkElement.setPrefix(OS_NS.getPrefix());
         return linkElement;
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
+    protected Element generateSimpleElement(final String name, final String value, final Element parent) {
 
-        final Element element = new Element(name, OS_NS);
-        element.addContent(value);
+        final Element element = parent.getOwnerDocument().createElementNS(OS_NS.getNamespaceURI(), name);
+        element.setPrefix(OS_NS.getPrefix());
+        element.setTextContent(value);
 
         return element;
     }

@@ -20,14 +20,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Element;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.rss.Enclosure;
 import com.rometools.rome.feed.rss.Item;
 
 /**
  * Feed Generator for RSS 0.93
- * <p/>
+ * 
  */
 public class RSS093Generator extends RSS092Generator {
 
@@ -40,17 +40,17 @@ public class RSS093Generator extends RSS092Generator {
     }
 
     @Override
-    protected void populateItem(final Item item, final Element eItem, final int index) {
-        super.populateItem(item, eItem, index);
+    protected void populateItem(final Item item, final Element eItem, final int index, final Element parent) {
+        super.populateItem(item, eItem, index, parent);
 
         final Date pubDate = item.getPubDate();
         if (pubDate != null) {
-            eItem.addContent(generateSimpleElement("pubDate", DateParser.formatRFC822(pubDate, Locale.US)));
+            eItem.appendChild(generateSimpleElement("pubDate", DateParser.formatRFC822(pubDate, Locale.US), eItem));
         }
 
         final Date expirationDate = item.getExpirationDate();
         if (expirationDate != null) {
-            eItem.addContent(generateSimpleElement("expirationDate", DateParser.formatRFC822(expirationDate, Locale.US)));
+            eItem.appendChild(generateSimpleElement("expirationDate", DateParser.formatRFC822(expirationDate, Locale.US), eItem));
         }
     }
 

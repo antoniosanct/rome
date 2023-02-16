@@ -19,7 +19,9 @@ package com.rometools.modules.sle.types;
 
 import java.io.Serializable;
 
-import org.jdom2.Namespace;
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
 
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
@@ -33,11 +35,11 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * allows the user to group or filter on the values of that property. Groupable&nbsp;properties
  * should contain
  *
- * a small set of discrete values (e.g. book genres are perfect for groups). </p>
+
  *
- * <p>
+
  * The <code>cf:group</code> element contains the following attributes:
- * </p>
+
  *
  * <ul>
  * <li><b>ns </b>- this attribute is the full namespace used in the property element. If the
@@ -58,7 +60,8 @@ import com.rometools.rome.feed.impl.ToStringBean;
  */
 public class Group implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
-    private Namespace namespace = Namespace.XML_NAMESPACE;
+    
+    private Namespace namespace = XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI);
     private final String element;
     private final String label;
 
@@ -68,7 +71,7 @@ public class Group implements Serializable, Cloneable {
      * @param label Label for the grouping.
      */
     public Group(final Namespace namespace, final String element, final String label) {
-        this.namespace = namespace == null ? Namespace.XML_NAMESPACE : namespace;
+        this.namespace = namespace == null ? XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI) : namespace;
         this.element = element;
         this.label = label;
     }

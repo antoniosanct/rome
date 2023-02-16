@@ -21,8 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleGenerator;
@@ -48,7 +50,7 @@ public class ModuleGenerators extends PluginManager<ModuleGenerator> {
         return getKeys();
     }
 
-    public void generateModules(final List<Module> modules, final Element element) {
+    public void generateModules(final List<Module> modules, final Element element) throws DOMException {
         final Map<String, ModuleGenerator> generators = getPluginMap();
         for (final Module module : modules) {
             final String namespaceUri = module.getUri();

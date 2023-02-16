@@ -18,12 +18,12 @@ package com.rometools.rome.unittest;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import com.rometools.rome.feed.atom.Content;
 import com.rometools.rome.feed.atom.Feed;
 import com.rometools.rome.io.WireFeedInput;
 import com.rometools.rome.io.WireFeedOutput;
+
+import junit.framework.TestCase;
 
 public class TestAtomContent extends TestCase {
 

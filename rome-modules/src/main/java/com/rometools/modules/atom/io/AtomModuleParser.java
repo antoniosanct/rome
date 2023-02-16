@@ -16,25 +16,28 @@
 
 package com.rometools.modules.atom.io;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
+
 import com.rometools.modules.atom.modules.AtomLinkModule;
 import com.rometools.modules.atom.modules.AtomLinkModuleImpl;
 import com.rometools.rome.feed.atom.Link;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.rome.feed.synd.SyndPersonImpl;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 import com.rometools.rome.io.impl.NumberParser;
-import org.jdom2.Attribute;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+public class AtomModuleParser extends ChildNavigator implements ModuleParser {
 
-public class AtomModuleParser implements ModuleParser {
-
-    private static final Namespace NS = Namespace.getNamespace(AtomLinkModule.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(AtomLinkModule.URI);
 
     @Override
     public String getNamespaceUri() {
@@ -44,7 +47,7 @@ public class AtomModuleParser implements ModuleParser {
     @Override
     public Module parse(Element element, Locale locale) {
         AtomLinkModuleImpl mod = null;
-        if (element.getName().equals("channel") || element.getName().equals("item")) {
+        if (element.getLocalName().equals("channel") || element.getLocalName().equals("item")) {
             mod = new AtomLinkModuleImpl();
             mod.setLinks(parseLinks(element));
             mod.setAuthors(parseAuthors(element));
@@ -55,7 +58,7 @@ public class AtomModuleParser implements ModuleParser {
 
     private List<Link> parseLinks(Element parent) {
         final List<Link> result = new LinkedList<Link>();
-        final List<Element> links = parent.getChildren("link", NS);
+        final List<Element> links = super.getChildren(parent, "link", NS);
         for (Element link : links) {
             Link l = parseLink(link);
             result.add(l);
@@ -65,7 +68,7 @@ public class AtomModuleParser implements ModuleParser {
 
     private List<SyndPerson> parseAuthors(Element parent) {
         final List<SyndPerson> result = new LinkedList<SyndPerson>();
-        final List<Element> authors = parent.getChildren("author", NS);
+        final List<Element> authors = super.getChildren(parent, "author", NS);
         for (Element author : authors) {
             result.add(parsePerson(author));
         }
@@ -74,7 +77,7 @@ public class AtomModuleParser implements ModuleParser {
 
     private List<SyndPerson> parseContributor(Element parent) {
         final List<SyndPerson> result = new LinkedList<SyndPerson>();
-        final List<Element> contributors = parent.getChildren("contributor", NS);
+        final List<Element> contributors = super.getChildren(parent, "contributor", NS);
         for (Element contributor : contributors) {
             result.add(parsePerson(contributor));
         }
@@ -123,33 +126,29 @@ public class AtomModuleParser implements ModuleParser {
     }
 
     protected String getAttributeValue(final Element e, final String attributeName) {
-        Attribute attr = e.getAttribute(attributeName);
+        String attr = e.getAttribute(attributeName);
         if (attr == null) {
-            attr = e.getAttribute(attributeName, NS);
+            attr = e.getAttributeNS(NS.getNamespaceURI(), attributeName);
         }
-        if (attr != null) {
-            return attr.getValue();
-        } else {
-            return null;
-        }
+        return attr;
     }
 
     private SyndPerson parsePerson(Element element) {
         final SyndPerson person = new SyndPersonImpl();
 
-        final Element name = element.getChild("name", NS);
-        if (name != null && name.getValue() != null) {
-            person.setName(name.getValue().trim());
+        final Element name = super.getChild(element, "name", NS);
+        if (name != null && name.getTextContent() != null) {
+            person.setName(name.getTextContent().trim());
         }
 
-        final Element email = element.getChild("email", NS);
-        if (email != null && email.getValue() != null) {
-            person.setEmail(email.getValue().trim());
+        final Element email = super.getChild(element, "email", NS);
+        if (email != null && email.getTextContent() != null) {
+            person.setEmail(email.getTextContent().trim());
         }
 
-        final Element uri = element.getChild("uri", NS);
-        if (uri != null && uri.getValue() != null) {
-            person.setUri(uri.getValue().trim());
+        final Element uri = super.getChild(element, "uri", NS);
+        if (uri != null && uri.getTextContent() != null) {
+            person.setUri(uri.getTextContent().trim());
         }
 
         return person;

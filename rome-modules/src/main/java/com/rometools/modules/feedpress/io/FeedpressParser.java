@@ -15,21 +15,25 @@
  */
 package com.rometools.modules.feedpress.io;
 
+import java.util.Locale;
+
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
+
 import com.rometools.modules.feedpress.modules.FeedpressModule;
 import com.rometools.modules.feedpress.modules.FeedpressModuleImpl;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-
-import java.util.Locale;
 
 /**
  * The ModuleParser implementation for the Feedpress module.
  */
-public class FeedpressParser implements ModuleParser {
+public class FeedpressParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace NS = Namespace.getNamespace(FeedpressModule.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(FeedpressModule.URI);
 
     @Override
     public String getNamespaceUri() {
@@ -39,27 +43,27 @@ public class FeedpressParser implements ModuleParser {
     @Override
     public Module parse(Element element, Locale l) {
         FeedpressModule feedpress = null;
-        if (element.getName().equals("channel") || element.getName().equals("feed")) {
+        if (element.getLocalName().equals("channel") || element.getLocalName().equals("feed")) {
             feedpress = new FeedpressModuleImpl();
 
-            final Element newsletterId = element.getChild(FeedpressElement.NEWSLETTER_ID, NS);
-            if (newsletterId != null && newsletterId.getValue() != null) {
-                feedpress.setNewsletterId(newsletterId.getValue().trim());
+            final Element newsletterId = super.getChild(element, FeedpressElement.NEWSLETTER_ID, NS);
+            if (newsletterId != null && newsletterId.getTextContent() != null) {
+                feedpress.setNewsletterId(newsletterId.getTextContent().trim());
             }
 
-            final Element locale = element.getChild(FeedpressElement.LOCALE, NS);
-            if (locale != null && locale.getValue() != null) {
-                feedpress.setLocale(locale.getValue().trim());
+            final Element locale = super.getChild(element, FeedpressElement.LOCALE, NS);
+            if (locale != null && locale.getTextContent() != null) {
+                feedpress.setLocale(locale.getTextContent().trim());
             }
 
-            final Element podcastId = element.getChild(FeedpressElement.PODCAST_ID, NS);
-            if (podcastId != null && podcastId.getValue() != null) {
-                feedpress.setPodcastId(podcastId.getValue().trim());
+            final Element podcastId = super.getChild(element, FeedpressElement.PODCAST_ID, NS);
+            if (podcastId != null && podcastId.getTextContent() != null) {
+                feedpress.setPodcastId(podcastId.getTextContent().trim());
             }
 
-            final Element cssFile = element.getChild(FeedpressElement.CSS_FILE, NS);
-            if (cssFile != null && cssFile.getValue() != null) {
-                feedpress.setCssFile(cssFile.getValue().trim());
+            final Element cssFile = super.getChild(element, FeedpressElement.CSS_FILE, NS);
+            if (cssFile != null && cssFile.getTextContent() != null) {
+                feedpress.setCssFile(cssFile.getTextContent().trim());
             }
         }
         return feedpress;

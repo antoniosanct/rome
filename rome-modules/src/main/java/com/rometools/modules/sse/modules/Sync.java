@@ -22,19 +22,19 @@ import com.rometools.rome.feed.CopyFrom;
 
 /**
  * <pre>
- * <sx:sync>
+ * &lt;sx:sync&gt;
  * </pre>
  *
  * Element within RSS
  *
  * <pre>
- * <item>
+ * &lt;item&gt;
  * </pre>
  *
  * or OPML
  *
  * <pre>
- * <outline>
+ * &lt;outline&gt;
  * </pre>
  *
  * .
@@ -78,10 +78,12 @@ public class Sync extends SSEModule {
     /**
      * Provides access to the sync id, a required, string attribute. This is the identifier for the
      * item.
-     * <p/>
+     * 
      * The ID is assigned by the creator of the item, and MUST NOT be changed by subsequent
      * publishers. Applications will collate and compare these identifiers, therefore they MUST
      * conform to the syntax for Namespace Specific Strings (the NSS portion of a URN) in RFC 2141.
+     * 
+     * @return the sync id to get.
      */
     public String getId() {
         return id;
@@ -101,6 +103,8 @@ public class Sync extends SSEModule {
     /**
      * Provides access to a required, integer attribute. This is the modification sequence number of
      * the item, starting at 1 and incrementing by 1 indefinitely for each subsequent modification.
+     * 
+     * @return the version to get.
      */
     public Integer getVersion() {
         return version;
@@ -120,6 +124,8 @@ public class Sync extends SSEModule {
      * (lower-case), it indicates that the item has been deleted and this is a tombstone. If not
      * present, or if present with value of "false" or "", then the item is not deleted. All other
      * values are invalid.
+     * 
+     * @return the isDeleted flag to get.
      */
     public Boolean isDeleted() {
         return deleted;

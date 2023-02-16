@@ -19,20 +19,23 @@ package com.rometools.modules.slash.io;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.modules.slash.Slash;
 import com.rometools.modules.slash.SlashImpl;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 
 /**
  * ModuleParser implementation for Slash RSS.
  */
-public class SlashModuleParser implements ModuleParser {
+public class SlashModuleParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace NS = Namespace.getNamespace(Slash.URI);
+    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(Slash.URI);
 
     public SlashModuleParser() {
         super();
@@ -46,29 +49,29 @@ public class SlashModuleParser implements ModuleParser {
     @Override
     public Module parse(final Element element, final Locale locale) {
         final SlashImpl si = new SlashImpl();
-        Element tag = element.getChild("hit_parade", SlashModuleParser.NS);
+        Element tag = super.getChild(element, "hit_parade", SlashModuleParser.NS);
         if (tag != null) {
-            final StringTokenizer tok = new StringTokenizer(tag.getText(), ",");
+            final StringTokenizer tok = new StringTokenizer(tag.getTextContent(), ",");
             final Integer[] hp = new Integer[tok.countTokens()];
             for (int i = 0; tok.hasMoreTokens(); i++) {
-                hp[i] = new Integer(tok.nextToken());
+                hp[i] = Integer.valueOf(tok.nextToken());
             }
             si.setHitParade(hp);
         }
         tag = null;
-        tag = element.getChild("comments", SlashModuleParser.NS);
-        if (tag != null && !tag.getText().trim().isEmpty()) {
-            si.setComments(new Integer(tag.getText().trim()));
+        tag = super.getChild(element, "comments", SlashModuleParser.NS);
+        if (tag != null && !tag.getTextContent().trim().isEmpty()) {
+            si.setComments(Integer.valueOf(tag.getTextContent().trim()));
         }
         tag = null;
-        tag = element.getChild("department", SlashModuleParser.NS);
+        tag = super.getChild(element, "department", SlashModuleParser.NS);
         if (tag != null) {
-            si.setDepartment(tag.getText().trim());
+            si.setDepartment(tag.getTextContent().trim());
         }
         tag = null;
-        tag = element.getChild("section", SlashModuleParser.NS);
+        tag = super.getChild(element, "section", SlashModuleParser.NS);
         if (tag != null) {
-            si.setSection(tag.getText().trim());
+            si.setSection(tag.getTextContent().trim());
         }
         if (si.getHitParade() != null || si.getComments() != null || si.getDepartment() != null || si.getSection() != null) {
             return si;

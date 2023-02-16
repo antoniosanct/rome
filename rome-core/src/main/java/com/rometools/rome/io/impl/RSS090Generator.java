@@ -18,9 +18,12 @@ package com.rometools.rome.io.impl;
 
 import java.util.List;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.rss.Channel;
@@ -28,10 +31,11 @@ import com.rometools.rome.feed.rss.Image;
 import com.rometools.rome.feed.rss.Item;
 import com.rometools.rome.feed.rss.TextInput;
 import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.ModuleGenerator;
 
 /**
  * Feed Generator for RSS 0.90
- * <p/>
+ * 
  */
 public class RSS090Generator extends BaseWireFeedGenerator {
 
@@ -39,9 +43,9 @@ public class RSS090Generator extends BaseWireFeedGenerator {
     private static final String RSS_URI = "http://my.netscape.com/rdf/simple/0.9/";
     private static final String CONTENT_URI = "http://purl.org/rss/1.0/modules/content/";
 
-    private static final Namespace RDF_NS = Namespace.getNamespace("rdf", RDF_URI);
-    private static final Namespace RSS_NS = Namespace.getNamespace(RSS_URI);
-    private static final Namespace CONTENT_NS = Namespace.getNamespace("content", CONTENT_URI);
+    private static final Namespace RDF_NS = BaseWireFeedParser.createNamespace("rdf", RDF_URI);
+    private static final Namespace RSS_NS = BaseWireFeedParser.createNamespace(RSS_URI);
+    private static final Namespace CONTENT_NS = BaseWireFeedParser.createNamespace("content", CONTENT_URI);
 
     public RSS090Generator() {
         this("rss_0.9");
@@ -53,11 +57,22 @@ public class RSS090Generator extends BaseWireFeedGenerator {
 
     @Override
     public Document generate(final WireFeed feed) throws FeedException {
-        final Channel channel = (Channel) feed;
-        final Element root = createRootElement(channel);
-        populateFeed(channel, root);
-        purgeUnusedNamespaceDeclarations(root);
-        return createDocument(root);
+    	try {
+    		DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+    		dbf.setNamespaceAware(true);
+//    		dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+//        	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+//        	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+    		final Document doc = dbf.newDocumentBuilder().newDocument();
+			final Channel channel = (Channel) feed;
+	        final Element root = createRootElement(channel, doc);
+	        populateFeed(channel, root);
+	        purgeUnusedNamespaceDeclarations(root);
+	        doc.appendChild(root);
+	        return doc;
+		} catch (ParserConfigurationException e) {
+			throw new FeedException("Document builder failed", e);
+		}
     }
 
     protected Namespace getFeedNamespace() {
@@ -72,15 +87,15 @@ public class RSS090Generator extends BaseWireFeedGenerator {
         return CONTENT_NS;
     }
 
-    protected Document createDocument(final Element root) {
-        return new Document(root);
-    }
-
-    protected Element createRootElement(final Channel channel) {
-        final Element root = new Element("RDF", getRDFNamespace());
-        root.addNamespaceDeclaration(getFeedNamespace());
-        root.addNamespaceDeclaration(getRDFNamespace());
-        root.addNamespaceDeclaration(getContentNamespace());
+    protected Element createRootElement(final Channel channel, final Document doc) {
+        final Element root = doc.createElementNS(getRDFNamespace().getNamespaceURI(), "RDF");
+        root.setPrefix(getRDFNamespace().getPrefix());
+//        root.addNamespaceDeclaration(getFeedNamespace());
+        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns", getFeedNamespace().getNamespaceURI());
+//        root.addNamespaceDeclaration(getRDFNamespace());
+        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + getRDFNamespace().getPrefix(), getRDFNamespace().getNamespaceURI());
+//        root.addNamespaceDeclaration(getContentNamespace());
+        root.setAttributeNS(ModuleGenerator.XMLNS_URI, "xmlns:" + getContentNamespace().getPrefix(), getContentNamespace().getNamespaceURI());
         generateModuleNamespaceDefs(root);
         return root;
     }
@@ -90,14 +105,15 @@ public class RSS090Generator extends BaseWireFeedGenerator {
         addImage(channel, parent);
         addTextInput(channel, parent);
         addItems(channel, parent);
-        generateForeignMarkup(parent, channel.getForeignMarkup());
+        generateForeignMarkup(parent, channel.getForeignMarkup(), null);
     }
 
     protected void addChannel(final Channel channel, final Element parent) throws FeedException {
-        final Element eChannel = new Element("channel", getFeedNamespace());
+        final Element eChannel = parent.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "channel");
+        eChannel.setPrefix(getFeedNamespace().getPrefix());
         populateChannel(channel, eChannel);
         checkChannelConstraints(eChannel);
-        parent.addContent(eChannel);
+        parent.appendChild(eChannel);
         generateFeedModules(channel.getModules(), eChannel);
     }
 
@@ -111,36 +127,36 @@ public class RSS090Generator extends BaseWireFeedGenerator {
     protected void populateChannel(final Channel channel, final Element eChannel) {
         final String title = channel.getTitle();
         if (title != null) {
-            eChannel.addContent(generateSimpleElement("title", title));
+            eChannel.appendChild(generateSimpleElement("title", title, eChannel));
         }
         final String link = channel.getLink();
         if (link != null) {
-            eChannel.addContent(generateSimpleElement("link", link));
+            eChannel.appendChild(generateSimpleElement("link", link, eChannel));
         }
         final String description = channel.getDescription();
         if (description != null) {
-            eChannel.addContent(generateSimpleElement("description", description));
+            eChannel.appendChild(generateSimpleElement("description", description, eChannel));
         }
     }
 
     // maxLen == -1 means unlimited.
-    protected void checkNotNullAndLength(final Element parent, final String childName, final int minLen, final int maxLen) throws FeedException {
-        final Element child = parent.getChild(childName, getFeedNamespace());
+    protected void checkNotNullAndLength(final Element element, final String childName, final int minLen, final int maxLen) throws FeedException {
+        final Element child = super.getChild(element, childName);
         if (child == null) {
-            throw new FeedException("Invalid " + getType() + " feed, missing " + parent.getName() + " " + childName);
+            throw new FeedException("Invalid " + getType() + " feed, missing " + element.getNodeName() + " " + childName);
         }
-        checkLength(parent, childName, minLen, maxLen);
+        checkLength(element, childName, minLen, maxLen);
     }
 
     // maxLen == -1 means unlimited.
     protected void checkLength(final Element parent, final String childName, final int minLen, final int maxLen) throws FeedException {
-        final Element child = parent.getChild(childName, getFeedNamespace());
+    	final Element child = super.getChild(parent, childName);
         if (child != null) {
-            if (minLen > 0 && child.getText().length() < minLen) {
-                throw new FeedException("Invalid " + getType() + " feed, " + parent.getName() + " " + childName + "short of " + minLen + " length");
+            if (minLen > 0 && child.getTextContent().length() < minLen) {
+                throw new FeedException("Invalid " + getType() + " feed, " + parent.getNodeName() + " " + childName + "short of " + minLen + " length");
             }
-            if (maxLen > -1 && child.getText().length() > maxLen) {
-                throw new FeedException("Invalid " + getType() + " feed, " + parent.getName() + " " + childName + "exceeds " + maxLen + " length");
+            if (maxLen > -1 && child.getTextContent().length() > maxLen) {
+                throw new FeedException("Invalid " + getType() + " feed, " + parent.getNodeName() + " " + childName + "exceeds " + maxLen + " length");
             }
         }
     }
@@ -148,25 +164,26 @@ public class RSS090Generator extends BaseWireFeedGenerator {
     protected void addImage(final Channel channel, final Element parent) throws FeedException {
         final Image image = channel.getImage();
         if (image != null) {
-            final Element eImage = new Element("image", getFeedNamespace());
+            final Element eImage = parent.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "image");
+            eImage.setPrefix(getFeedNamespace().getPrefix());
             populateImage(image, eImage);
             checkImageConstraints(eImage);
-            parent.addContent(eImage);
+            parent.appendChild(eImage);
         }
     }
 
     protected void populateImage(final Image image, final Element eImage) {
         final String title = image.getTitle();
         if (title != null) {
-            eImage.addContent(generateSimpleElement("title", title));
+            eImage.appendChild(generateSimpleElement("title", title, eImage));
         }
         final String url = image.getUrl();
         if (url != null) {
-            eImage.addContent(generateSimpleElement("url", url));
+            eImage.appendChild(generateSimpleElement("url", url, eImage));
         }
         final String link = image.getLink();
         if (link != null) {
-            eImage.addContent(generateSimpleElement("link", link));
+            eImage.appendChild(generateSimpleElement("link", link, eImage));
         }
     }
 
@@ -178,29 +195,30 @@ public class RSS090Generator extends BaseWireFeedGenerator {
     protected void addTextInput(final Channel channel, final Element parent) throws FeedException {
         final TextInput textInput = channel.getTextInput();
         if (textInput != null) {
-            final Element eTextInput = new Element(getTextInputLabel(), getFeedNamespace());
+            final Element eTextInput = parent.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), getTextInputLabel());
+            eTextInput.setPrefix(getFeedNamespace().getPrefix());
             populateTextInput(textInput, eTextInput);
             checkTextInputConstraints(eTextInput);
-            parent.addContent(eTextInput);
+            parent.appendChild(eTextInput);
         }
     }
 
     protected void populateTextInput(final TextInput textInput, final Element eTextInput) {
         final String title = textInput.getTitle();
         if (title != null) {
-            eTextInput.addContent(generateSimpleElement("title", title));
+            eTextInput.appendChild(generateSimpleElement("title", title, eTextInput));
         }
         final String description = textInput.getDescription();
         if (description != null) {
-            eTextInput.addContent(generateSimpleElement("description", description));
+            eTextInput.appendChild(generateSimpleElement("description", description, eTextInput));
         }
         final String name = textInput.getName();
         if (name != null) {
-            eTextInput.addContent(generateSimpleElement("name", name));
+            eTextInput.appendChild(generateSimpleElement("name", name, eTextInput));
         }
         final String link = textInput.getLink();
         if (link != null) {
-            eTextInput.addContent(generateSimpleElement("link", link));
+            eTextInput.appendChild(generateSimpleElement("link", link, eTextInput));
         }
     }
 
@@ -213,28 +231,30 @@ public class RSS090Generator extends BaseWireFeedGenerator {
     }
 
     protected void addItem(final Item item, final Element parent, final int index) throws FeedException {
-        final Element eItem = new Element("item", getFeedNamespace());
-        populateItem(item, eItem, index);
+        final Element eItem = parent.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "item");
+        eItem.setPrefix(getFeedNamespace().getPrefix());
+        populateItem(item, eItem, index, parent);
         checkItemConstraints(eItem);
         generateItemModules(item.getModules(), eItem);
-        parent.addContent(eItem);
+        parent.appendChild(eItem);
     }
 
-    protected void populateItem(final Item item, final Element eItem, final int index) {
+    protected void populateItem(final Item item, final Element eItem, final int index, final Element parent) {
         final String title = item.getTitle();
         if (title != null) {
-            eItem.addContent(generateSimpleElement("title", title));
+            eItem.appendChild(generateSimpleElement("title", title, eItem));
         }
         final String link = item.getLink();
         if (link != null) {
-            eItem.addContent(generateSimpleElement("link", link));
+            eItem.appendChild(generateSimpleElement("link", link, eItem));
         }
-        generateForeignMarkup(eItem, item.getForeignMarkup());
+        generateForeignMarkup(eItem, item.getForeignMarkup(), parent);
     }
 
-    protected Element generateSimpleElement(final String name, final String value) {
-        final Element element = new Element(name, getFeedNamespace());
-        element.addContent(value);
+    protected Element generateSimpleElement(final String name, final String value, final Element e) {
+        final Element element = e.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), name);
+        element.setPrefix(getFeedNamespace().getPrefix());
+        element.setTextContent(value);
         return element;
     }
 
@@ -258,8 +278,9 @@ public class RSS090Generator extends BaseWireFeedGenerator {
     }
 
     protected void checkItemsConstraints(final Element parent) throws FeedException {
-        final int count = parent.getChildren("item", getFeedNamespace()).size();
-        if (count < 1 || count > 15) {
+    	final List<Element> nodeItems = super.getChildren(parent, "item", getFeedNamespace());
+    	if (null == nodeItems || nodeItems.size() < 1 || nodeItems.size() > 15) {
+    		final int count = (null == nodeItems ? 0 : nodeItems.size());
             throw new FeedException("Invalid " + getType() + " feed, item count is " + count + " it must be between 1 an 15");
         }
     }

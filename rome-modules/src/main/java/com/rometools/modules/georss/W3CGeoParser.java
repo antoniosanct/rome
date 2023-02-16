@@ -18,55 +18,56 @@ package com.rometools.modules.georss;
 
 import java.util.Locale;
 
-import org.jdom2.Element;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.georss.geometries.Point;
 import com.rometools.modules.georss.geometries.Position;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 import com.rometools.utils.Strings;
 
 /**
  * W3CGeoParser is a parser for the W3C geo format.
  */
-public class W3CGeoParser implements ModuleParser {
+public class W3CGeoParser extends ChildNavigator implements ModuleParser {
 
     @Override
     public String getNamespaceUri() {
         return GeoRSSModule.GEORSS_W3CGEO_URI;
     }
 
-    static Module parseW3C(final Element element) {
+    Module parseW3C(final Element element) {
 
         GeoRSSModule geoRSSModule = null;
 
         // do we have an optional "Point" element ?
-        Element pointElement = element.getChild("Point", GeoRSSModule.W3CGEO_NS);
+        Element pointElement = super.getChild(element, "Point", GeoRSSModule.W3CGEO_NS);
 
         // we don't have an optional "Point" element
         if (pointElement == null) {
             pointElement = element;
         }
 
-        final Element lat = pointElement.getChild("lat", GeoRSSModule.W3CGEO_NS);
-        Element lng = pointElement.getChild("long", GeoRSSModule.W3CGEO_NS);
+        final Element lat = super.getChild(pointElement, "lat", GeoRSSModule.W3CGEO_NS);
+        Element lng = super.getChild(pointElement, "long", GeoRSSModule.W3CGEO_NS);
         if (lng == null) {
-            lng = pointElement.getChild("lon", GeoRSSModule.W3CGEO_NS);
+            lng = super.getChild(pointElement, "lon", GeoRSSModule.W3CGEO_NS);
         }
 
         if (lat != null && lng != null) {
 
             geoRSSModule = new W3CGeoModuleImpl();
 
-            final String latTxt = Strings.trimToNull(lat.getText());
-            final String lngTxt = Strings.trimToNull(lng.getText());
+            final String latTxt = Strings.trimToNull(lat.getTextContent());
+            final String lngTxt = Strings.trimToNull(lng.getTextContent());
 
             if (latTxt != null && lngTxt != null) {
 
                 final double latitude, longitude;
                 try {
-                    latitude = Double.parseDouble(lat.getText());
-                    longitude = Double.parseDouble(lng.getText());
+                    latitude = Double.parseDouble(lat.getTextContent());
+                    longitude = Double.parseDouble(lng.getTextContent());
                 } catch (final NumberFormatException e) {
                 	return null;
                 }

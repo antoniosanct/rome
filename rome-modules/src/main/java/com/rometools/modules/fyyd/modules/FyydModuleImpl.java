@@ -20,13 +20,16 @@ import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 import com.rometools.rome.feed.module.ModuleImpl;
 
-import java.io.Serializable;
-
 public class FyydModuleImpl
         extends ModuleImpl
-        implements FyydModule, Cloneable, Serializable {
+        implements FyydModule {
 
-    private String verify;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5263752328539093829L;
+	
+	private String verify;
 
     public FyydModuleImpl() {
         super(FyydModule.class, FyydModule.URI);

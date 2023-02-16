@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom2.Element;
+import org.w3c.dom.Element;
 
 import com.rometools.modules.georss.geometries.Envelope;
 import com.rometools.modules.georss.geometries.LineString;
@@ -30,13 +30,14 @@ import com.rometools.modules.georss.geometries.Polygon;
 import com.rometools.modules.georss.geometries.Position;
 import com.rometools.modules.georss.geometries.PositionList;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleParser;
 import com.rometools.utils.Strings;
 
 /**
  * GMLParser is a parser for the GML georss format.
  */
-public class GMLParser implements ModuleParser {
+public class GMLParser extends ChildNavigator implements ModuleParser {
 
     @Override
     public String getNamespaceUri() {
@@ -50,7 +51,7 @@ public class GMLParser implements ModuleParser {
     }
 
     private static PositionList parsePosList(final Element element) {
-        final String coordinates = element.getText();
+        final String coordinates = element.getTextContent();
         final String[] coord = Strings.trimToEmpty(coordinates).split("\\s+");
         final PositionList posList = new PositionList();
         for (int i = 0; i < coord.length; i += 2) {
@@ -63,18 +64,18 @@ public class GMLParser implements ModuleParser {
         return posList;
     }
 
-    static Module parseGML(final Element element) {
+    Module parseGML(final Element element) {
         GeoRSSModule geoRSSModule = null;
 
-        final Element pointElement = element.getChild("Point", GeoRSSModule.GML_NS);
-        final Element lineStringElement = element.getChild("LineString", GeoRSSModule.GML_NS);
-        final Element polygonElement = element.getChild("Polygon", GeoRSSModule.GML_NS);
-        final Element envelopeElement = element.getChild("Envelope", GeoRSSModule.GML_NS);
+        final Element pointElement = super.getChild(element, "Point", GeoRSSModule.GML_NS);
+        final Element lineStringElement = super.getChild(element, "LineString", GeoRSSModule.GML_NS);
+        final Element polygonElement = super.getChild(element, "Polygon", GeoRSSModule.GML_NS);
+        final Element envelopeElement = super.getChild(element, "Envelope", GeoRSSModule.GML_NS);
         if (pointElement != null) {
-            final Element posElement = pointElement.getChild("pos", GeoRSSModule.GML_NS);
+            final Element posElement = super.getChild(pointElement, "pos", GeoRSSModule.GML_NS);
             if (posElement != null) {
                 geoRSSModule = new GMLModuleImpl();
-                final String coordinates = posElement.getText();
+                final String coordinates = posElement.getTextContent();
                 final String[] coord = Strings.trimToEmpty(coordinates).split("\\s+");
                 final Position pos;
                 try {
@@ -85,7 +86,7 @@ public class GMLParser implements ModuleParser {
                 geoRSSModule.setGeometry(new Point(pos));
             }
         } else if (lineStringElement != null) {
-            final Element posListElement = lineStringElement.getChild("posList", GeoRSSModule.GML_NS);
+            final Element posListElement = super.getChild(lineStringElement, "posList", GeoRSSModule.GML_NS);
             if (posListElement != null) {
                 geoRSSModule = new GMLModuleImpl();
                 PositionList positionList = parsePosList(posListElement);
@@ -98,11 +99,11 @@ public class GMLParser implements ModuleParser {
             Polygon poly = null;
 
             // The external ring
-            final Element exteriorElement = polygonElement.getChild("exterior", GeoRSSModule.GML_NS);
+            final Element exteriorElement = super.getChild(polygonElement, "exterior", GeoRSSModule.GML_NS);
             if (exteriorElement != null) {
-                final Element linearRingElement = exteriorElement.getChild("LinearRing", GeoRSSModule.GML_NS);
+                final Element linearRingElement = super.getChild(exteriorElement, "LinearRing", GeoRSSModule.GML_NS);
                 if (linearRingElement != null) {
-                    final Element posListElement = linearRingElement.getChild("posList", GeoRSSModule.GML_NS);
+                    final Element posListElement = super.getChild(linearRingElement, "posList", GeoRSSModule.GML_NS);
                     if (posListElement != null) {
                         if (poly == null) {
                             poly = new Polygon();
@@ -118,14 +119,14 @@ public class GMLParser implements ModuleParser {
             }
 
             // The internal rings (holes)
-            final List<Element> interiorElementList = polygonElement.getChildren("interior", GeoRSSModule.GML_NS);
+            final List<Element> interiorElementList = super.getChildren(polygonElement, "interior", GeoRSSModule.GML_NS);
             final Iterator<Element> it = interiorElementList.iterator();
             while (it.hasNext()) {
                 final Element interiorElement = it.next();
                 if (interiorElement != null) {
-                    final Element linearRingElement = interiorElement.getChild("LinearRing", GeoRSSModule.GML_NS);
+                    final Element linearRingElement = super.getChild(interiorElement, "LinearRing", GeoRSSModule.GML_NS);
                     if (linearRingElement != null) {
-                        final Element posListElement = linearRingElement.getChild("posList", GeoRSSModule.GML_NS);
+                        final Element posListElement = super.getChild(linearRingElement, "posList", GeoRSSModule.GML_NS);
                         if (posListElement != null) {
                             if (poly == null) {
                                 poly = new Polygon();
@@ -147,13 +148,13 @@ public class GMLParser implements ModuleParser {
                 geoRSSModule.setGeometry(poly);
             }
         } else if (envelopeElement != null) {
-            final Element lowerElement = envelopeElement.getChild("lowerCorner", GeoRSSModule.GML_NS);
-            final Element upperElement = envelopeElement.getChild("upperCorner", GeoRSSModule.GML_NS);
+            final Element lowerElement = super.getChild(envelopeElement, "lowerCorner", GeoRSSModule.GML_NS);
+            final Element upperElement = super.getChild(envelopeElement, "upperCorner", GeoRSSModule.GML_NS);
             if (lowerElement != null && upperElement != null) {
                 geoRSSModule = new GMLModuleImpl();
-                final String lowerCoordinates = lowerElement.getText();
+                final String lowerCoordinates = lowerElement.getTextContent();
                 final String[] lowerCoord = Strings.trimToEmpty(lowerCoordinates).split("\\s+");
-                final String upperCoordinates = upperElement.getText();
+                final String upperCoordinates = upperElement.getTextContent();
                 final String[] upperCoord = Strings.trimToEmpty(upperCoordinates).split("\\s+");
                 final Envelope envelope;
                 try {

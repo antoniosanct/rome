@@ -47,11 +47,13 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <revision>0.0.0-SNAPSHOT</revision>
+        <revision>1.19.0-SNAPSHOT</revision>
+	    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+	    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+	    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <build>
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -138,6 +140,11 @@
                     <artifactId>nexus-staging-maven-plugin</artifactId>
                     <version>1.6.13</version>
                 </plugin>
+                <plugin>
+				    <groupId>org.jacoco</groupId>
+				    <artifactId>jacoco-maven-plugin</artifactId>
+				    <version>0.8.6</version>
+				</plugin>
             </plugins>
         </pluginManagement>
 
@@ -146,7 +153,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <doclint>none</doclint>
+                    <doclint>all</doclint>
                 </configuration>
                 <executions>
                     <execution>
@@ -201,6 +208,33 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						 <configuration>
+							<destFile>${project.build.directory}/jacoco-ut.exec</destFile>
+						</configuration>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${project.build.directory}/jacoco-ut.exec</dataFile>
+							<outputEncoding>UTF-8</outputEncoding>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
 
@@ -259,12 +293,6 @@
                 <groupId>com.rometools</groupId>
                 <artifactId>rome-utils</artifactId>
                 <version>${revision}</version>
-            </dependency>
-            <!-- JDOM -->
-            <dependency>
-                <groupId>org.jdom</groupId>
-                <artifactId>jdom2</artifactId>
-                <version>2.0.6.1</version>
             </dependency>
             <!-- Lombok -->
             <dependency>

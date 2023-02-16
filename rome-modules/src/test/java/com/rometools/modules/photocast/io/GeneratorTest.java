@@ -74,7 +74,7 @@ public class GeneratorTest extends AbstractTestCase {
      * Test of getNamespaces method, of class
      * com.rometools.rome.feed.module.photocast.io.Generator.
      */
-    public void testGetNamespaces() {
+    public void _testGetNamespaces() {
         // TODO add your test code.
     }
 
@@ -82,7 +82,7 @@ public class GeneratorTest extends AbstractTestCase {
      * Test of getNamespaceUri method, of class
      * com.rometools.rome.feed.module.photocast.io.Generator.
      */
-    public void testGetNamespaceUri() {
+    public void _testGetNamespaceUri() {
         // TODO add your test code.
     }
 

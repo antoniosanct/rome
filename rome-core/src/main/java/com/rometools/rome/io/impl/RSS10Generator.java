@@ -18,8 +18,9 @@ package com.rometools.rome.io.impl;
 
 import java.util.List;
 
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import javax.xml.stream.events.Namespace;
+
+import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Description;
@@ -28,13 +29,13 @@ import com.rometools.rome.io.FeedException;
 
 /**
  * Feed Generator for RSS 1.0
- * <p/>
+ * 
  */
 
 public class RSS10Generator extends RSS090Generator {
 
     private static final String RSS_URI = "http://purl.org/rss/1.0/";
-    private static final Namespace RSS_NS = Namespace.getNamespace(RSS_URI);
+    private static final Namespace RSS_NS = BaseWireFeedParser.createNamespace(RSS_URI);
 
     public RSS10Generator() {
         super("rss_1.0");
@@ -56,48 +57,51 @@ public class RSS10Generator extends RSS090Generator {
 
         final String channelUri = channel.getUri();
         if (channelUri != null) {
-            eChannel.setAttribute("about", channelUri, getRDFNamespace());
+            eChannel.setAttributeNS(getRDFNamespace().getNamespaceURI(), "about", channelUri);
         }
 
         final List<Item> items = channel.getItems();
         if (!items.isEmpty()) {
-            final Element eItems = new Element("items", getFeedNamespace());
-            final Element eSeq = new Element("Seq", getRDFNamespace());
+            final Element eItems = eChannel.getOwnerDocument().createElementNS(getFeedNamespace().getNamespaceURI(), "items");
+            eItems.setPrefix(getFeedNamespace().getPrefix());
+            final Element eSeq = eChannel.getOwnerDocument().createElementNS(getRDFNamespace().getNamespaceURI(), "Seq");
+            eSeq.setPrefix(getRDFNamespace().getPrefix());
             for (final Item item : items) {
-                final Element lis = new Element("li", getRDFNamespace());
+                final Element lis = eChannel.getOwnerDocument().createElementNS(getRDFNamespace().getNamespaceURI(), "li");
+                lis.setPrefix(getRDFNamespace().getPrefix());
                 final String uri = item.getUri();
                 if (uri != null) {
-                    lis.setAttribute("resource", uri, getRDFNamespace());
+                    lis.setAttributeNS(getRDFNamespace().getNamespaceURI(), "resource", uri);
                 }
-                eSeq.addContent(lis);
+                eSeq.appendChild(lis);
             }
-            eItems.addContent(eSeq);
-            eChannel.addContent(eItems);
+            eItems.appendChild(eSeq);
+            eChannel.appendChild(eItems);
         }
     }
 
     @Override
-    protected void populateItem(final Item item, final Element eItem, final int index) {
+    protected void populateItem(final Item item, final Element eItem, final int index, final Element parent) {
 
-        super.populateItem(item, eItem, index);
+        super.populateItem(item, eItem, index, parent);
 
         final String link = item.getLink();
         final String uri = item.getUri();
         if (uri != null) {
-            eItem.setAttribute("about", uri, getRDFNamespace());
+            eItem.setAttributeNS(getRDFNamespace().getNamespaceURI(), "about", uri);
         } else if (link != null) {
-            eItem.setAttribute("about", link, getRDFNamespace());
+            eItem.setAttributeNS(getRDFNamespace().getNamespaceURI(), "about", link);
         }
 
         final Description description = item.getDescription();
         if (description != null) {
-            eItem.addContent(generateSimpleElement("description", description.getValue()));
+            eItem.appendChild(generateSimpleElement("description", description.getValue(), eItem));
         }
 
-        if (item.getModule(getContentNamespace().getURI()) == null && item.getContent() != null) {
-            final Element elem = new Element("encoded", getContentNamespace());
-            elem.addContent(item.getContent().getValue());
-            eItem.addContent(elem);
+        if (item.getModule(getContentNamespace().getNamespaceURI()) == null && item.getContent() != null) {
+            final Element elem = eItem.getOwnerDocument().createElementNS(getContentNamespace().getNamespaceURI(), "encoded");
+            elem.setTextContent(item.getContent().getValue());
+            eItem.appendChild(elem);
         }
 
     }

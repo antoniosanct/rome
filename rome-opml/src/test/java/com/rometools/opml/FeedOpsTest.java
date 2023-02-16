@@ -20,20 +20,32 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StringWriter;
+
+import javax.xml.XMLConstants;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.jdom2.Document;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import org.w3c.dom.Document;
 
 import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.WireFeedOutput;
 
+/**
+ * FeedOps abstract test class
+ */
 public abstract class FeedOpsTest extends FeedTest {
 
     protected FeedOpsTest(final String feedType) {
@@ -41,6 +53,10 @@ public abstract class FeedOpsTest extends FeedTest {
         new File("target/test-reports").mkdirs();
     }
 
+    /**
+     * testWireFeedEquals
+     * @throws Exception any exception
+     */
     // 1.2a
     public void testWireFeedEquals() throws Exception {
         final WireFeed feed1 = getCachedWireFeed();
@@ -48,6 +64,10 @@ public abstract class FeedOpsTest extends FeedTest {
         assertTrue(feed1.equals(feed2));
     }
 
+    /**
+     * testWireFeedNotEqual
+     * @throws Exception any exception
+     */
     // 1.2b
     public void testWireFeedNotEqual() throws Exception {
         final WireFeed feed1 = getCachedWireFeed();
@@ -56,6 +76,10 @@ public abstract class FeedOpsTest extends FeedTest {
         assertFalse(feed1.equals(feed2));
     }
 
+    /**
+     * testWireFeedCloning
+     * @throws Exception any exception
+     */
     // 1.3
     public void testWireFeedCloning() throws Exception {
         final WireFeed feed1 = getCachedWireFeed();
@@ -64,6 +88,10 @@ public abstract class FeedOpsTest extends FeedTest {
         assertTrue(feed1.equals(feed2));
     }
 
+    /**
+     * testWireFeedSerialization
+     * @throws Exception any exception
+     */
     // 1.4
     public void testWireFeedSerialization() throws Exception {
         final WireFeed feed1 = getCachedWireFeed();
@@ -81,17 +109,20 @@ public abstract class FeedOpsTest extends FeedTest {
         assertTrue(feed1.equals(feed2));
     }
 
+    /**
+     * testWireFeedW3CSerialization
+     * @throws Exception any exception
+     */
     // 1.5
-    public void testWireFeedJDOMSerialization() throws Exception {
-        Document inputDoc = getCachedJDomDoc();
+    public void testWireFeedW3CSerialization() throws Exception {
+        Document inputDoc = getCachedDoc();
 
         final WireFeed feed = getCachedWireFeed();
         WireFeedOutput output = new WireFeedOutput();
-        Document outputDoc = output.outputJDom(feed);
+        Document outputDoc = output.outputDom(feed);
 
-        XMLOutputter outputter = new XMLOutputter(Format.getCompactFormat());
-        String inputString = outputter.outputString(inputDoc);
-        String outputString = outputter.outputString(outputDoc);
+        String inputString = this.outputString(inputDoc);
+        String outputString = this.outputString(outputDoc);
 
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
@@ -102,6 +133,10 @@ public abstract class FeedOpsTest extends FeedTest {
         XMLAssert.assertXMLEqual(diff, true);
     }
 
+    /**
+     * testWireFeedSyndFeedConversion
+     * @throws Exception any exception
+     */
     // 1.6
     public void testWireFeedSyndFeedConversion() throws Exception {
         final SyndFeed sFeed1 = getCachedSyndFeed();
@@ -111,6 +146,10 @@ public abstract class FeedOpsTest extends FeedTest {
         assertEquals(sFeed1, sFeed2);
     }
 
+    /**
+     * testSyndFeedEquals
+     * @throws Exception any exception
+     */
     // 1.7a
     public void testSyndFeedEquals() throws Exception {
         final SyndFeed feed1 = getCachedSyndFeed();
@@ -118,6 +157,10 @@ public abstract class FeedOpsTest extends FeedTest {
         assertTrue(feed1.equals(feed2));
     }
 
+    /**
+     * testSyndFeedNotEqual
+     * @throws Exception any exception
+     */
     // 1.7b
     public void testSyndFeedNotEqual() throws Exception {
         final SyndFeed feed1 = getCachedSyndFeed();
@@ -126,6 +169,10 @@ public abstract class FeedOpsTest extends FeedTest {
         assertFalse(feed1.equals(feed2));
     }
 
+    /**
+     * testSyndFeedCloning
+     * @throws Exception any exception
+     */
     // 1.8
     public void testSyndFeedCloning() throws Exception {
         final SyndFeed feed1 = getCachedSyndFeed();
@@ -134,6 +181,10 @@ public abstract class FeedOpsTest extends FeedTest {
         assertTrue(feed1.equals(feed2));
     }
 
+    /**
+     * testSyndFeedSerialization
+     * @throws Exception any exception
+     */
     // 1.9
     public void testSyndFeedSerialization() throws Exception {
         final SyndFeed feed1 = getCachedSyndFeed();
@@ -151,4 +202,20 @@ public abstract class FeedOpsTest extends FeedTest {
         assertTrue(feed1.equals(feed2));
     }
 
+    private String outputString(final Document doc) throws Exception {
+		try {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer t = tf.newTransformer();
+			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			t.setOutputProperty(OutputKeys.METHOD, "xml");
+			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+	        StreamResult result = new StreamResult(new StringWriter());
+	        DOMSource source = new DOMSource(doc);
+	        t.transform(source, result);
+	        return result.getWriter().toString();
+		} catch (TransformerException | TransformerFactoryConfigurationError e) {
+			throw new FeedException("Error outputting feed", e);
+		}
+        
+    }
 }
