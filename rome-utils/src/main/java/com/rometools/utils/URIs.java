@@ -6,12 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import lombok.experimental.UtilityClass;
-
 /**
  * URI utility class.
  */
-@UtilityClass
 public class URIs {
 
     private static final Map<String, String> FIXES = new HashMap<>();

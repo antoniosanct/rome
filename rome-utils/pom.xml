@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>com.rometools</groupId>
-        <artifactId>rome</artifactId>
+        <artifactId>rome-parent</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -27,10 +27,18 @@
     </build>
     
     <dependencies>
-        <!-- Test dependencies -->
         <dependency>
-            <groupId>com.rometools</groupId>
-            <artifactId>rome-test</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

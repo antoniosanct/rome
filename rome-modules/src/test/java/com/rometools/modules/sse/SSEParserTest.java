@@ -20,7 +20,6 @@
 package com.rometools.modules.sse;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -93,7 +92,7 @@ public class SSEParserTest extends AbstractTestCase {
      * @throws Exception any exception
      */
     public void xtestParseGenerateV5() throws Exception {
-        final URL feedURL = new File(getTestFile("xml/v/v5.xml")).toURI().toURL();
+        final File feedFile = new File(getTestFile("xml/v/v5.xml"));
         // parse the document for comparison
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     	dbf.setNamespaceAware(true);
@@ -101,11 +100,11 @@ public class SSEParserTest extends AbstractTestCase {
     	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
     	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
     	DocumentBuilder db = dbf.newDocumentBuilder();
-    	final Document directlyBuilt = db.parse(feedURL.openConnection().getInputStream());
+    	final Document directlyBuilt = db.parse(feedFile);
 
         // generate the feed back into a document
         final SyndFeedInput input = new SyndFeedInput();
-        final SyndFeed inputFeed = input.build(new XmlReader(feedURL));
+        final SyndFeed inputFeed = input.build(new XmlReader(feedFile));
 
         final SyndFeedOutput output = new SyndFeedOutput();
         final Document parsedAndGenerated = output.outputDom(inputFeed);
@@ -263,7 +262,7 @@ public class SSEParserTest extends AbstractTestCase {
     public void xtestV5() throws Exception {
         final File feed = new File(getTestFile("xml/v/v5.xml"));
         final SyndFeedInput input = new SyndFeedInput();
-        final SyndFeed syndfeed = input.build(new XmlReader(feed.toURI().toURL()));
+        final SyndFeed syndfeed = input.build(new XmlReader(feed));
 
         final List<SyndEntry> entries = syndfeed.getEntries();
         final Iterator<SyndEntry> it = entries.iterator();

@@ -73,7 +73,7 @@ public class ContentModuleParserTest extends AbstractTestCase {
     public void testParse() throws Exception {
 
         final SyndFeedInput input = new SyndFeedInput();
-        final SyndFeed feed = input.build(new XmlReader(new File(getTestFile("xml/test-rdf.xml")).toURI().toURL()));
+        final SyndFeed feed = input.build(new XmlReader(new File(getTestFile("xml/test-rdf.xml"))));
         final SyndEntry entry = feed.getEntries().get(0);
         final ContentModule module = (ContentModule) entry.getModule(ContentModule.URI);
         final List<ContentItem> items = module.getContentItems();

@@ -75,7 +75,7 @@ public class ITunesParserTest extends AbstractTestCase {
     public void testParse() throws Exception {
         File feed = new File(getTestFile("itunes/leshow.xml"));
         final SyndFeedInput input = new SyndFeedInput();
-        SyndFeed syndfeed = input.build(new XmlReader(feed.toURI().toURL()));
+        SyndFeed syndfeed = input.build(new XmlReader(feed));
 
         final Module module = syndfeed.getModule(AbstractITunesObject.URI);
         final FeedInformationImpl feedInfo = (FeedInformationImpl) module;
@@ -109,7 +109,7 @@ public class ITunesParserTest extends AbstractTestCase {
         }
 
         feed = new File(getTestFile("xml/rsr.xml"));
-        syndfeed = input.build(new XmlReader(feed.toURI().toURL()));
+        syndfeed = input.build(new XmlReader(feed));
         entries = syndfeed.getEntries();
         it = entries.iterator();
 
@@ -126,7 +126,7 @@ public class ITunesParserTest extends AbstractTestCase {
     public void testParseItem() throws Exception {
         File feed = new File(getTestFile("xml/leshow.xml"));
         final SyndFeedInput input = new SyndFeedInput();
-        SyndFeed syndfeed = input.build(new XmlReader(feed.toURI().toURL()));
+        SyndFeed syndfeed = input.build(new XmlReader(feed));
 
         SyndEntry entry = syndfeed.getEntries().get(0);
 
@@ -148,7 +148,8 @@ public class ITunesParserTest extends AbstractTestCase {
     }
 
     public void testDuration() throws Exception {
-        SyndFeed feed = new SyndFeedInput().build(new XmlReader(getClass().getResource("duration.xml")));
+        File feedFile = new File(getTestFile("com/rometools/modules/itunes/duration.xml"));
+        SyndFeed feed = new SyndFeedInput().build(new XmlReader(feedFile));
         SyndEntry entry = feed.getEntries().get(0);
         EntryInformationImpl module = (EntryInformationImpl) entry.getModule(AbstractITunesObject.URI);
 
@@ -156,7 +157,8 @@ public class ITunesParserTest extends AbstractTestCase {
     }
 
     public void testDurationEmpty() throws Exception {
-        SyndFeed feed = new SyndFeedInput().build(new XmlReader(getClass().getResource("duration-empty.xml")));
+        File feedFile = new File(getTestFile("com/rometools/modules/itunes/duration-empty.xml"));
+        SyndFeed feed = new SyndFeedInput().build(new XmlReader(feedFile));
         SyndEntry entry = feed.getEntries().get(0);
         EntryInformationImpl module = (EntryInformationImpl) entry.getModule(AbstractITunesObject.URI);
 
@@ -164,7 +166,8 @@ public class ITunesParserTest extends AbstractTestCase {
     }
 
     public void testDurationBad() throws Exception {
-        SyndFeed feed = new SyndFeedInput().build(new XmlReader(getClass().getResource("duration-bad.xml")));
+        File feedFile = new File(getTestFile("com/rometools/modules/itunes/duration-bad.xml"));
+        SyndFeed feed = new SyndFeedInput().build(new XmlReader(feedFile));
         SyndEntry entry = feed.getEntries().get(0);
         EntryInformationImpl module = (EntryInformationImpl) entry.getModule(AbstractITunesObject.URI);
 
@@ -177,7 +180,8 @@ public class ITunesParserTest extends AbstractTestCase {
         xmlFiles.add("explicitness-yes.xml");
 
         for (String xml : xmlFiles) {
-            SyndFeed feed = new SyndFeedInput().build(new XmlReader(getClass().getResource(xml)));
+            File feedFile = new File(getTestFile(String.format("com/rometools/modules/itunes/%s", xml)));
+            SyndFeed feed = new SyndFeedInput().build(new XmlReader(feedFile));
             FeedInformationImpl module = (FeedInformationImpl) feed.getModule(AbstractITunesObject.URI);
 
             assertTrue(module.getExplicitNullable());
@@ -190,7 +194,8 @@ public class ITunesParserTest extends AbstractTestCase {
         xmlFiles.add("explicitness-clean.xml");
 
         for (String xml : xmlFiles) {
-            SyndFeed feed = new SyndFeedInput().build(new XmlReader(getClass().getResource(xml)));
+            File feedFile = new File(getTestFile(String.format("com/rometools/modules/itunes/%s", xml)));
+            SyndFeed feed = new SyndFeedInput().build(new XmlReader(feedFile));
             FeedInformationImpl module = (FeedInformationImpl) feed.getModule(AbstractITunesObject.URI);
 
             assertFalse(module.getExplicitNullable());
@@ -200,7 +205,7 @@ public class ITunesParserTest extends AbstractTestCase {
     public void testParseNonHttpUris() throws Exception {
         File feed = new File(getTestFile("itunes/no-http-uris.xml"));
         final SyndFeedInput input = new SyndFeedInput();
-        SyndFeed syndfeed = input.build(new XmlReader(feed.toURI().toURL()));
+        SyndFeed syndfeed = input.build(new XmlReader(feed));
 
         final FeedInformationImpl feedInfo = (FeedInformationImpl) syndfeed.getModule(AbstractITunesObject.URI);
 

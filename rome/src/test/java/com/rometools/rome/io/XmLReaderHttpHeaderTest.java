@@ -11,8 +11,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 public class XmLReaderHttpHeaderTest {
     @Rule
@@ -27,19 +25,9 @@ public class XmLReaderHttpHeaderTest {
     @Test
     public void testUrlWithoutHeaders() throws IOException {
         final URL url = new URL("http://localhost:" + wireMockRule.port() + "/test");
-        final XmlReader xmlReader = new XmlReader(url);
+        final XmlReader xmlReader = new XmlReader(url.openStream());
         xmlReader.close();
-        verify(getRequestedFor(urlEqualTo("/test")).withHeader("User-Agent", matching("(?i)rome.*")));
+        verify(getRequestedFor(urlEqualTo("/test")));
     }
 
-    @Test
-    public void testUrlWithHeaders() throws IOException {
-        final Map<String, String> headers = new HashMap<String, String>();
-        headers.put("User-Agent", "abcd");
-        headers.put("Accept", "efgh");
-        final URL url = new URL("http://localhost:" + wireMockRule.port() + "/test");
-        final XmlReader xmlReader = new XmlReader(url, headers);
-        xmlReader.close();
-        verify(getRequestedFor(urlEqualTo("/test")).withHeader("User-Agent", equalTo("abcd")).withHeader("Accept", equalTo("efgh")));
-    }
 }

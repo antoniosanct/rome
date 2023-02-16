@@ -6,15 +6,15 @@
 
     <parent>
         <groupId>com.rometools</groupId>
-        <artifactId>rome</artifactId>
+        <artifactId>rome-parent</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>rome-core</artifactId>
+    <artifactId>rome</artifactId>
     <packaging>jar</packaging>
 
-    <name>rome-core</name>
+    <name>rome</name>
     <description>Core module for generating, parsing and converting RSS and Atom feeds</description>
 
     <build>
@@ -63,15 +63,32 @@
     </build>
 
     <dependencies>
-        <!-- Rome -->
         <dependency>
             <groupId>com.rometools</groupId>
             <artifactId>rome-utils</artifactId>
         </dependency>
-        <!-- Test dependencies -->
         <dependency>
-            <groupId>com.rometools</groupId>
-            <artifactId>rome-test</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

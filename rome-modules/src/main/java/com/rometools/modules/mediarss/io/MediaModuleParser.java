@@ -472,17 +472,19 @@ public class MediaModuleParser extends ChildNavigator implements ModuleParser {
             final Element priceElement = priceElements.get(i);
             prices[i] = new Price();
             
-            if (null != super.getAttributeNotBlank("currency", priceElement)) {
+            final String currency = super.getAttributeNotBlank("currency", priceElement);
+            if (null != currency) {
                 try {
-                    prices[i].setCurrency(Currency.getInstance(super.getAttributeNotBlank("currency", priceElement)));
+                    prices[i].setCurrency(Currency.getInstance(currency));
                 } catch (IllegalArgumentException ex) {
                     LOG.warn("Invalid currency", ex);
                 }
             }
 
-            if (null != super.getAttributeNotBlank("price", priceElement)) {
+            final String price = super.getAttributeNotBlank("price", priceElement);
+            if (null != price) {
                 try {
-                    prices[i].setPrice(new BigDecimal(super.getAttributeNotBlank("price", priceElement)));
+                    prices[i].setPrice(new BigDecimal(price));
                 } catch (NumberFormatException ex) {
                     LOG.warn("Invalid price", ex);
                 }

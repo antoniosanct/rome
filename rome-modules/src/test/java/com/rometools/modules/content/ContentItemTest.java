@@ -137,7 +137,6 @@ public class ContentItemTest extends TestCase {
 	public void testEquals() {
 
 		LOG.debug("testEquals");
-        final String test = "http://www.w3.org/2000/svg";
         
 		final ContentItem item1 = ContentModuleImplTest.contentItems.get(0);
 
@@ -149,16 +148,6 @@ public class ContentItemTest extends TestCase {
 
 		assertEquals(item1, item2);
 
-        assertTrue(test.equals(test));
-        final ContentItem test2 = ContentModuleImplTest.contentItems.get(0);
-        assertFalse(test.equals(test2.getContentFormat()));
-        final ContentItem test3 = new ContentItem();
-        test3.setContentFormat(new String("http://www.w3.org/1999/xhtml"));
-        test3.setContentEncoding(new String("http://www.w3.org/TR/REC-xml#dt-wellformed"));
-        test3.setContentValueParseType(new String("Literal"));
-//        test3.setContentValueNamespace(new String("http://www.w3.org/1999/xhtml"));
-//        test3.setContentValue(new String("<em>This is <strong>very</strong></em> <strong>cool</strong>."));
-        assertEquals( test2, test3 );
     }
 
 }

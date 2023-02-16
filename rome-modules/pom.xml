@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>com.rometools</groupId>
-        <artifactId>rome</artifactId>
+        <artifactId>rome-parent</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -55,15 +55,28 @@
     </build>
 
     <dependencies>
-        <!-- Rome -->
         <dependency>
             <groupId>com.rometools</groupId>
-            <artifactId>rome-core</artifactId>
+            <artifactId>rome</artifactId>
         </dependency>
-        <!-- Test dependencies -->
         <dependency>
-            <groupId>com.rometools</groupId>
-            <artifactId>rome-test</artifactId>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
