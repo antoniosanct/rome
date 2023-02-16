@@ -134,9 +134,20 @@ public class ContentItemTest extends TestCase {
      * @todo make better Test of ContentResource method, of class
      *       com.totsp.xml.syndication.content.ContentItem.
      */
-    public void testEquals() {
-        LOG.debug("testEquals");
+	public void testEquals() {
+
+		LOG.debug("testEquals");
         final String test = "http://www.w3.org/2000/svg";
+        
+		final ContentItem item1 = ContentModuleImplTest.contentItems.get(0);
+
+		final ContentItem item2 = new ContentItem();
+		item2.setContentFormat(new String("http://www.w3.org/1999/xhtml"));
+		item2.setContentEncoding(new String("http://www.w3.org/TR/REC-xml#dt-wellformed"));
+		item2.setContentValue(new String("<em>This is <strong>very</strong></em> <strong>cool</strong>."));
+		item2.setContentValueParseType(new String("Literal"));
+
+		assertEquals(item1, item2);
 
         assertTrue(test.equals(test));
         final ContentItem test2 = ContentModuleImplTest.contentItems.get(0);
