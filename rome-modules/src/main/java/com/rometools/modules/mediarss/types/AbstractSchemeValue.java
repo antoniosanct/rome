@@ -23,13 +23,10 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 /**
  * Simple data bean parent for scheme-value type entities.
  */
-public abstract class AbstractSchemeValue implements Serializable {
-    private static final long serialVersionUID = 1L;
+public abstract class AbstractSchemeValue {
     private final String scheme;
     private final String value;
 

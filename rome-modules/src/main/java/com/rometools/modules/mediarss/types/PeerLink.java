@@ -19,7 +19,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.net.URL;
 
 /**
@@ -27,9 +26,8 @@ import java.net.URL;
  * 
  * @since MediaRSS 1.5.0
  */
-public class PeerLink implements Serializable {
+public class PeerLink {
 
-    private static final long serialVersionUID = -7117791317811346321L;
     private String type;
     private URL href;
 

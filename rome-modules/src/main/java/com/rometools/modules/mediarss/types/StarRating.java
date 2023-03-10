@@ -19,15 +19,12 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 /**
  * This element specifies the rating-related information about a media object.
  * 
  * @since MediaRSS 1.5.0
  */
-public class StarRating implements Serializable {
-    private static final long serialVersionUID = -6807718323210492980L;
+public class StarRating {
     private Double average;
     private Integer count;
     private Integer min;

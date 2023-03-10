@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.synd;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,9 +29,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
 /**
  * Bean for content of SyndFeedImpl entries.
  */
-public class SyndContentImpl implements Serializable, SyndContent {
-
-    private static final long serialVersionUID = 1L;
+public class SyndContentImpl implements SyndContent {
 
     private static final CopyFromHelper COPY_FROM_HELPER;
 

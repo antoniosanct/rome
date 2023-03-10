@@ -17,7 +17,6 @@
  */
 package com.rometools.rome.feed.synd;
 
-import java.io.Serializable;
 import java.util.Collections;
 
 import com.rometools.rome.feed.impl.CloneableBean;
@@ -27,9 +26,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
 /**
  * Represents a link or an enclosure.
  */
-public class SyndLinkImpl implements Cloneable, Serializable, SyndLink {
-    private static final long serialVersionUID = 1L;
-
+public class SyndLinkImpl implements Cloneable, SyndLink {
     private String href;
     private String rel;
     private String type;

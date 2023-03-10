@@ -19,8 +19,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 import com.rometools.modules.georss.GeoRSSModule;
 
 /**
@@ -28,9 +26,8 @@ import com.rometools.modules.georss.GeoRSSModule;
  * 
  * @since MediaRSS 1.5.0
  */
-public class Location implements Serializable {
+public class Location {
 
-    private static final long serialVersionUID = 2899286634307076735L;
     private String description;
     private Time start;
     private Time end;

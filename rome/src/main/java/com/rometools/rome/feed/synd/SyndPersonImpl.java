@@ -17,7 +17,6 @@
  */
 package com.rometools.rome.feed.synd;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,9 +30,7 @@ import com.rometools.utils.Lists;
 /**
  * Bean for authors and contributors of SyndFeedImpl feeds and entries.
  */
-public class SyndPersonImpl implements Serializable, SyndPerson {
-
-    private static final long serialVersionUID = 1L;
+public class SyndPersonImpl implements SyndPerson {
 
     private String name;
     private String uri;

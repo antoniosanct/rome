@@ -15,8 +15,6 @@
  */
 package com.rometools.modules.yahooweather.types;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
@@ -28,9 +26,8 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * <li>country: two-character country code. (string)</li>
  * </ul>
  */
-public class Location implements Serializable, Cloneable {
+public class Location implements Cloneable {
 
-    private static final long serialVersionUID = 1L;
     private String city;
     private String region;
     private String country;

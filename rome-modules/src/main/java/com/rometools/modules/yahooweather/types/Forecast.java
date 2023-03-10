@@ -15,7 +15,6 @@
  */
 package com.rometools.modules.yahooweather.types;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -42,9 +41,8 @@ import com.rometools.rome.feed.impl.ToStringBean;
  *
  * @see ConditionCode
  */
-public class Forecast implements Serializable, Cloneable {
+public class Forecast implements Cloneable {
 
-    private static final long serialVersionUID = 1L;
     private String day;
     private Date date;
     private int low;

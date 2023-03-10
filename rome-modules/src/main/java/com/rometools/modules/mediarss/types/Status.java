@@ -19,16 +19,12 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 /**
  * Optional tag to specify the status of a media object -- whether it's still active or it has been blocked/deleted.
  * 
  * @since MediaRSS 1.5.0
  */
-public class Status implements Serializable {
-    private static final long serialVersionUID = 7136177408594285103L;
-
+public class Status {
     /**
      * state can have values {@code active}, {@code blocked} or {@code deleted}.
      * 

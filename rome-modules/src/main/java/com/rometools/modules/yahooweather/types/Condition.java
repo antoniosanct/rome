@@ -15,7 +15,6 @@
  */
 package com.rometools.modules.yahooweather.types;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -36,9 +35,8 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * "Wed, 30 Nov 2005 1:56 pm PST" (string)</li>
  * </ul>
  */
-public class Condition implements Serializable, Cloneable {
+public class Condition implements Cloneable {
 
-    private static final long serialVersionUID = 1L;
     private String text;
     private ConditionCode code;
     private int temperature;

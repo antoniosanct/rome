@@ -17,7 +17,6 @@
  */
 package com.rometools.rome.feed;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,9 +40,7 @@ import com.rometools.utils.Lists;
  * The format of the 'type' property must be [FEEDNAME]_[FEEDVERSION] with the FEEDNAME in lower
  * case, for example: rss_0.9, rss_0.93, atom_0.3
  */
-public abstract class WireFeed implements Cloneable, Serializable, Extendable {
-
-    private static final long serialVersionUID = 1L;
+public abstract class WireFeed implements Cloneable, Extendable {
 
     private String feedType;
     private String encoding;

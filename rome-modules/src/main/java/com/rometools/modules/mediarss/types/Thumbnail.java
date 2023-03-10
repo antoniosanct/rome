@@ -21,7 +21,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.net.URI;
 
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -63,9 +62,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * attribute.
  * </p>
  */
-public class Thumbnail implements Cloneable, Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class Thumbnail implements Cloneable {
     private Integer thumbHeight = null;
     private Integer thumbWidth = null;
     private final Time time;

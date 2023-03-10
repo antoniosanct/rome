@@ -15,16 +15,13 @@
 
 package com.rometools.modules.opensearch.entity;
 
-import java.io.Serializable;
 import java.util.Collections;
 
 import com.rometools.rome.feed.impl.CloneableBean;
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
-public class OSQuery implements Cloneable, Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class OSQuery implements Cloneable {
     // role is required
     private String role;
     private int startPage = -1;

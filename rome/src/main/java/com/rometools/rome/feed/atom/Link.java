@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.atom;
 
-import java.io.Serializable;
 import java.util.Collections;
 
 import com.rometools.rome.feed.impl.CloneableBean;
@@ -27,9 +26,7 @@ import com.rometools.utils.Alternatives;
 /**
  * Bean for link elements of Atom feeds.
  */
-public class Link implements Cloneable, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Link implements Cloneable {
 
     private String href;
     private String hrefResolved;

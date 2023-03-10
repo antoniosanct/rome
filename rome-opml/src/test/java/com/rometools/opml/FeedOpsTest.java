@@ -64,23 +64,6 @@ public abstract class FeedOpsTest extends FeedTest {
         assertTrue(feed1.equals(feed2));
     }
 
-    // 1.4
-    public void testWireFeedSerialization() throws Exception {
-        final WireFeed feed1 = getCachedWireFeed();
-
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(feed1);
-        oos.close();
-
-        final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final ObjectInputStream ois = new ObjectInputStream(bais);
-        final WireFeed feed2 = (WireFeed) ois.readObject();
-        ois.close();
-
-        assertTrue(feed1.equals(feed2));
-    }
-
     // 1.5
     public void testWireFeedJDOMSerialization() throws Exception {
         Document inputDoc = getCachedJDomDoc();
@@ -131,23 +114,6 @@ public abstract class FeedOpsTest extends FeedTest {
         final SyndFeed feed1 = getCachedSyndFeed();
         final SyndFeed feed2 = (SyndFeed) feed1.clone();
         ;
-        assertTrue(feed1.equals(feed2));
-    }
-
-    // 1.9
-    public void testSyndFeedSerialization() throws Exception {
-        final SyndFeed feed1 = getCachedSyndFeed();
-
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(feed1);
-        oos.close();
-
-        final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final ObjectInputStream ois = new ObjectInputStream(bais);
-        final SyndFeed feed2 = (SyndFeed) ois.readObject();
-        ois.close();
-
         assertTrue(feed1.equals(feed2));
     }
 

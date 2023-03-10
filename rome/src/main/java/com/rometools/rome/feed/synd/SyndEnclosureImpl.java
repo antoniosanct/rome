@@ -15,7 +15,6 @@
  */
 package com.rometools.rome.feed.synd;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,9 +25,7 @@ import com.rometools.rome.feed.impl.CopyFromHelper;
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
-public class SyndEnclosureImpl implements Serializable, SyndEnclosure {
-
-    private static final long serialVersionUID = 1L;
+public class SyndEnclosureImpl implements SyndEnclosure {
 
     private static final CopyFromHelper COPY_FROM_HELPER;
 

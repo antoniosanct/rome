@@ -19,7 +19,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.net.URL;
 
 /**
@@ -28,8 +27,7 @@ import java.net.URL;
  * @since MediaRSS 1.5.0
  * 
  */
-public class License implements Serializable {
-    private static final long serialVersionUID = 8468812050262548541L;
+public class License {
     private String type;
     private URL href;
     private String value;

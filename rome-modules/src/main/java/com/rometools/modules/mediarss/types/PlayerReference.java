@@ -22,7 +22,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.net.URI;
 
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -53,9 +52,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * is an optional attribute.
  * </p>
  */
-public class PlayerReference implements Reference, Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class PlayerReference implements Reference {
     private final Integer height;
     private final Integer width;
     private final URI url;

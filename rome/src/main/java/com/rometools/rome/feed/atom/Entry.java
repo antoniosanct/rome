@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.atom;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -36,9 +35,7 @@ import com.rometools.utils.Lists;
 /**
  * Bean for entry elements of Atom feeds.
  */
-public class Entry implements Cloneable, Serializable, Extendable {
-
-    private static final long serialVersionUID = 1L;
+public class Entry implements Cloneable, Extendable {
 
     private Content summary;
     private Content title;

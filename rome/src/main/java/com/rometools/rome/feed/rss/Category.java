@@ -17,7 +17,6 @@
  */
 package com.rometools.rome.feed.rss;
 
-import java.io.Serializable;
 import java.util.Collections;
 
 import com.rometools.rome.feed.impl.CloneableBean;
@@ -27,8 +26,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
 /**
  * Bean for categories of RSS feeds.
  */
-public class Category implements Cloneable, Serializable {
-    private static final long serialVersionUID = 1L;
+public class Category implements Cloneable {
     private String domain;
     private String value;
 

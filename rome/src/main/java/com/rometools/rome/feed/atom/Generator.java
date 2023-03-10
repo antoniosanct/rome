@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.atom;
 
-import java.io.Serializable;
 import java.util.Collections;
 
 import com.rometools.rome.feed.impl.CloneableBean;
@@ -26,9 +25,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
 /**
  * Bean for the generator element of Atom feeds.
  */
-public class Generator implements Cloneable, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Generator implements Cloneable {
 
     private String url;
     private String version;

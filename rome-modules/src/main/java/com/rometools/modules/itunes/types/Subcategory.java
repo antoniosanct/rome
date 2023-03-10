@@ -16,14 +16,11 @@
  */
 package com.rometools.modules.itunes.types;
 
-import java.io.Serializable;
-
 /**
  * This class represents a Subcategor of a Category.
  */
-public class Subcategory implements Serializable {
+public class Subcategory {
 
-    private static final long serialVersionUID = 1L;
     private String name;
 
     public Subcategory() {

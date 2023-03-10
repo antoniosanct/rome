@@ -15,14 +15,10 @@
 
 package com.rometools.modules.georss.geometries;
 
-import java.io.Serializable;
-
 /**
  * Abstract base class for geometries.
  */
-public abstract class AbstractGeometry implements Cloneable, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public abstract class AbstractGeometry implements Cloneable {
 
     public AbstractGeometry() {
     }

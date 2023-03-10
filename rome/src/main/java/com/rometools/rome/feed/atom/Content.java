@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.atom;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,9 +28,7 @@ import com.rometools.utils.Strings;
 /**
  * Bean for content elements of Atom feeds.
  */
-public class Content implements Cloneable, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Content implements Cloneable {
 
     private String type;
     private String value;

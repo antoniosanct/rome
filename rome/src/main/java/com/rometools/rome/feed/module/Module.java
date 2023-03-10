@@ -16,15 +16,13 @@
  */
 package com.rometools.rome.feed.module;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.CopyFrom;
 
 /**
  * Base class for modules describing Metadata of feeds. Examples of such modules are the Dublin Core
  * and Syndication modules.
  */
-public interface Module extends Cloneable, CopyFrom, Serializable {
+public interface Module extends Cloneable, CopyFrom {
 
     /**
      * Returns the URI of the module.

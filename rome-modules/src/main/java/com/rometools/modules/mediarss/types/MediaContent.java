@@ -21,8 +21,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
@@ -130,8 +128,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  *         specification. There may be one or more <media:content> instances within each instance of
  *         an <item> within an RSS 2.0 document.
  */
-public class MediaContent implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class MediaContent {
     private Expression expression;
     private Float bitrate = null;
     private Float framerate = null;

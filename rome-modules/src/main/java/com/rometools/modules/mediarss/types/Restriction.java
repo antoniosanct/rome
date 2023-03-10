@@ -22,8 +22,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
@@ -71,9 +69,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * "uri" allows restrictions based on URI. Examples: urn:apple, http://images.google.com, urn:yahoo,
  * etc.
  */
-public class Restriction implements Serializable {
-    private static final long serialVersionUID = 7944281267467298628L;
-
+public class Restriction {
     private final Relationship relationship;
     private final String value;
     private final Type type;

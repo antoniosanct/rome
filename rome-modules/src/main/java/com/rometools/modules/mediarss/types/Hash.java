@@ -22,8 +22,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
@@ -46,9 +44,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * <em>algo</em> indicates the algorithm used to create the hash. Possible values are 'md5' and
  * 'sha-1'. Default value is 'md5'. It is an optional attribute.
  */
-public class Hash extends AbstractSchemeValue implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class Hash extends AbstractSchemeValue {
     /**
      * @param algorithm algoright used
      * @param value value of the hash

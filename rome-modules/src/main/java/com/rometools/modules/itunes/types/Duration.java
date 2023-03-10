@@ -15,7 +15,6 @@
  */
 package com.rometools.modules.itunes.types;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.StringTokenizer;
 
@@ -25,9 +24,8 @@ import com.rometools.rome.io.impl.NumberParser;
  * An encapsulation of the duration of a podcast. This will serialize (via .toString()) to HH:MM:SS
  * format, and can parse [H]*H:[M]*M:[S]*S or [M]*M:[S]*S.
  */
-public class Duration implements Serializable {
+public class Duration {
 
-    private static final long serialVersionUID = 1L;
     static final long SECOND = 1000;
     static final long MINUTE = SECOND * 60;
     static final long HOUR = MINUTE * 60;

@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.atom;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,9 +32,7 @@ import com.rometools.utils.Lists;
 /**
  * Bean for person elements of Atom feeds.
  */
-public class Person implements SyndPerson, Cloneable, Serializable, Extendable {
-
-    private static final long serialVersionUID = 1L;
+public class Person implements SyndPerson, Cloneable, Extendable {
 
     private String name;
     private String uri; // since Atom 1.0 (was called url)

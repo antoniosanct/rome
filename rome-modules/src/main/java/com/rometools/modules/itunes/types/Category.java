@@ -17,7 +17,6 @@
 package com.rometools.modules.itunes.types;
 
 import com.rometools.utils.Lists;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +24,8 @@ import java.util.List;
  * This Category information. Basically a name and an optional Subcategory. Categories are defined
  * by Apple. See ITMS for a view.
  */
-public class Category implements Serializable {
+public class Category {
 
-    private static final long serialVersionUID = 1L;
     private String name;
     private List<Subcategory> subcategories = new ArrayList<Subcategory>();
 

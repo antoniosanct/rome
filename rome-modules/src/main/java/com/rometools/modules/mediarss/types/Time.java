@@ -22,7 +22,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
 
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -31,9 +30,7 @@ import com.rometools.rome.feed.impl.EqualsBean;
  * Represents a <a href="http://www.ietf.org/rfc/rfc2326.txt">RFC 2326 3.6 Normal Play Time</a>
  * timestamp.
  */
-public class Time implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class Time {
     private static final long SECOND = 1000;
     private static final long MINUTE = 60 * SECOND;
     private static final long HOUR = 60 * MINUTE;

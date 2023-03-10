@@ -15,8 +15,6 @@
  */
 package com.rometools.modules.yahooweather.types;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
@@ -34,9 +32,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * 0, 1, 2)</li>
  * </ul>
  */
-public class Atmosphere implements Serializable, Cloneable {
-
-    private static final long serialVersionUID = 1L;
+public class Atmosphere implements Cloneable {
 
     private int humidity;
     private double visibility;
@@ -156,9 +152,8 @@ public class Atmosphere implements Serializable, Cloneable {
         return new Atmosphere(humidity, visibility, pressure, change);
     }
 
-    public static class PressureChange implements Serializable {
+    public static class PressureChange {
 
-        private static final long serialVersionUID = 1L;
         public static final PressureChange RISING = new PressureChange(1, "rising");
         public static final PressureChange STEADY = new PressureChange(0, "steady");
         public static final PressureChange FALLING = new PressureChange(2, "falling");

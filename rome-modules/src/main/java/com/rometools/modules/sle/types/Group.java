@@ -17,8 +17,6 @@
  */
 package com.rometools.modules.sle.types;
 
-import java.io.Serializable;
-
 import org.jdom2.Namespace;
 
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -56,8 +54,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * "element" attribute is omitted.&nbsp;&nbsp;</li>
  * </ul>
  */
-public class Group implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
+public class Group implements Cloneable {
     private Namespace namespace = Namespace.XML_NAMESPACE;
     private final String element;
     private final String label;

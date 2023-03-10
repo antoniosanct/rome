@@ -22,8 +22,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
@@ -84,8 +82,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * href="http://www.ebu.ch/en/technical/metadata/specifications/role_codes.php">European
  * Broadcasting Union Role Codes</a>
  */
-public class Credit implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Credit {
     /**
      * Scheme value for the EBU credits.
      */

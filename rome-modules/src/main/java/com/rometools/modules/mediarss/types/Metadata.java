@@ -23,7 +23,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 
@@ -50,8 +49,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * &lt;media:content&gt;, &lt;media:group&gt;, &lt;item&gt;, &lt;channel&gt;.
  * </p>
  */
-public class Metadata implements Cloneable, Serializable {
-    private static final long serialVersionUID = 649350950456005250L;
+public class Metadata implements Cloneable {
     /**
      * status is the status of the media object saying whether a media object has been created by the publisher or they have rights to circulate it.
      */

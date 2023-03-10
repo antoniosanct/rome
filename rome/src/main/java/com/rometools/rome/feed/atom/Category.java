@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.atom;
 
-import java.io.Serializable;
 import java.util.Collections;
 
 import com.rometools.rome.feed.impl.CloneableBean;
@@ -27,9 +26,7 @@ import com.rometools.utils.Alternatives;
 /**
  * Bean for category elements of Atom feeds.
  */
-public class Category implements Cloneable, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Category implements Cloneable {
 
     private String term;
     private String scheme;

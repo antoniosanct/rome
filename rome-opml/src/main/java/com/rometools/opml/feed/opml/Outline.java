@@ -17,7 +17,6 @@
  */
 package com.rometools.opml.feed.opml;
 
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,9 +30,7 @@ import com.rometools.rome.feed.module.Module;
 /**
  * This class represents an OPML outline element.
  */
-public class Outline implements Cloneable, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Outline implements Cloneable {
 
     private Date created;
     private List<Attribute> attributes;

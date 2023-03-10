@@ -19,7 +19,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.net.URL;
 import java.util.Arrays;
 
@@ -28,8 +27,7 @@ import java.util.Arrays;
  * 
  * @since MediaRSS 1.5.0
  */
-public class Embed implements Serializable {
-    private static final long serialVersionUID = -6950838495477768173L;
+public class Embed {
     private Param[] params = new Param[0];
     private URL url;
     private Integer width;
@@ -135,8 +133,7 @@ public class Embed implements Serializable {
     /**
      * param for embed.
      */
-    public static class Param implements Serializable {
-        private static final long serialVersionUID = -1191307096400967579L;
+    public static class Param {
         private String name;
         private String value;
 

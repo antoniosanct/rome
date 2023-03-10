@@ -17,7 +17,6 @@
  */
 package com.rometools.rome.feed.rss;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -41,9 +40,7 @@ import com.rometools.utils.Lists;
  * For RSS1.0 it supports Dublin Core and Syndication modules. Note that those modules currently
  * support simple syntax format only.
  */
-public class Item implements Cloneable, Serializable, Extendable {
-
-    private static final long serialVersionUID = 1L;
+public class Item implements Cloneable, Extendable {
 
     private String title;
     private String link;

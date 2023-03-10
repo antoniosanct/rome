@@ -19,7 +19,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -28,8 +27,7 @@ import java.util.TreeSet;
  * 
  * @since MediaRSS 1.5.0
  */
-public class Community implements Serializable {
-    private static final long serialVersionUID = 1176552685678871066L;
+public class Community {
     private StarRating starRating;
     private Statistics statistics;
     private final Set<Tag> tags = new TreeSet<Tag>();

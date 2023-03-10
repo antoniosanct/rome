@@ -19,15 +19,12 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 /**
  * optionally weighted tag in media:tags.
  * 
  * @since MediaRSS 1.5.0
  */
-public class Tag implements Serializable, Comparable<Tag> {
-    private static final long serialVersionUID = 6410023938827034872L;
+public class Tag implements Comparable<Tag> {
     private final String name;
     private Integer weight;
 

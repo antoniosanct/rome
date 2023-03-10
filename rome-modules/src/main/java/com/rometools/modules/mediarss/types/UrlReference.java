@@ -23,7 +23,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -32,9 +31,7 @@ import com.rometools.rome.feed.impl.EqualsBean;
 /**
  * Used to indicate a URL primary reference for a MediaContent object.
  */
-public class UrlReference implements Reference, Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class UrlReference implements Reference {
     private final URI url;
 
     /**

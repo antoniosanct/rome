@@ -17,17 +17,13 @@
  */
 package com.rometools.opml.feed.opml;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
 /**
  * This is a simple name-value pair attribute for outlines.
  */
-public class Attribute implements Cloneable, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Attribute implements Cloneable {
 
     private String name;
     private String value;

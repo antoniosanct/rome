@@ -19,16 +19,12 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 /**
  * Optional tag to include scene information about a media object.
  * 
  * @since MediaRSS 1.5.0
  */
-public class Scene implements Serializable {
-
-    private static final long serialVersionUID = 7901019257277734134L;
+public class Scene {
 
     private String title;
     private String description;

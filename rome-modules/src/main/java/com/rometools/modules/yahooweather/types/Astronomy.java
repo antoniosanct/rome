@@ -15,7 +15,6 @@
  */
 package com.rometools.modules.yahooweather.types;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -30,9 +29,8 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * example "4:51 pm" (string)</li>
  * </ul>
  */
-public class Astronomy implements Serializable, Cloneable {
+public class Astronomy implements Cloneable {
 
-    private static final long serialVersionUID = 1L;
     private Date sunrise;
     private Date sunset;
 

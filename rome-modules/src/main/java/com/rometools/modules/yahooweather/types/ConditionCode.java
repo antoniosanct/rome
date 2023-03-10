@@ -15,7 +15,6 @@
  */
 package com.rometools.modules.yahooweather.types;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -260,9 +259,7 @@ import com.rometools.rome.feed.impl.EqualsBean;
  * </tbody>
  * </table>
  */
-public class ConditionCode implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class ConditionCode {
 
     private transient static Map<Integer, ConditionCode> LOOKUP = new HashMap<Integer, ConditionCode>();
     public static final ConditionCode TORNADO = new ConditionCode(0, "tornado");

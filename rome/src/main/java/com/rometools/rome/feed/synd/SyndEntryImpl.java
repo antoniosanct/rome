@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.synd;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -47,9 +46,7 @@ import com.rometools.utils.Strings;
 /**
  * Bean for entries of SyndFeedImpl feeds.
  */
-public class SyndEntryImpl implements Serializable, SyndEntry {
-
-    private static final long serialVersionUID = 1L;
+public class SyndEntryImpl implements SyndEntry {
 
     private static final CopyFromHelper COPY_FROM_HELPER;
 

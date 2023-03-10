@@ -17,14 +17,12 @@
  */
 package com.rometools.modules.sle.types;
 
-import java.io.Serializable;
-
 import org.jdom2.Namespace;
 
 /**
  * An interface that parents data types for sorting and grouping.
  */
-public interface EntryValue extends Serializable, Cloneable, Comparable<EntryValue> {
+public interface EntryValue extends Cloneable, Comparable<EntryValue> {
     /**
      * Returns the name of the element.
      *

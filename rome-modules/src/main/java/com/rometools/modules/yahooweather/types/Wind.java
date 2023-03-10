@@ -15,8 +15,6 @@
  */
 package com.rometools.modules.yahooweather.types;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
@@ -34,9 +32,8 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * degree units for the feed (using the u request parameter), all the units are in metric format
  * (Celsius, kilometers, millibars, kilometers per hour).
  */
-public class Wind implements Serializable, Cloneable {
+public class Wind implements Cloneable {
 
-    private static final long serialVersionUID = 1L;
     private int chill;
     private int direction;
     private int speed;

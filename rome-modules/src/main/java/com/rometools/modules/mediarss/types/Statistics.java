@@ -19,16 +19,13 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 /**
  * 
  * media:statistics element.
  * 
  * @since MediaRSS 1.5.0
  */
-public class Statistics implements Serializable {
-    private static final long serialVersionUID = -2184017520632902691L;
+public class Statistics {
     private Integer views;
     private Integer favorites;
 

@@ -15,14 +15,13 @@
  */
 package com.rometools.modules.base;
 
-import java.io.Serializable;
 import java.net.URL;
 import java.util.Date;
 
 /**
  * This is an interface representing the universals.
  */
-public interface GlobalInterface extends Serializable {
+public interface GlobalInterface {
     /**
      * Expiration Date for this item. <br>
      *

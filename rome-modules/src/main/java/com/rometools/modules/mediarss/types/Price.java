@@ -19,7 +19,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Currency;
@@ -29,9 +28,7 @@ import java.util.Currency;
  * 
  * @since MediaRSS 1.5.0
  */
-public class Price implements Serializable {
-    private static final long serialVersionUID = 446362162632617445L;
-
+public class Price {
     /**
      * Valid values are {@code rent}, {@code purchase}, {@code package} or {@code subscription}.
      * 

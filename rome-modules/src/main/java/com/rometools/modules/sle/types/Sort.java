@@ -17,8 +17,6 @@
  */
 package com.rometools.modules.sle.types;
 
-import java.io.Serializable;
-
 import org.jdom2.Namespace;
 
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -73,8 +71,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  *
  * </ul>
  */
-public class Sort implements Serializable, Cloneable {
-    private static final long serialVersionUID = 1L;
+public class Sort implements Cloneable {
     /**
      * dataType value for Date information.
      */

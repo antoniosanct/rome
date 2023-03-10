@@ -16,7 +16,6 @@
  */
 package com.rometools.rome.feed.synd;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,9 +48,7 @@ import com.rometools.utils.Lists;
  * It handles all RSS versions, Atom 0.3 and Atom 1.0, it normalizes all info, it may lose
  * information.
  */
-public class SyndFeedImpl implements Serializable, SyndFeed {
-
-    private static final long serialVersionUID = 1L;
+public class SyndFeedImpl implements SyndFeed {
 
     private static final CopyFromHelper COPY_FROM_HELPER;
 

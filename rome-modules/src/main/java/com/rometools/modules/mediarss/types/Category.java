@@ -22,8 +22,6 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
@@ -58,8 +56,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * an optional attribute.
  * </p>
  */
-public class Category implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Category {
     /**
      * Schem for FLICKR tags
      */

@@ -15,14 +15,11 @@
 
 package com.rometools.modules.georss.geometries;
 
-import java.io.Serializable;
-
 /**
  * A two dimensional position represented by latitude and longitude decimal degrees in WGS84
  */
-public class Position implements Cloneable, Serializable {
+public class Position implements Cloneable {
 
-    private static final long serialVersionUID = 1L;
     private double latitude;
     private double longitude;
 

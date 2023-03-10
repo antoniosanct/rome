@@ -15,14 +15,10 @@
 
 package com.rometools.modules.georss.geometries;
 
-import java.io.Serializable;
-
 /**
  * Abstract base class for rings (closed linear objects used for polygon borders)
  */
-public abstract class AbstractRing implements Cloneable, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public abstract class AbstractRing implements Cloneable {
 
     public AbstractRing() {
     }

@@ -17,15 +17,12 @@
  */
 package com.rometools.modules.mediarss.types;
 
-import java.io.Serializable;
-
 /**
  * expression determines if the object is a sample or the full version of the object, or even if it
  * is a continuous stream (sample | full | nonstop). Default value is 'full'. It is an optional
  * attribute.
  */
-public class Expression implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Expression {
 
     /**
      * Represents a complete media object.
