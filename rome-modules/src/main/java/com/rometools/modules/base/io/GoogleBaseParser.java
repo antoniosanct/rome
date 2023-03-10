@@ -18,8 +18,12 @@ package com.rometools.modules.base.io;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,8 +58,9 @@ public class GoogleBaseParser implements ModuleParser {
 
     public static final char[] INTEGER_CHARS = "-1234567890".toCharArray();
     public static final char[] FLOAT_CHARS = "-1234567890.".toCharArray();
-    public static final SimpleDateFormat SHORT_DT_FMT = new SimpleDateFormat("yyyy-MM-dd");
-    public static final SimpleDateFormat LONG_DT_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    //public static final DateTimeFormatter SHORT_DT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd").withLocale(Locale.US);
+    //public static final DateTimeFormatter LONG_DT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withLocale(Locale.US);
+
     static final Namespace NS = Namespace.getNamespace(GoogleBase.URI);
     static final Properties PROPS2TAGS = new Properties();
     static List<PropertyDescriptor> pds = null;
@@ -140,7 +145,13 @@ public class GoogleBaseParser implements ModuleParser {
 
     private void handleTag(final Element tag, final PropertyDescriptor pd, final GoogleBase module) throws Exception {
         Object tagValue = null;
-
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        final DateTimeFormatter longDtFmt = builder.toFormatter().withLocale(Locale.US);
+        builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        final DateTimeFormatter shortDtFmt = builder.toFormatter().withLocale(Locale.US);
+        
         if (pd.getPropertyType() == Integer.class || pd.getPropertyType().getComponentType() == Integer.class) {
             tagValue = new Integer(GoogleBaseParser.stripNonValidCharacters(GoogleBaseParser.INTEGER_CHARS, tag.getText()));
         } else if (pd.getPropertyType() == Float.class || pd.getPropertyType().getComponentType() == Float.class) {
@@ -151,22 +162,25 @@ public class GoogleBaseParser implements ModuleParser {
             tagValue = new URL(tag.getText().trim());
         } else if (pd.getPropertyType() == Boolean.class || pd.getPropertyType().getComponentType() == Boolean.class) {
             tagValue = new Boolean(tag.getText().trim());
-        } else if (pd.getPropertyType() == Date.class || pd.getPropertyType().getComponentType() == Date.class) {
+        } else if (pd.getPropertyType() == ZonedDateTime.class || pd.getPropertyType().getComponentType() == ZonedDateTime.class) {
             final String text = tag.getText().trim();
-
             if (text.length() > 10) {
-                tagValue = GoogleBaseParser.LONG_DT_FMT.parse(text);
+                tagValue = LocalDateTime.parse(text, longDtFmt).atZone(ZoneId.of("UTC"));
             } else {
-                tagValue = GoogleBaseParser.SHORT_DT_FMT.parse(text);
+                tagValue = LocalDate.parse(text, shortDtFmt).atStartOfDay(ZoneId.of("UTC"));
             }
         } else if (pd.getPropertyType() == IntUnit.class || pd.getPropertyType().getComponentType() == IntUnit.class) {
             tagValue = new IntUnit(tag.getText());
         } else if (pd.getPropertyType() == FloatUnit.class || pd.getPropertyType().getComponentType() == FloatUnit.class) {
             tagValue = new FloatUnit(tag.getText());
         } else if (pd.getPropertyType() == DateTimeRange.class || pd.getPropertyType().getComponentType() == DateTimeRange.class) {
-            tagValue =
-                    new DateTimeRange(LONG_DT_FMT.parse(tag.getChild("start", GoogleBaseParser.NS).getText().trim()), LONG_DT_FMT.parse(tag
-                            .getChild("end", GoogleBaseParser.NS).getText().trim()));
+            final ZonedDateTime start = LocalDateTime.parse(
+                tag.getChild("start", GoogleBaseParser.NS).getText().trim(),
+                longDtFmt).atZone(ZoneId.of("UTC"));
+            final ZonedDateTime end = LocalDateTime.parse(
+                tag.getChild("end", GoogleBaseParser.NS).getText().trim(),
+                longDtFmt).atZone(ZoneId.of("UTC"));
+            tagValue = new DateTimeRange(start, end);
         } else if (pd.getPropertyType() == ShippingType.class || pd.getPropertyType().getComponentType() == ShippingType.class) {
             final FloatUnit price = new FloatUnit(tag.getChild("price", GoogleBaseParser.NS).getText().trim());
             ShippingType.ServiceEnumeration service =

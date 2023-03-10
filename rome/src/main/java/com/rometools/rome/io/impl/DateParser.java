@@ -16,21 +16,23 @@
  */
 package com.rometools.rome.io.impl;
 
-import java.text.DateFormat;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * A helper class that parses Dates out of Strings with date time in RFC822 and W3CDateTime formats
  * plus the variants Atom (0.3) and RSS (0.9, 0.91, 0.92, 0.93, 0.94, 1.0 and 2.0) specificators
  * added to those formats.
  * <p/>
- * It uses the JDK java.text.SimpleDateFormat class attemtping the parse using a mask for each one
+ * It uses the JDK java.time.format.DateTimeFormatter class attemtping the parse using a mask for each one
  * of the possible formats.
  * <p/>
  */
@@ -41,7 +43,7 @@ public class DateParser {
     // order is like this because the SimpleDateFormat.parse does not fail with exception if it can
     // parse a valid date out of a substring of the full string given the mask so we have to check
     // the most complete format first, then it fails with exception
-    private static final String[] RFC822_MASKS = { "EEE, dd MMM yy HH:mm:ss z", "EEE, dd MMM yy HH:mm z", "dd MMM yy HH:mm:ss z", "dd MMM yy HH:mm z" };
+    private static final String[] RFC822_MASKS = { "EEE, dd MMM yyyy HH:mm:ss z", "EEE, dd MMM yyyy HH:mm z", "EEE, dd MMM yy HH:mm:ss z", "EEE, dd MMM yy HH:mm z", "dd MMM yy HH:mm:ss z", "dd MMM yy HH:mm z" };
 
     // order is like this because the SimpleDateFormat.parse does not fail with exception if it can
     // parse a valid date out of a substring of the full string given the mask so we have to check
@@ -97,23 +99,27 @@ public class DateParser {
      *         <b>null</b> if it was not possible to parse the the string with any of the masks.
      *
      */
-    private static Date parseUsingMask(final String[] masks, String sDate, final Locale locale) {
+    private static ZonedDateTime parseUsingMask(final String[] masks, String sDate, final Locale locale) {
         if (sDate != null) {
             sDate = sDate.trim();
         }
-        ParsePosition pp = null;
-        Date d = null;
+        ZonedDateTime d = null;
+        
         for (int i = 0; d == null && i < masks.length; i++) {
-            final DateFormat df = new SimpleDateFormat(masks[i].trim(), locale);
-            // df.setLenient(false);
-            df.setLenient(true);
             try {
-                pp = new ParsePosition(0);
-                d = df.parse(sDate, pp);
-                if (pp.getIndex() != sDate.length()) {
-                    d = null;
-                }
-            } catch (final Exception ex1) {
+                DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
+                final String mask = masks[i].trim();
+                if (mask.indexOf('M')<0)
+                    builder.parseDefaulting(ChronoField.MONTH_OF_YEAR, 1);
+                if (mask.indexOf('d')<0)
+                    builder.parseDefaulting(ChronoField.DAY_OF_MONTH, 1);
+                if (mask.indexOf('s')<0)
+                    builder.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0);
+                builder.append(DateTimeFormatter.ofPattern(mask));
+                DateTimeFormatter dtf = builder.toFormatter().withLocale(locale);
+                d = LocalDateTime.parse(sDate, dtf).atZone(ZoneId.of("UTC"));
+            } catch (DateTimeParseException dtpe) {
+                
             }
         }
         return d;
@@ -134,7 +140,7 @@ public class DateParser {
      * <li>"dd MMM yy HH:mm z"</li>
      * </ul>
      * <p/>
-     * Refer to the java.text.SimpleDateFormat javadocs for details on the format of each element.
+     * Refer to the java.time.format.DateTimeFormatter javadocs for details on the format of each element.
      * <p/>
      *
      * @param sDate string to parse for a date.
@@ -142,7 +148,7 @@ public class DateParser {
      *         possible to parse the given string into a Date.
      *
      */
-    public static Date parseRFC822(String sDate, final Locale locale) {
+    public static ZonedDateTime parseRFC822(String sDate, final Locale locale) {
         sDate = convertUnsupportedTimeZones(sDate);
         return parseUsingMask(RFC822_MASKS, sDate, locale);
     }
@@ -183,7 +189,7 @@ public class DateParser {
      * <li>"yyyy"</li>
      * </ul>
      * <p/>
-     * Refer to the java.text.SimpleDateFormat javadocs for details on the format of each element.
+     * Refer to the java.time.format.DateTimeFormatter javadocs for details on the format of each element.
      * <p/>
      *
      * @param sDate string to parse for a date.
@@ -191,7 +197,7 @@ public class DateParser {
      *         was not possible to parse the given string into a Date.
      *
      */
-    public static Date parseW3CDateTime(String sDate, final Locale locale) {
+    public static ZonedDateTime parseW3CDateTime(String sDate, final Locale locale) {
         // if sDate has time on it, it injects 'GTM' before de TZ displacement to allow the
         // SimpleDateFormat parser to parse it properly
         final int tIndex = sDate.indexOf("T");
@@ -227,8 +233,8 @@ public class DateParser {
      *         was not possible to parse the given string into a Date.
      *
      * */
-    public static Date parseDate(final String sDate, final Locale locale) {
-    	Date date = null;
+    public static ZonedDateTime parseDate(final String sDate, final Locale locale) {
+    	ZonedDateTime date = null;
     	if (ADDITIONAL_MASKS.length > 0) {
     		date = parseUsingMask(ADDITIONAL_MASKS, sDate, locale);
     		if (date != null) {
@@ -245,7 +251,7 @@ public class DateParser {
     /**
      * create a RFC822 representation of a date.
      * <p/>
-     * Refer to the java.text.SimpleDateFormat javadocs for details on the format of each element.
+     * Refer to the java.time.format.DateTimeFormatter javadocs for details on the format of each element.
      * <p/>
      *
      * @param date Date to parse
@@ -253,16 +259,17 @@ public class DateParser {
      *         possible to parse the date.
      *
      */
-    public static String formatRFC822(final Date date, final Locale locale) {
-        final SimpleDateFormat dateFormater = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", locale);
-        dateFormater.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return dateFormater.format(date);
+    public static String formatRFC822(final ZonedDateTime date, final Locale locale) {
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'"));
+        final DateTimeFormatter dtf = builder.toFormatter().withLocale(locale);
+        return dtf.format(date);
     }
 
     /**
      * create a W3C Date Time representation of a date.
      * <p/>
-     * Refer to the java.text.SimpleDateFormat javadocs for details on the format of each element.
+     * Refer to the java.time.format.DateTimeFormatter javadocs for details on the format of each element.
      * <p/>
      *
      * @param date Date to parse
@@ -270,10 +277,11 @@ public class DateParser {
      *         possible to parse the date.
      *
      */
-    public static String formatW3CDateTime(final Date date, final Locale locale) {
-        final SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", locale);
-        dateFormater.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return dateFormater.format(date);
+    public static String formatW3CDateTime(final ZonedDateTime date, final Locale locale) {
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+        final DateTimeFormatter dtf = builder.toFormatter().withLocale(locale);
+        return dtf.format(date);
     }
 
 }

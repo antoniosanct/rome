@@ -16,8 +16,8 @@
  */
 package com.rometools.rome.io.impl;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -253,8 +253,8 @@ public class DCModuleParser implements ModuleParser {
      * @param elements the list of elements to parse.
      * @return the list of dates.
      */
-    protected final List<Date> parseElementListDate(final List<Element> elements, final Locale locale) {
-        final List<Date> values = new ArrayList<Date>();
+    protected final List<ZonedDateTime> parseElementListDate(final List<Element> elements, final Locale locale) {
+        final List<ZonedDateTime> values = new ArrayList<>();
         for (final Element element : elements) {
             values.add(DateParser.parseDate(element.getText(), locale));
         }

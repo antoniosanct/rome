@@ -16,7 +16,7 @@
 package com.rometools.modules.yahooweather.types;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
@@ -46,7 +46,7 @@ public class Forecast implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
     private String day;
-    private Date date;
+    private ZonedDateTime date;
     private int low;
     private int high;
     private String text;
@@ -68,7 +68,7 @@ public class Forecast implements Serializable, Cloneable {
      * @param text a textual description of conditions, for example, "Partly Cloudy"
      * @param code ConditionCode instance for this forcast.
      */
-    public Forecast(final String day, final Date date, final int low, final int high, final String text, final ConditionCode code) {
+    public Forecast(final String day, final ZonedDateTime date, final int low, final int high, final String text, final ConditionCode code) {
         super();
         this.day = day;
         this.date = date;
@@ -103,7 +103,7 @@ public class Forecast implements Serializable, Cloneable {
      *
      * @return the date to which this forecast applies
      */
-    public Date getDate() {
+    public ZonedDateTime getDate() {
         return date;
     }
 
@@ -112,7 +112,7 @@ public class Forecast implements Serializable, Cloneable {
      *
      * @param date the date to which this forecast applies
      */
-    public void setDate(final Date date) {
+    public void setDate(final ZonedDateTime date) {
         this.date = date;
     }
 
@@ -209,6 +209,9 @@ public class Forecast implements Serializable, Cloneable {
 
     @Override
     public Object clone() {
-        return new Forecast(day, date != null ? new Date(date.getTime()) : null, low, high, text, code);
+        return new Forecast(day, date != null ? 
+            ZonedDateTime.of(date.toLocalDate(), 
+                date.toLocalTime(), date.getZone()) : null,
+            low, high, text, code);
     }
 }

@@ -16,7 +16,7 @@
 package com.rometools.modules.base;
 
 import java.net.URL;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import com.rometools.modules.base.types.FloatUnit;
 
@@ -377,7 +377,7 @@ public interface Review extends GlobalInterface {
      *
      * @param publishDate Date the item was published.
      */
-    public void setPublishDate(Date publishDate);
+    public void setPublishDate(ZonedDateTime publishDate);
 
     /**
      * Date the item was published.
@@ -421,7 +421,7 @@ public interface Review extends GlobalInterface {
      *
      * @return Date the item was published.
      */
-    public Date getPublishDate();
+    public ZonedDateTime getPublishDate();
 
     /**
      * Rating of the product or service on a scale of 1-5, with 5 as the best.

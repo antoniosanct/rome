@@ -15,8 +15,7 @@
  */
 package com.rometools.modules.base.types;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * This class represents a simple 4 digit year.
@@ -39,10 +38,8 @@ public class YearType implements CloneableType {
     /**
      * @param date Date to get the year from.
      */
-    public YearType(final Date date) {
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        year = cal.get(Calendar.YEAR);
+    public YearType(final ZonedDateTime date) {
+        year = date.getYear();
     }
 
     /**

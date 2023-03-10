@@ -17,7 +17,7 @@ package com.rometools.modules.base;
 
 import java.lang.reflect.Array;
 import java.net.URL;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,6 @@ import com.rometools.modules.base.types.IntUnit;
 import com.rometools.modules.base.types.PaymentTypeEnumeration;
 import com.rometools.modules.base.types.PriceTypeEnumeration;
 import com.rometools.modules.base.types.ShippingType;
-import com.rometools.modules.base.types.ShortDate;
 import com.rometools.modules.base.types.Size;
 import com.rometools.modules.base.types.YearType;
 import com.rometools.rome.feed.CopyFrom;
@@ -56,7 +55,7 @@ public class GoogleBaseImpl implements GoogleBase {
     private CurrencyEnumeration currency;
 
     /** dateTime:expiration_date_time */
-    private Date expirationDateTime;
+    private ZonedDateTime expirationDateTime;
 
     /** dateTimeRange:course_date_range */
     private DateTimeRange courseDateRange;
@@ -137,10 +136,10 @@ public class GoogleBaseImpl implements GoogleBase {
     private PriceTypeEnumeration salaryType;
 
     /** date:expiration_date */
-    private ShortDate expirationDate;
+    private ZonedDateTime expirationDate;
 
     /** date:publishedDate */
-    private ShortDate publishDate;
+    private ZonedDateTime publishDate;
 
     /** string:size */
     private Size size;
@@ -543,26 +542,22 @@ public class GoogleBaseImpl implements GoogleBase {
     }
 
     @Override
-    public void setExpirationDate(final Date expirationDate) {
-        if (expirationDate != null && !(expirationDate instanceof ShortDate)) {
-            this.expirationDate = new ShortDate(expirationDate);
-        } else {
-            this.expirationDate = null;
-        }
+    public void setExpirationDate(final ZonedDateTime expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
     @Override
-    public Date getExpirationDate() {
+    public ZonedDateTime getExpirationDate() {
         return expirationDate;
     }
 
     @Override
-    public void setExpirationDateTime(final Date expirationDateTime) {
+    public void setExpirationDateTime(final ZonedDateTime expirationDateTime) {
         this.expirationDateTime = expirationDateTime;
     }
 
     @Override
-    public Date getExpirationDateTime() {
+    public ZonedDateTime getExpirationDateTime() {
         return expirationDateTime;
     }
 
@@ -982,16 +977,12 @@ public class GoogleBaseImpl implements GoogleBase {
     }
 
     @Override
-    public void setPublishDate(final Date publishDate) {
-        if (publishDate != null && !(publishDate instanceof ShortDate)) {
-            this.publishDate = new ShortDate(publishDate);
-        } else {
-            this.publishDate = null;
-        }
+    public void setPublishDate(final ZonedDateTime publishDate) {
+        this.publishDate = publishDate;
     }
 
     @Override
-    public Date getPublishDate() {
+    public ZonedDateTime getPublishDate() {
         return publishDate;
     }
 
@@ -1403,11 +1394,11 @@ public class GoogleBaseImpl implements GoogleBase {
         }
     }
 
-    private Date dateOrNull(final Date date) {
+    private ZonedDateTime dateOrNull(final ZonedDateTime date) {
         if (date == null) {
             return null;
         } else {
-            return new Date(date.getTime());
+            return ZonedDateTime.of(date.toLocalDate(), date.toLocalTime(), date.getZone());
         }
     }
 }

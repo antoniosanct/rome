@@ -16,12 +16,11 @@
 package com.rometools.modules.base;
 
 import java.net.URL;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import com.rometools.modules.base.types.DateTimeRange;
 import com.rometools.modules.base.types.FloatUnit;
 import com.rometools.modules.base.types.IntUnit;
-import com.rometools.modules.base.types.ShortDate;
 
 public class CustomTagImpl implements CustomTag {
     private Object value;
@@ -67,15 +66,7 @@ public class CustomTagImpl implements CustomTag {
         this.value = value;
     }
 
-    public CustomTagImpl(final String name, final ShortDate value) {
-        if (name == null || value == null) {
-            throw new NullPointerException("Name and Value cannont be null.");
-        }
-        this.name = name;
-        this.value = value;
-    }
-
-    public CustomTagImpl(final String name, final Date value) {
+    public CustomTagImpl(final String name, final ZonedDateTime value) {
         if (name == null || value == null) {
             throw new NullPointerException("Name and Value cannont be null.");
         }

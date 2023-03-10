@@ -21,8 +21,8 @@ package com.rometools.modules.sse;
 
 import java.io.File;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -253,9 +253,9 @@ public class SSEParserTest extends AbstractTestCase {
             final History history = sync.getHistory();
             assertNotNull(history);
 
-            final Date when = history.getWhen();
+            final ZonedDateTime when = history.getWhen();
             assertNotNull(when);
-            final Date testDate = DateParser.parseRFC822("Fri, 6 Jan 2006 19:24:09 GMT", Locale.US);
+            final ZonedDateTime testDate = DateParser.parseRFC822("Fri, 6 Jan 2006 19:24:09 GMT", Locale.US);
             assertEquals(testDate, when);
         }
 

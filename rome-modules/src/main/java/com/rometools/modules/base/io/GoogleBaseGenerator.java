@@ -16,10 +16,13 @@
 package com.rometools.modules.base.io;
 
 import java.net.URL;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.jdom2.Element;
@@ -37,7 +40,6 @@ import com.rometools.modules.base.types.IntUnit;
 import com.rometools.modules.base.types.PaymentTypeEnumeration;
 import com.rometools.modules.base.types.PriceTypeEnumeration;
 import com.rometools.modules.base.types.ShippingType;
-import com.rometools.modules.base.types.ShortDate;
 import com.rometools.modules.base.types.Size;
 import com.rometools.modules.base.types.YearType;
 import com.rometools.rome.feed.impl.PropertyDescriptor;
@@ -99,14 +101,16 @@ public class GoogleBaseGenerator implements ModuleGenerator {
     }
 
     public Element generateTag(final Object o, final String tagName) {
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        final DateTimeFormatter longDtFmt = builder.toFormatter().withLocale(Locale.US);
+
         if (o instanceof URL || o instanceof Float || o instanceof Boolean || o instanceof Integer || o instanceof String || o instanceof FloatUnit
                 || o instanceof IntUnit || o instanceof GenderEnumeration || o instanceof PaymentTypeEnumeration || o instanceof PriceTypeEnumeration
                 || o instanceof CurrencyEnumeration || o instanceof Size || o instanceof YearType) {
             return generateSimpleElement(tagName, o.toString());
-        } else if (o instanceof ShortDate) {
-            return generateSimpleElement(tagName, GoogleBaseParser.SHORT_DT_FMT.format(o));
-        } else if (o instanceof Date) {
-            return generateSimpleElement(tagName, GoogleBaseParser.LONG_DT_FMT.format(o));
+        } else if (o instanceof ZonedDateTime) {
+            return generateSimpleElement(tagName, ((ZonedDateTime)o).format(longDtFmt));
         } else if (o instanceof ShippingType) {
             final ShippingType st = (ShippingType) o;
             final Element element = new Element(tagName, GoogleBaseGenerator.NS);
@@ -121,8 +125,8 @@ public class GoogleBaseGenerator implements ModuleGenerator {
         } else if (o instanceof DateTimeRange) {
             final DateTimeRange dtr = (DateTimeRange) o;
             final Element element = new Element(tagName, GoogleBaseGenerator.NS);
-            element.addContent(generateSimpleElement("start", GoogleBaseParser.LONG_DT_FMT.format(dtr.getStart())));
-            element.addContent(generateSimpleElement("end", GoogleBaseParser.LONG_DT_FMT.format(dtr.getEnd())));
+            element.addContent(generateSimpleElement("start", longDtFmt.format(dtr.getStart())));
+            element.addContent(generateSimpleElement("end", longDtFmt.format(dtr.getEnd())));
 
             return element;
         }

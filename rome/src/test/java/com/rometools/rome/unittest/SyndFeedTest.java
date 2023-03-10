@@ -15,7 +15,7 @@
  */
 package com.rometools.rome.unittest;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -146,7 +146,7 @@ public abstract class SyndFeedTest extends FeedTest {
         // getEntryPublishedDate(getCachedSyndFeed().getEntries().get(1)));
     }
 
-    public Date getEntryPublishedDate(final Object o) {
+    public ZonedDateTime getEntryPublishedDate(final Object o) {
         final SyndEntry e = (SyndEntry) o;
         return e.getPublishedDate();
     }

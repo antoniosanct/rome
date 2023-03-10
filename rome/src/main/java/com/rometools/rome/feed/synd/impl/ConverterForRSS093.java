@@ -16,7 +16,7 @@
  */
 package com.rometools.rome.feed.synd.impl;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import com.rometools.rome.feed.rss.Item;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -36,8 +36,8 @@ public class ConverterForRSS093 extends ConverterForRSS092 {
 
         final SyndEntry syndEntry = super.createSyndEntry(item, preserveWireItem);
 
-        final Date pubDate = item.getPubDate();
-        final Date publishedDate = syndEntry.getPublishedDate();
+        final ZonedDateTime pubDate = item.getPubDate();
+        final ZonedDateTime publishedDate = syndEntry.getPublishedDate();
         if (pubDate != null && publishedDate == null) {
             syndEntry.setPublishedDate(pubDate); // c
         }

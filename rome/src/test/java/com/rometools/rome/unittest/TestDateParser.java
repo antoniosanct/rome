@@ -21,10 +21,13 @@ import com.rometools.rome.io.impl.DateParser;
 
 import org.junit.Test;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -101,17 +104,19 @@ public class TestDateParser {
         assertNull(DateParser.parseDate("X00:00 2005-07-19", Locale.US));
     }
 
-    static Date date(String dateString) {
+    static ZonedDateTime date(String dateString) {
         return date(dateString, TimeZone.getTimeZone("UTC"));
     }
 
-    static Date date(String dateString, TimeZone timeZone) {
-        final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        dateFormat.setTimeZone(timeZone);
+    static ZonedDateTime date(String dateString, TimeZone timeZone) {
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        DateTimeFormatter dtf = builder.toFormatter();
+        dtf.withZone(timeZone.toZoneId());
 
         try {
-            return dateFormat.parse(dateString);
-        } catch (ParseException e) {
+            return LocalDateTime.parse(dateString, dtf).atZone(ZoneId.of("UTC"));
+        } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Failed to parse date", e);
         }
     }

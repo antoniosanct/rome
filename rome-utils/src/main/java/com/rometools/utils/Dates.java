@@ -14,7 +14,7 @@
 
 package com.rometools.utils;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 public final class Dates {
 
@@ -27,12 +27,8 @@ public final class Dates {
      * @param d The Date to copy, can be null
      * @return null when the input Date was null, a copy of the Date otherwise
      */
-    public static Date copy(final Date d) {
-        if (d == null) {
-            return null;
-        } else {
-            return new Date(d.getTime());
-        }
+    public static ZonedDateTime copy(final ZonedDateTime d) {
+        return d;
     }
 
 }

@@ -15,7 +15,7 @@
 
 package com.rometools.modules.sse;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -186,8 +186,8 @@ public class SSE091Generator implements DelegatingModuleGenerator {
 
     private String toString(final Object o) {
         if (o != null) {
-            if (o instanceof Date) {
-                return DateParser.formatRFC822((Date) o, Locale.US);
+            if (o instanceof ZonedDateTime) {
+                return DateParser.formatRFC822((ZonedDateTime) o, Locale.US);
             } else {
                 return o.toString();
             }

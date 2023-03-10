@@ -12,7 +12,7 @@
 
 package com.rometools.modules.sse.modules;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,14 +57,14 @@ public class Conflict extends SSEModule {
     public static final String WHEN_ATTRIBUTE = "when";
 
     private Integer version;
-    private Date when;
+    private ZonedDateTime when;
     private String by;
     private Item conflictItem;
 
     @Override
     public void copyFrom(final CopyFrom obj) {
         final Conflict conflict = (Conflict) obj;
-        conflict.when = when == null ? null : (Date) when.clone();
+        conflict.when = when == null ? null : (ZonedDateTime) when;
         conflict.by = by;
         conflict.version = version;
         try {
@@ -91,11 +91,11 @@ public class Conflict extends SSEModule {
         this.version = version;
     }
 
-    public Date getWhen() {
+    public ZonedDateTime getWhen() {
         return when;
     }
 
-    public void setWhen(final Date when) {
+    public void setWhen(final ZonedDateTime when) {
         this.when = when;
     }
 

@@ -16,10 +16,13 @@
 package com.rometools.modules.base.io;
 
 import java.net.URL;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.jdom2.Element;
@@ -31,7 +34,6 @@ import com.rometools.modules.base.CustomTags;
 import com.rometools.modules.base.types.DateTimeRange;
 import com.rometools.modules.base.types.FloatUnit;
 import com.rometools.modules.base.types.IntUnit;
-import com.rometools.modules.base.types.ShortDate;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleGenerator;
 
@@ -62,6 +64,13 @@ public class CustomTagGenerator implements ModuleGenerator {
             return;
         }
 
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        final DateTimeFormatter longDtFmt = builder.toFormatter().withLocale(Locale.US);
+        builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        final DateTimeFormatter shortDtFmt = builder.toFormatter().withLocale(Locale.US);
+
         final List<CustomTag> tags = ((CustomTags) module).getValues();
         final Iterator<CustomTag> it = tags.iterator();
 
@@ -72,17 +81,12 @@ public class CustomTagGenerator implements ModuleGenerator {
                 final DateTimeRange dtr = (DateTimeRange) tag.getValue();
                 final Element newTag = new Element(tag.getName(), CustomTagParser.NS);
                 newTag.setAttribute("type", "dateTimeRange");
-                newTag.addContent(generateSimpleElement("start", GoogleBaseParser.LONG_DT_FMT.format(dtr.getStart())));
-                newTag.addContent(generateSimpleElement("end", GoogleBaseParser.LONG_DT_FMT.format(dtr.getEnd())));
+                newTag.addContent(generateSimpleElement("start", longDtFmt.format(dtr.getStart())));
+                newTag.addContent(generateSimpleElement("end", longDtFmt.format(dtr.getEnd())));
                 element.addContent(newTag);
-            } else if (tag.getValue() instanceof ShortDate) {
-                final ShortDate sd = (ShortDate) tag.getValue();
-                final Element newTag = generateSimpleElement(tag.getName(), GoogleBaseParser.SHORT_DT_FMT.format(sd));
-                newTag.setAttribute("type", "date");
-                element.addContent(newTag);
-            } else if (tag.getValue() instanceof Date) {
-                final Date d = (Date) tag.getValue();
-                final Element newTag = generateSimpleElement(tag.getName(), GoogleBaseParser.SHORT_DT_FMT.format(d));
+            } else if (tag.getValue() instanceof ZonedDateTime) {
+                final ZonedDateTime d = (ZonedDateTime) tag.getValue();
+                final Element newTag = generateSimpleElement(tag.getName(), shortDtFmt.format(d));
                 newTag.setAttribute("type", "dateTime");
                 element.addContent(newTag);
             } else if (tag.getValue() instanceof Integer) {

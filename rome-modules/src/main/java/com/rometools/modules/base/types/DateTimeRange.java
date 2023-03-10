@@ -15,7 +15,7 @@
  */
 package com.rometools.modules.base.types;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * Represents a time range.
@@ -24,17 +24,17 @@ public class DateTimeRange implements CloneableType {
     /**
      * end time
      */
-    private Date end;
+    private ZonedDateTime end;
     /**
      * start time
      */
-    private Date start;
+    private ZonedDateTime start;
 
     /**
      * @param start Beginning of the timeframe.
      * @param end End of the Timeframe.
      */
-    public DateTimeRange(final Date start, final Date end) {
+    public DateTimeRange(final ZonedDateTime start, final ZonedDateTime end) {
         this.start = start;
         this.end = end;
     }
@@ -44,7 +44,7 @@ public class DateTimeRange implements CloneableType {
      *
      * @return The end of the timeframe.
      */
-    public Date getEnd() {
+    public ZonedDateTime getEnd() {
         return end;
     }
 
@@ -53,7 +53,7 @@ public class DateTimeRange implements CloneableType {
      *
      * @return The beginning of the timeframe.
      */
-    public Date getStart() {
+    public ZonedDateTime getStart() {
         return start;
     }
 
@@ -67,11 +67,11 @@ public class DateTimeRange implements CloneableType {
         final DateTimeRange retValue = new DateTimeRange(null, null);
 
         if (getStart() != null) {
-            retValue.start = (Date) getStart().clone();
+            retValue.start = (ZonedDateTime) getStart();
         }
 
         if (getEnd() != null) {
-            retValue.end = (Date) getEnd().clone();
+            retValue.end = (ZonedDateTime) getEnd();
         }
 
         return retValue;

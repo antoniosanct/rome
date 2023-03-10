@@ -17,9 +17,9 @@ package com.rometools.utils;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.junit.Test;
 
@@ -28,11 +28,11 @@ public class DatesTest {
     @Test
     public void testCopy() {
 
-        final Date date = new Date();
-        final Date nullDate = null;
+        final ZonedDateTime date = ZonedDateTime.now();
+        final ZonedDateTime nullDate = null;
 
         assertThat(Dates.copy(date), is(notNullValue()));
-        assertThat(Dates.copy(date).getTime(), is(date.getTime()));
+        assertThat(Dates.copy(date).toInstant(), is(date.toInstant()));
         assertThat(Dates.copy(nullDate), is(nullValue()));
 
     }

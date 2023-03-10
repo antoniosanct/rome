@@ -18,10 +18,10 @@
 package com.rometools.opml.feed.opml;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import com.rometools.rome.feed.impl.EqualsBean;
@@ -35,7 +35,7 @@ public class Outline implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Date created;
+    private ZonedDateTime created;
     private List<Attribute> attributes;
     private List<String> categories;
     private List<Outline> children;
@@ -196,7 +196,7 @@ public class Outline implements Cloneable, Serializable {
      *
      * @param created date-time that the outline node was created.
      */
-    public void setCreated(final Date created) {
+    public void setCreated(final ZonedDateTime created) {
         this.created = created;
     }
 
@@ -205,7 +205,7 @@ public class Outline implements Cloneable, Serializable {
      *
      * @return date-time that the outline node was created.
      */
-    public Date getCreated() {
+    public ZonedDateTime getCreated() {
         return created;
     }
 
@@ -326,7 +326,7 @@ public class Outline implements Cloneable, Serializable {
         o.setBreakpoint(isBreakpoint());
         o.setCategories(new ArrayList<String>(getCategories()));
         o.setComment(isComment());
-        o.setCreated(created != null ? (Date) created.clone() : null);
+        o.setCreated(created != null ? (ZonedDateTime) created : null);
         o.setModules(new ArrayList<Module>(getModules()));
         o.setText(getText());
         o.setTitle(getTitle());

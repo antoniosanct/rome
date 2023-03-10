@@ -15,8 +15,13 @@
  */
 package com.rometools.modules.yahooweather.io;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -98,11 +103,12 @@ public class WeatherModuleParser implements ModuleParser {
 
         if (astronomy != null) {
             try {
-                final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", locale);
-                final Astronomy a = new Astronomy(timeFormat.parse(astronomy.getAttributeValue("sunrise").replaceAll("am", "AM").replaceAll("pm", "PM")),
-                        timeFormat.parse(astronomy.getAttributeValue("sunset").replaceAll("am", "AM").replaceAll("pm", "PM")));
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a", locale);
+                LocalTime sunrise = LocalTime.parse(astronomy.getAttributeValue("sunrise").replaceAll("am", "AM").replaceAll("pm", "PM"), formatter);
+                LocalTime sunset = LocalTime.parse(astronomy.getAttributeValue("sunset").replaceAll("am", "AM").replaceAll("pm", "PM"), formatter);
+                final Astronomy a = new Astronomy(sunrise, sunset);
                 module.setAstronomy(a);
-            } catch (final ParseException pe) {
+            } catch (final DateTimeParseException pe) {
                 LOG.warn("ParseException processing <astronomy> tag.", pe);
             }
         }
@@ -111,14 +117,19 @@ public class WeatherModuleParser implements ModuleParser {
 
         if (condition != null) {
             try {
-                final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy h:mm a zzz", locale);
-                final Condition c = new Condition(condition.getAttributeValue("text"), ConditionCode.fromCode(Integer.parseInt(condition
-                        .getAttributeValue("code"))), Integer.parseInt(condition.getAttributeValue("temp")), dateFormat.parse(condition
-                        .getAttributeValue("date").replaceAll("pm", "PM").replaceAll("am", "AM")));
+                final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("EEE, d MMM yyyy h:mm a zzz", locale);
+                final ZonedDateTime zdt = LocalDateTime.parse(
+                        condition.getAttributeValue("date").replaceAll("pm", "PM").replaceAll("am", "AM"), dateFormat)
+                    .atZone(ZoneId.of("UTC"));
+                final Condition c = new Condition(condition.getAttributeValue("text"), 
+                    ConditionCode.fromCode(
+                        Integer.parseInt(condition.getAttributeValue("code"))),
+                    Integer.parseInt(condition.getAttributeValue("temp")),
+                    zdt);
                 module.setCondition(c);
             } catch (final NumberFormatException nfe) {
                 LOG.warn("NumberFormatException processing <condition> tag.", nfe);
-            } catch (final ParseException pe) {
+            } catch (final DateTimeParseException pe) {
                 LOG.warn("ParseException processing <condition> tag.", pe);
             }
         }
@@ -129,17 +140,22 @@ public class WeatherModuleParser implements ModuleParser {
             final Forecast[] f = new Forecast[forecasts.size()];
             int i = 0;
 
-            final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMM yyyy", locale);
+            final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMM yyyy", locale);
+                
             for (final Iterator<Element> it = forecasts.iterator(); it.hasNext(); i++) {
                 final Element forecast = it.next();
 
                 try {
-                    f[i] = new Forecast(forecast.getAttributeValue("day"), dateFormat.parse(forecast.getAttributeValue("date")), Integer.parseInt(forecast
+                    final ZonedDateTime zdt = LocalDate.parse(
+                            forecast.getAttributeValue("date"), dateFormat)
+                        .atStartOfDay()
+                        .atZone(ZoneId.of("UTC"));
+                    f[i] = new Forecast(forecast.getAttributeValue("day"), zdt, Integer.parseInt(forecast
                             .getAttributeValue("low")), Integer.parseInt(forecast.getAttributeValue("high")), forecast.getAttributeValue("text"),
                             ConditionCode.fromCode(Integer.parseInt(forecast.getAttributeValue("code"))));
                 } catch (final NumberFormatException nfe) {
                     LOG.warn("NumberFormatException processing <forecast> tag.", nfe);
-                } catch (final ParseException pe) {
+                } catch (final DateTimeParseException pe) {
                     LOG.warn("ParseException processing <forecast> tag.", pe);
                 }
             }

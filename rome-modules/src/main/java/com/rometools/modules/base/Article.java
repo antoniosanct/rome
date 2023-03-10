@@ -15,7 +15,7 @@
  */
 package com.rometools.modules.base;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * This is an interface for the GoogleBase plug in that exposes methods used for Article or News
@@ -303,7 +303,7 @@ public interface Article extends GlobalInterface {
      *
      * @param publishDate Date article was published
      */
-    public void setPublishDate(Date publishDate);
+    public void setPublishDate(ZonedDateTime publishDate);
 
     /**
      * Date article was published.
@@ -349,5 +349,5 @@ public interface Article extends GlobalInterface {
      *
      * @return Date article was published
      */
-    public Date getPublishDate();
+    public ZonedDateTime getPublishDate();
 }

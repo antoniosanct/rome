@@ -17,8 +17,11 @@
 package com.rometools.modules.photocast.io;
 
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -41,9 +44,9 @@ public class Parser implements ModuleParser {
 
     private static final Namespace NS = Namespace.getNamespace(PhotocastModule.URI);
     // 2005-11-29T04:36:06
-    static final DateFormat PHOTO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    static final DateTimeFormatter PHOTO_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     // 2006-01-11 16:42:26 -0800
-    static final DateFormat CROP_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+    static final DateTimeFormatter CROP_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
 
     public Parser() {
     }
@@ -65,13 +68,13 @@ public class Parser implements ModuleParser {
             }
             if (e.getName().equals("photoDate")) {
                 try {
-                    pm.setPhotoDate(Parser.PHOTO_DATE_FORMAT.parse(e.getText()));
+                    pm.setPhotoDate(LocalDateTime.parse(e.getText(), Parser.PHOTO_DATE_FORMAT).atZone(ZoneId.of("UTC")));
                 } catch (final Exception ex) {
                     LOG.warn("Unable to parse photoDate: " + e.getText(), ex);
                 }
             } else if (e.getName().equals("cropDate")) {
                 try {
-                    pm.setCropDate(Parser.CROP_DATE_FORMAT.parse(e.getText()));
+                    pm.setCropDate(LocalDateTime.parse(e.getText(), Parser.CROP_DATE_FORMAT).atZone(ZoneId.of("UTC")));
                 } catch (final Exception ex) {
                     LOG.warn("Unable to parse cropDate: " + e.getText(), ex);
                 }
@@ -92,7 +95,8 @@ public class Parser implements ModuleParser {
                 PhotoDate photoDate = null;
                 if (e.getChildText("PhotoDate") != null) {
                     try {
-                        photoDate = new PhotoDate(Double.parseDouble(e.getChildText("PhotoDate")));
+                        photoDate = new PhotoDate(
+                            Double.parseDouble(e.getChildText("PhotoDate")));
                     } catch (final Exception ex) {
                         LOG.warn("Unable to parse PhotoDate: " + e.getText(), ex);
                     }

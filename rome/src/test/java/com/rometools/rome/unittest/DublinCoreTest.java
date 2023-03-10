@@ -14,7 +14,8 @@
 
 package com.rometools.rome.unittest;
 
-import java.util.Date;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import com.rometools.rome.feed.module.DCModule;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -29,6 +30,6 @@ public class DublinCoreTest extends FeedTest {
         final SyndEntry entry = this.getCachedSyndFeed().getEntries().get(0);
         final DCModule dublinCore = (DCModule) entry.getModule(DCModule.URI);
 
-        assertEquals(new Date(1000), dublinCore.getDate());
+        assertEquals(ZonedDateTime.of(1970, 1, 1, 0, 0, 1, 0, ZoneId.of("UTC")), dublinCore.getDate());
     }
 }

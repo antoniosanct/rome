@@ -18,8 +18,8 @@ package com.rometools.modules.base.io;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,10 +72,8 @@ public class CustomTagParserTest extends AbstractTestCase {
             if (tag.getName().equals("prior_experience_years")) {
                 Assert.assertEquals(new Integer(5), tag.getValue());
             } else if (tag.getName().equals("start_date")) {
-                final Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(0);
-                cal.set(2005, 10, 15, 0, 0, 0);
-                Assert.assertEquals(cal.getTime(), tag.getValue());
+                final ZonedDateTime zdt = ZonedDateTime.of(2005, 11, 15, 0, 0, 0, 0, ZoneId.of("UTC"));
+                Assert.assertEquals(zdt, tag.getValue());
             } else if (tag.getName().equals("test_url")) {
                 Assert.assertEquals(new URL("http://www.screaming-penguin.com"), tag.getValue());
             } else if (tag.getName().equals("test_boolean")) {
@@ -87,12 +85,9 @@ public class CustomTagParserTest extends AbstractTestCase {
             } else if (tag.getName().equals("test_location")) {
                 Assert.assertEquals(new CustomTagImpl.Location("125 Main St, Sometown, GA"), tag.getValue());
             } else if (tag.getName().equals("test_dateRange")) {
-                final Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(0);
-                cal.set(2005, 06, 04, 20, 0, 0);
-                final Date start = cal.getTime();
-                cal.set(2005, 06, 04, 23, 0, 0);
-                final DateTimeRange dtr = new DateTimeRange(start, cal.getTime());
+                final ZonedDateTime start = ZonedDateTime.of(2005, 7, 4, 20, 0, 0, 0, ZoneId.of("UTC"));
+                final ZonedDateTime end = ZonedDateTime.of(2005, 7, 4, 23, 0, 0, 0, ZoneId.of("UTC"));
+                final DateTimeRange dtr = new DateTimeRange(start, end);
                 Assert.assertEquals(dtr, tag.getValue());
             }
         }

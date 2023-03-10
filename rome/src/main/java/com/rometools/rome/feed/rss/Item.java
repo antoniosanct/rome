@@ -18,8 +18,8 @@
 package com.rometools.rome.feed.rss;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.jdom2.Element;
@@ -56,8 +56,8 @@ public class Item implements Cloneable, Serializable, Extendable {
     private Guid guid;
     private String comments;
     private String author;
-    private Date pubDate;
-    private Date expirationDate;
+    private ZonedDateTime pubDate;
+    private ZonedDateTime expirationDate;
     private List<Module> modules;
     private List<Element> foreignMarkup;
 
@@ -411,7 +411,7 @@ public class Item implements Cloneable, Serializable, Extendable {
      * @return the item publishing date, <b>null</b> if none.
      *
      */
-    public Date getPubDate() {
+    public ZonedDateTime getPubDate() {
         return Dates.copy(pubDate);
     }
 
@@ -422,7 +422,7 @@ public class Item implements Cloneable, Serializable, Extendable {
      * @param pubDate the item publishing date to set, <b>null</b> if none.
      *
      */
-    public void setPubDate(final Date pubDate) {
+    public void setPubDate(final ZonedDateTime pubDate) {
         this.pubDate = Dates.copy(pubDate);
     }
 
@@ -433,7 +433,7 @@ public class Item implements Cloneable, Serializable, Extendable {
      * @return the item expiration date, <b>null</b> if none.
      *
      */
-    public Date getExpirationDate() {
+    public ZonedDateTime getExpirationDate() {
         return Dates.copy(expirationDate);
     }
 
@@ -444,7 +444,7 @@ public class Item implements Cloneable, Serializable, Extendable {
      * @param expirationDate the item expiration date to set, <b>null</b> if none.
      *
      */
-    public void setExpirationDate(final Date expirationDate) {
+    public void setExpirationDate(final ZonedDateTime expirationDate) {
         this.expirationDate = Dates.copy(expirationDate);
     }
 

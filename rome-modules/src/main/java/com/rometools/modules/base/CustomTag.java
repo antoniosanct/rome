@@ -77,7 +77,7 @@ public interface CustomTag {
      * </tr>
      *
      * <tr valign="top">
-     * <td><font size="-1">dateTime (java.util.Date)</font></td>
+     * <td><font size="-1">dateTime (java.time.ZonedDateTime)</font></td>
      *
      * <td><font size="-1">Date and time for an event, in format YYYY-MM-DDThh:mm:ss</font></td>
      * <td><font size="-1">2005-12-12T12:00:00 </font></td>

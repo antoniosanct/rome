@@ -17,7 +17,7 @@
  */
 package com.rometools.modules.sle.types;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.jdom2.Namespace;
 
@@ -32,7 +32,7 @@ public class DateValue implements EntryValue {
 
     private String element;
     private String label;
-    private Date value;
+    private ZonedDateTime value;
     private Namespace namespace = Namespace.XML_NAMESPACE;
 
     public void setElement(final String element) {
@@ -53,12 +53,12 @@ public class DateValue implements EntryValue {
         return label;
     }
 
-    public void setValue(final Date value) {
+    public void setValue(final ZonedDateTime value) {
         this.value = value;
     }
 
     @Override
-    public Date getValue() {
+    public ZonedDateTime getValue() {
         return value;
     }
 
@@ -99,8 +99,8 @@ public class DateValue implements EntryValue {
     @Override
     public int compareTo(final EntryValue other) {
         final Comparable<?> otherValue = other.getValue();
-        if (otherValue instanceof Date) {
-            return value.compareTo((Date) otherValue);
+        if (otherValue instanceof ZonedDateTime) {
+            return value.compareTo((ZonedDateTime) otherValue);
         } else {
             throw new RuntimeException("Can't compare different EntryValue types");
         }

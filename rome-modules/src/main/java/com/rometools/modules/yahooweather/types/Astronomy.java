@@ -16,7 +16,9 @@
 package com.rometools.modules.yahooweather.types;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Date;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
@@ -33,8 +35,8 @@ import com.rometools.rome.feed.impl.ToStringBean;
 public class Astronomy implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
-    private Date sunrise;
-    private Date sunset;
+    private LocalTime sunrise;
+    private LocalTime sunset;
 
     /**
      * Simple constructor.
@@ -47,14 +49,15 @@ public class Astronomy implements Serializable, Cloneable {
      * @param sunrise time of sunrise (from 0ms)
      * @param sunset time of sunset (from 0ms)
      */
-    public Astronomy(final Date sunrise, final Date sunset) {
+    public Astronomy(final LocalTime sunrise, final LocalTime sunset) {
         this.sunrise = sunrise;
         this.sunset = sunset;
     }
 
     @Override
     public Object clone() {
-        return new Astronomy(getSunrise() != null ? new Date(getSunrise().getTime()) : null, getSunset() != null ? new Date(getSunset().getTime()) : null);
+        return new Astronomy(getSunrise() != null ? getSunrise() : null,
+            getSunset() != null ? getSunset() : null);
     }
 
     @Override
@@ -77,7 +80,7 @@ public class Astronomy implements Serializable, Cloneable {
      *
      * @return ime of sunrise (from 0ms)
      */
-    public Date getSunrise() {
+    public LocalTime getSunrise() {
         return sunrise;
     }
 
@@ -86,7 +89,7 @@ public class Astronomy implements Serializable, Cloneable {
      *
      * @param sunrise ime of sunrise (from 0ms)
      */
-    public void setSunrise(final Date sunrise) {
+    public void setSunrise(final LocalTime sunrise) {
         this.sunrise = sunrise;
     }
 
@@ -95,7 +98,7 @@ public class Astronomy implements Serializable, Cloneable {
      *
      * @return time of sunset (from 0ms)
      */
-    public Date getSunset() {
+    public LocalTime getSunset() {
         return sunset;
     }
 
@@ -104,7 +107,7 @@ public class Astronomy implements Serializable, Cloneable {
      *
      * @param sunset time of sunset (from 0ms)
      */
-    public void setSunset(final Date sunset) {
+    public void setSunset(final LocalTime sunset) {
         this.sunset = sunset;
     }
 }

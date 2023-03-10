@@ -18,7 +18,13 @@ package com.rometools.modules.base.io;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +42,6 @@ import com.rometools.modules.base.CustomTagsImpl;
 import com.rometools.modules.base.types.DateTimeRange;
 import com.rometools.modules.base.types.FloatUnit;
 import com.rometools.modules.base.types.IntUnit;
-import com.rometools.modules.base.types.ShortDate;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleParser;
 
@@ -55,6 +60,13 @@ public class CustomTagParser implements ModuleParser {
         final ArrayList<CustomTag> tags = new ArrayList<CustomTag>();
         final List<Element> elements = element.getChildren();
         final Iterator<Element> it = elements.iterator();
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        final DateTimeFormatter longDtFmt = builder.toFormatter().withLocale(Locale.US);
+        builder = new DateTimeFormatterBuilder();
+        builder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        final DateTimeFormatter shortDtFmt = builder.toFormatter().withLocale(Locale.US);
+        
         while (it.hasNext()) {
             final Element child = it.next();
             if (child.getNamespace().equals(NS)) {
@@ -74,21 +86,37 @@ public class CustomTagParser implements ModuleParser {
                         tags.add(new CustomTagImpl(child.getName(), new FloatUnit(child.getTextTrim())));
                     } else if (type.equals("date")) {
                         try {
-                            tags.add(new CustomTagImpl(child.getName(), new ShortDate(GoogleBaseParser.SHORT_DT_FMT.parse(child.getTextTrim()))));
-                        } catch (final ParseException e) {
+                            final String dateStr = child.getTextTrim();
+                            final LocalDate ldt = LocalDate.parse(dateStr, shortDtFmt);
+                            final ZonedDateTime zdt = ldt.atStartOfDay().atZone(ZoneId.of("UTC"));
+                            tags.add(new CustomTagImpl(child.getName(), zdt));
+                        } catch (final DateTimeParseException e) {
                             LOG.warn("Unable to parse date type on " + child.getName(), e);
                         }
                     } else if (type.equals("dateTime")) {
                         try {
-                            tags.add(new CustomTagImpl(child.getName(), GoogleBaseParser.LONG_DT_FMT.parse(child.getTextTrim())));
-                        } catch (final ParseException e) {
-                            LOG.warn("Unable to parse date type on " + child.getName(), e);
+                            final String dateStr = child.getTextTrim();
+                            final ZonedDateTime zdt = LocalDateTime.parse(dateStr, longDtFmt).atZone(ZoneId.of("UTC"));
+                            tags.add(new CustomTagImpl(child.getName(), zdt));
+                        } catch (final DateTimeParseException e) {
+                            try {
+                                final String dateStr = child.getTextTrim();
+                                final LocalDate ldt = LocalDate.parse(dateStr, shortDtFmt);
+                                final ZonedDateTime zdt = ldt.atStartOfDay().atZone(ZoneId.of("UTC"));
+                                tags.add(new CustomTagImpl(child.getName(), zdt));
+                            } catch (final DateTimeParseException f) {
+                                LOG.warn("Unable to parse date type on " + child.getName(), f);
+                            }
                         }
                     } else if (type.equals("dateTimeRange")) {
                         try {
-                            tags.add(new CustomTagImpl(child.getName(), new DateTimeRange(GoogleBaseParser.LONG_DT_FMT.parse(child
-                                    .getChild("start", CustomTagParser.NS).getText().trim()), GoogleBaseParser.LONG_DT_FMT.parse(child
-                                    .getChild("end", CustomTagParser.NS).getText().trim()))));
+                            final ZonedDateTime start = LocalDateTime.parse(
+                                child.getChild("start", CustomTagParser.NS).getText().trim(),
+                                longDtFmt).atZone(ZoneId.of("UTC"));
+                            final ZonedDateTime end = LocalDateTime.parse(
+                                child.getChild("end", CustomTagParser.NS).getText().trim(), 
+                                longDtFmt).atZone(ZoneId.of("UTC"));
+                            tags.add(new CustomTagImpl(child.getName(), new DateTimeRange(start, end)));
                         } catch (final Exception e) {
                             LOG.warn("Unable to parse date type on " + child.getName(), e);
                         }

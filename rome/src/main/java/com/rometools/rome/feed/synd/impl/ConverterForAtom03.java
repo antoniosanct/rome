@@ -17,8 +17,8 @@
  */
 package com.rometools.rome.feed.synd.impl;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.jdom2.Element;
@@ -142,7 +142,7 @@ public class ConverterForAtom03 implements Converter {
             syndFeed.setCopyright(copyright);
         }
 
-        final Date date = aFeed.getModified();
+        final ZonedDateTime date = aFeed.getModified();
         if (date != null) {
             syndFeed.setPublishedDate(date);
         }
@@ -270,7 +270,7 @@ public class ConverterForAtom03 implements Converter {
             syndEntry.setAuthor(firstPerson.getName());
         }
 
-        Date date = entry.getModified();
+        ZonedDateTime date = entry.getModified();
         if (date == null) {
             date = Alternatives.firstNotNull(entry.getIssued(), entry.getCreated());
         }

@@ -21,7 +21,9 @@ package com.rometools.modules.base.io;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import junit.framework.Test;
@@ -46,7 +48,6 @@ import com.rometools.modules.base.Service;
 import com.rometools.modules.base.Travel;
 import com.rometools.modules.base.Vehicle;
 import com.rometools.modules.base.Wanted;
-import com.rometools.modules.base.io.GoogleBaseParser;
 import com.rometools.modules.base.types.CurrencyEnumeration;
 import com.rometools.modules.base.types.FloatUnit;
 import com.rometools.modules.base.types.GenderEnumeration;
@@ -83,16 +84,14 @@ public class GoogleBaseParserTest extends AbstractTestCase {
         SyndEntry entry = entries.get(0);
         Course course = (Course) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", course.getImageLinks()[0].toString());
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
-        cal.set(2005, 10, 30, 0, 0, 0);
-        Assert.assertEquals("Course Date", cal.getTime(), course.getExpirationDate());
+        final ZonedDateTime zdt = LocalDate.of(2005, 11, 30).atStartOfDay(ZoneId.of("UTC"));
+        Assert.assertEquals("Course Date", zdt, course.getExpirationDate());
         String[] labels = new String[] { "robots", "society", "computers" };
         this.assertEquals("Labels", labels, course.getLabels());
-        cal.set(2005, 7, 19, 8, 30, 00);
-        Assert.assertEquals("Start Time", cal.getTime(), course.getCourseDateRange().getStart());
-        cal.set(2005, 11, 20, 9, 45, 00);
-        Assert.assertEquals("End Time", cal.getTime(), course.getCourseDateRange().getEnd());
+        ZonedDateTime zdtStart = ZonedDateTime.of(2005, 8, 19, 8, 30, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Start Time", zdtStart.toInstant(), course.getCourseDateRange().getStart().toInstant());
+        ZonedDateTime zdtEnd = ZonedDateTime.of(2005, 12, 20, 9, 45, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("End Time", zdtEnd.toInstant(), course.getCourseDateRange().getEnd().toInstant());
         Assert.assertEquals("Course Number", "CS 230", course.getCourseNumber());
         Assert.assertEquals("Coutse Times", "MWF 08:30-09:00", course.getCourseTimes());
         this.assertEquals("Subject", new String[] { "computer science" }, course.getSubjects());
@@ -101,16 +100,11 @@ public class GoogleBaseParserTest extends AbstractTestCase {
         entry = entries.get(1);
         course = (Course) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", course.getImageLinks()[0].toString());
-        cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
-        cal.set(2005, 10, 30, 0, 0, 0);
-        Assert.assertEquals("Course Date", cal.getTime(), course.getExpirationDate());
+        Assert.assertEquals("Course Date", zdt, course.getExpirationDate());
         labels = new String[] { "film", "video", "documentary" };
         this.assertEquals("Labels", labels, course.getLabels());
-        cal.set(2005, 7, 19, 8, 30, 00);
-        Assert.assertEquals("Start Time", cal.getTime(), course.getCourseDateRange().getStart());
-        cal.set(2005, 11, 20, 9, 45, 00);
-        Assert.assertEquals("End Time", cal.getTime(), course.getCourseDateRange().getEnd());
+        Assert.assertEquals("Start Time", zdtStart.toInstant(), course.getCourseDateRange().getStart().toInstant());
+        Assert.assertEquals("End Time", zdtEnd.toInstant(), course.getCourseDateRange().getEnd().toInstant());
         Assert.assertEquals("Course Number", "FS 192", course.getCourseNumber());
         Assert.assertEquals("Coutse Times", "TTh 14:00-16:00", course.getCourseTimes());
         Assert.assertEquals("Subject", "film", course.getSubjects()[0]);
@@ -129,10 +123,8 @@ public class GoogleBaseParserTest extends AbstractTestCase {
         SyndEntry entry = entries.get(0);
         Event event = (Event) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", event.getImageLinks()[0].toString());
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), event.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), event.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Festival", "Halloween", "Party", "Costumes" }, event.getLabels());
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, event.getCurrency());
         Assert.assertEquals("Price", 10, event.getPrice().getValue(), 0);
@@ -145,10 +137,10 @@ public class GoogleBaseParserTest extends AbstractTestCase {
          * <g:event_date_range> <g:start>2005-07-04T20:00:00</g:start>
          * <g:end>2005-07-04T23:00:00</g:end> </g:event_date_range>
          */
-        cal.set(2005, 06, 04, 20, 00, 00);
-        Assert.assertEquals("Start Time", cal.getTime(), event.getEventDateRange().getStart());
-        cal.set(2005, 06, 04, 23, 00, 00);
-        Assert.assertEquals("End Time", cal.getTime(), event.getEventDateRange().getEnd());
+        zdt = ZonedDateTime.of(2005, 7, 4, 20, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Start Time", zdt.toInstant(), event.getEventDateRange().getStart().toInstant());
+        zdt = ZonedDateTime.of(2005, 7, 4, 23, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("End Time", zdt.toInstant(), event.getEventDateRange().getEnd().toInstant());
         Assert.assertEquals("Location", "1600 Amphitheatre Parkway, Mountain View, CA, 94043", event.getLocation());
         Assert.assertEquals("Shipping Price", (float) 32.95, event.getShipping()[0].getPrice().getValue(), 0);
         // TODO: Determine what to do about the bogus services.
@@ -159,9 +151,8 @@ public class GoogleBaseParserTest extends AbstractTestCase {
         entry = entries.get(1);
         event = (Event) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image2.jpg", event.getImageLinks()[0].toString());
-        cal.setTimeInMillis(0);
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), event.getExpirationDate());
+        zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), event.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Concert", "festival", "music" }, event.getLabels());
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, event.getCurrency());
         Assert.assertEquals("Price", 50, event.getPrice().getValue(), 0);
@@ -174,10 +165,10 @@ public class GoogleBaseParserTest extends AbstractTestCase {
          * <g:event_date_range> <g:start>2005-08-23T20:00:00</g:start>
          * <g:end>2005-08-23T23:00:00</g:end> </g:event_date_range>
          */
-        cal.set(2005, 07, 23, 20, 00, 00);
-        Assert.assertEquals("Start Time", cal.getTime(), event.getEventDateRange().getStart());
-        cal.set(2005, 07, 23, 23, 00, 00);
-        Assert.assertEquals("End Time", cal.getTime(), event.getEventDateRange().getEnd());
+        zdt = ZonedDateTime.of(2005, 8, 23, 20, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Start Time", zdt.toInstant(), event.getEventDateRange().getStart().toInstant());
+        zdt = ZonedDateTime.of(2005, 8, 23, 23, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("End Time", zdt.toInstant(), event.getEventDateRange().getEnd().toInstant());
         Assert.assertEquals("Location", "123 Main St, Anytown, CA, 12345, USA", event.getLocation());
         Assert.assertEquals("Shipping Price", (float) 32.95, event.getShipping()[0].getPrice().getValue(), 0);
         // TODO: Determine what to do about the bogus services.
@@ -193,15 +184,13 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testHousing2Parse() throws Exception {
         LOG.debug("testHousing2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/housing2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         SyndEntry entry = entries.get(0);
         Housing module = (Housing) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2007, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2007, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Housing", "New House", "Sale" }, module.getLabels());
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, module.getCurrency());
         Assert.assertEquals("Price", 350000, module.getPrice().getValue(), 0);
@@ -227,8 +216,8 @@ public class GoogleBaseParserTest extends AbstractTestCase {
         entry = entries.get(1);
         module = (Housing) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image2.jpg", module.getImageLinks()[0].toString());
-        cal.set(2008, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        zdt = ZonedDateTime.of(2008, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Housing", "rent", "lease" }, module.getLabels());
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, module.getCurrency());
         Assert.assertEquals("Price", 1400, module.getPrice().getValue(), 0);
@@ -257,15 +246,13 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testJobs2Parse() throws Exception {
         LOG.debug("testJobs2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/jobs2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final Job module = (Job) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Coordinator", "Google", "Online Support" }, module.getLabels());
         this.assertEquals("Industriy", new String[] { "Internet" }, module.getJobIndustries());
         Assert.assertEquals("Employer", "Google, Inc", module.getEmployer());
@@ -287,19 +274,17 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testNews2Parse() throws Exception {
         LOG.debug("testNews2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/news2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final Article module = (Article) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2007, 2, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2007, 3, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "news", "old" }, module.getLabels());
         Assert.assertEquals("Source", "Journal", module.getNewsSource());
-        cal.set(1961, 3, 12, 0, 0, 0);
-        Assert.assertEquals("Pub Date", cal.getTime(), module.getPublishDate());
+        zdt = ZonedDateTime.of(1961, 4, 12, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Pub Date", zdt.toInstant(), module.getPublishDate().toInstant());
         this.assertEquals("Authors", new String[] { "James Smith" }, module.getAuthors());
         Assert.assertEquals("Pages", new Integer(1), module.getPages());
 
@@ -311,15 +296,13 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testTravel2Parse() throws Exception {
         LOG.debug("testTravel2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/travel2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final Travel module = (Travel) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Vacation", "Train" }, module.getLabels());
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, module.getCurrency());
         Assert.assertEquals("Price", 250, module.getPrice().getValue(), 0);
@@ -331,10 +314,10 @@ public class GoogleBaseParserTest extends AbstractTestCase {
         Assert.assertEquals("Quantity", new Integer(204), module.getQuantity());
         Assert.assertEquals("From", "Mytown, USA", module.getFromLocation());
         Assert.assertEquals("To", "Anytown, USA", module.getToLocation());
-        cal.set(2005, 11, 20, 18, 0, 0);
-        Assert.assertEquals("Start Date", cal.getTime(), module.getTravelDateRange().getStart());
-        cal.set(2005, 11, 22, 18, 0, 0);
-        Assert.assertEquals("End Date", cal.getTime(), module.getTravelDateRange().getEnd());
+        zdt = ZonedDateTime.of(2005, 12, 20, 18, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Start Date", zdt.toInstant(), module.getTravelDateRange().getStart().toInstant());
+        zdt = ZonedDateTime.of(2005, 12, 22, 18, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("End Date", zdt.toInstant(), module.getTravelDateRange().getEnd().toInstant());
         Assert.assertEquals("Location", "123 Main St, Mytown, CA, 12345, USA", module.getLocation());
         this.assertEquals("Shipping", new ShippingType[] { new ShippingType(new FloatUnit("32.95"), ShippingType.ServiceEnumeration.OVERNIGHT, "US") },
                 module.getShipping());
@@ -349,15 +332,13 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testPersona2Parse() throws Exception {
         LOG.debug("testPerson2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/personals2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final Person module = (Person) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Personals", "m4w" }, module.getLabels());
         this.assertEquals("Ethnicity", new String[] { "South Asian" }, module.getEthnicities());
         Assert.assertEquals("Gender", GenderEnumeration.MALE, module.getGender());
@@ -377,15 +358,13 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testProduct2Parse() throws Exception {
         LOG.debug("testProduct2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/products2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final Product module = (Product) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.googlestore.com/appliance/images/products/GO0144E.jpg", module.getImageLinks()[0].toString());
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "web search", "appliance" }, module.getLabels());
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, module.getCurrency());
         Assert.assertEquals("Price", 2995, module.getPrice().getValue(), 0);
@@ -398,7 +377,6 @@ public class GoogleBaseParserTest extends AbstractTestCase {
         Assert.assertEquals("Manufacturer", "Google", module.getManufacturer());
         Assert.assertEquals("ManufacturerId", "2325", module.getManufacturerId());
         Assert.assertEquals("Model number", "234", module.getModelNumber());
-        LOG.debug("{}", module.getSize());
         Assert.assertEquals("Size", 10, module.getSize().getLength().getValue(), 0);
         Assert.assertEquals("Size", 50, module.getSize().getWidth().getValue(), 0);
         Assert.assertEquals("Size", 20, module.getSize().getHeight().getValue(), 0);
@@ -416,18 +394,16 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testResearch2Parse() throws Exception {
         LOG.debug("testResearch2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/research2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final ScholarlyArticle module = (ScholarlyArticle) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Economy", "Tsunami" }, module.getLabels());
-        cal.set(2005, 1, 25);
-        Assert.assertEquals("PubDate", cal.getTime(), module.getPublishDate());
+        LocalDate lc = LocalDate.of(2005, 2, 25);
+        Assert.assertEquals("PubDate", lc.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant(), module.getPublishDate().toInstant());
         this.assertEquals("Authors", new String[] { "James Smith" }, module.getAuthors());
         Assert.assertEquals("Pub Name", "Tsunami and the Economy", module.getPublicationName());
         Assert.assertEquals("Pub Vol", "III", module.getPublicationVolume());
@@ -440,18 +416,16 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testReview2Parse() throws Exception {
         LOG.debug("testReview2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/reviews2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final Review module = (Review) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Review", "Earth", "Google" }, module.getLabels());
-        cal.set(2005, 2, 24);
-        Assert.assertEquals("PubDate", cal.getTime(), module.getPublishDate());
+        LocalDate lc = LocalDate.of(2005, 3, 24);
+        Assert.assertEquals("PubDate", lc.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant(), module.getPublishDate().toInstant());
         this.assertEquals("Authors", new String[] { "Jimmy Smith" }, module.getAuthors());
         Assert.assertEquals("Name of Item Rev", "Google Earth", module.getNameOfItemBeingReviewed());
         Assert.assertEquals("Type", "Product", module.getReviewType());
@@ -467,17 +441,15 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testService2Parse() throws Exception {
         LOG.debug("testService2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/services2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final Service module = (Service) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Food delivery" }, module.getLabels());
-        cal.set(2005, 2, 24);
+        LocalDate lc = LocalDate.of(2005, 3, 24);
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, module.getCurrency());
         Assert.assertEquals("Price", 15, module.getPrice().getValue(), 0);
         Assert.assertEquals("PriceType", PriceTypeEnumeration.STARTING, module.getPriceType());
@@ -497,17 +469,15 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testVehicle2Parse() throws Exception {
         LOG.debug("testVehicle2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/vehicles2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final Vehicle module = (Vehicle) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "car", "mini" }, module.getLabels());
-        cal.set(2005, 2, 24);
+        LocalDate lc = LocalDate.of(2005, 3, 24);
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, module.getCurrency());
         Assert.assertEquals("Price", 24000, module.getPrice().getValue(), 0);
         Assert.assertEquals("PriceType", PriceTypeEnumeration.STARTING, module.getPriceType());
@@ -531,15 +501,13 @@ public class GoogleBaseParserTest extends AbstractTestCase {
     public void testWanted2Parse() throws Exception {
         LOG.debug("testVehicle2Parse");
         final SyndFeedInput input = new SyndFeedInput();
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
         final SyndFeed feed = input.build(new File(super.getTestFile("xml/wanted2.xml")));
         final List<SyndEntry> entries = feed.getEntries();
         final SyndEntry entry = entries.get(0);
         final Wanted module = (Wanted) entry.getModule(GoogleBase.URI);
         Assert.assertEquals("Image Link", "http://www.providers-website.com/image1.jpg", module.getImageLinks()[0].toString());
-        cal.set(2005, 11, 20, 0, 0, 0);
-        Assert.assertEquals("Expiration Date", cal.getTime(), module.getExpirationDate());
+        ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
+        Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Wanted", "Truck" }, module.getLabels());
         Assert.assertEquals("Location", "123 Main Street, Anytown, CA, 12345, USA", module.getLocation());
     }

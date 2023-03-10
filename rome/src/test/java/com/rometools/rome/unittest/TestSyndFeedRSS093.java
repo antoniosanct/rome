@@ -17,9 +17,11 @@
  */
 package com.rometools.rome.unittest;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.io.impl.DateParser;
@@ -41,9 +43,12 @@ public class TestSyndFeedRSS093 extends TestSyndFeedRSS092 {
     @Override
     protected void testItem(final int i) throws Exception {
         super.testItem(i);
+        Map<Integer,String> dates = new HashMap<>(1);
+        dates.put(0, "Mon, 01 Jan 2001 00:00:00 GMT");
+        dates.put(1, "Tue, 02 Jan 2001 00:00:00 GMT");
         final List<SyndEntry> items = this.getCachedSyndFeed().getEntries();
         final SyndEntry entry = items.get(i);
-        final Date d = DateParser.parseRFC822("Mon, 0" + (i + 1) + " Jan 2001 00:00:00 GMT", Locale.US);
+        final ZonedDateTime d = DateParser.parseRFC822(dates.get(i), Locale.US);
         assertEquals(entry.getPublishedDate(), d);
         testDescriptionType(entry, i);
     }
@@ -54,8 +59,12 @@ public class TestSyndFeedRSS093 extends TestSyndFeedRSS092 {
 
     @Override
     public void testEntryPublishedDate() throws Exception {
-        assertEquals(DateParser.parseRFC822("Mon, 01 Jan 2001 00:00:00 GMT", Locale.US), getEntryPublishedDate(this.getCachedSyndFeed().getEntries().get(0)));
-        assertEquals(DateParser.parseRFC822("Tue, 02 Jan 2001 00:00:00 GMT", Locale.US), getEntryPublishedDate(this.getCachedSyndFeed().getEntries().get(1)));
+        final ZonedDateTime zdt = DateParser.parseRFC822("Mon, 01 Jan 2001 00:00:00 GMT", Locale.US);
+        final ZonedDateTime zdt2 = getEntryPublishedDate(this.getCachedSyndFeed().getEntries().get(0));
+        assertEquals(zdt.toInstant(), zdt2.toInstant());
+        final ZonedDateTime zdt3 = DateParser.parseRFC822("Tue, 02 Jan 2001 00:00:00 GMT", Locale.US);
+        final ZonedDateTime zdt4 = getEntryPublishedDate(this.getCachedSyndFeed().getEntries().get(1));
+        assertEquals(zdt3.toInstant(), zdt4.toInstant());
     }
 
 }

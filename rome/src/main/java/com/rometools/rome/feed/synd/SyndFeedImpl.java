@@ -17,8 +17,8 @@
 package com.rometools.rome.feed.synd;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -571,7 +571,7 @@ public class SyndFeedImpl implements Serializable, SyndFeed {
      *
      */
     @Override
-    public Date getPublishedDate() {
+    public ZonedDateTime getPublishedDate() {
         return getDCModule().getDate();
     }
 
@@ -585,7 +585,7 @@ public class SyndFeedImpl implements Serializable, SyndFeed {
      *
      */
     @Override
-    public void setPublishedDate(final Date publishedDate) {
+    public void setPublishedDate(final ZonedDateTime publishedDate) {
         getDCModule().setDate(publishedDate);
     }
 

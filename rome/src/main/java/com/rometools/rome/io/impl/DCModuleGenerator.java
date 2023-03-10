@@ -16,9 +16,9 @@
  */
 package com.rometools.rome.io.impl;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -130,9 +130,9 @@ public class DCModuleGenerator implements ModuleGenerator {
             element.addContent(generateSimpleElementList("contributor", contributors));
         }
 
-        final Date dcDate = dcModule.getDate();
+        final ZonedDateTime dcDate = dcModule.getDate();
         if (dcDate != null) {
-            for (final Date date : dcModule.getDates()) {
+            for (final ZonedDateTime date : dcModule.getDates()) {
                 element.addContent(generateSimpleElement("date", DateParser.formatW3CDateTime(date, Locale.US)));
             }
         }

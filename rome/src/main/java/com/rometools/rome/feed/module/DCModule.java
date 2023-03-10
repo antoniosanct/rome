@@ -16,7 +16,7 @@
  */
 package com.rometools.rome.feed.module;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -272,7 +272,7 @@ public interface DCModule extends Module {
      * @return a list of Strings representing the DublinCore module date, an empty list if none.
      *
      */
-    List<Date> getDates();
+    List<ZonedDateTime> getDates();
 
     /**
      * Sets the DublinCore module dates.
@@ -282,7 +282,7 @@ public interface DCModule extends Module {
      *            or <b>null</b> if none.
      *
      */
-    void setDates(List<Date> dates);
+    void setDates(List<ZonedDateTime> dates);
 
     /**
      * Gets the DublinCore module date. Convenience method that can be used to obtain the first
@@ -291,7 +291,7 @@ public interface DCModule extends Module {
      *
      * @return the first DublinCore module date, <b>null</b> if none.
      */
-    Date getDate();
+    ZonedDateTime getDate();
 
     /**
      * Sets the DublinCore module date. Convenience method that can be used when there is only one
@@ -301,7 +301,7 @@ public interface DCModule extends Module {
      * @param date the DublinCore module date to set, <b>null</b> if none.
      *
      */
-    void setDate(Date date);
+    void setDate(ZonedDateTime date);
 
     /**
      * Returns the DublinCore module type.

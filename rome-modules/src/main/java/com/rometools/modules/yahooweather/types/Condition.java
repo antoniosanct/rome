@@ -16,7 +16,7 @@
 package com.rometools.modules.yahooweather.types;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
@@ -42,7 +42,7 @@ public class Condition implements Serializable, Cloneable {
     private String text;
     private ConditionCode code;
     private int temperature;
-    private Date date;
+    private ZonedDateTime date;
 
     public Condition() {
         super();
@@ -54,7 +54,7 @@ public class Condition implements Serializable, Cloneable {
      * @param temperature the current temperature
      * @param date the current date and time
      */
-    public Condition(final String text, final ConditionCode code, final int temperature, final Date date) {
+    public Condition(final String text, final ConditionCode code, final int temperature, final ZonedDateTime date) {
         super();
         this.text = text;
         this.code = code;
@@ -123,7 +123,7 @@ public class Condition implements Serializable, Cloneable {
      *
      * @return the current date and time
      */
-    public Date getDate() {
+    public ZonedDateTime getDate() {
         return date;
     }
 
@@ -132,7 +132,7 @@ public class Condition implements Serializable, Cloneable {
      *
      * @param date the current date and time
      */
-    public void setDate(final Date date) {
+    public void setDate(final ZonedDateTime date) {
         this.date = date;
     }
 
@@ -153,6 +153,8 @@ public class Condition implements Serializable, Cloneable {
 
     @Override
     public Object clone() {
-        return new Condition(text, code, temperature, date != null ? new Date(date.getTime()) : null);
+        return new Condition(text, code, temperature, date != null ? 
+            ZonedDateTime.of(date.toLocalDate(), 
+                date.toLocalTime(), date.getZone()) : null);
     }
 }

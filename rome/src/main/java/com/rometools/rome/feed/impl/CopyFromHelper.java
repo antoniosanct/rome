@@ -18,9 +18,9 @@ package com.rometools.rome.feed.impl;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -55,7 +55,7 @@ public class CopyFromHelper {
         BASIC_TYPES.add(Long.class);
         BASIC_TYPES.add(Short.class);
         BASIC_TYPES.add(String.class);
-        BASIC_TYPES.add(Date.class);
+        BASIC_TYPES.add(ZonedDateTime.class);
     }
 
     public CopyFromHelper(final Class<? extends CopyFrom> beanInterfaceClass, final Map<String, Class<?>> basePropInterfaceMap,
@@ -119,8 +119,8 @@ public class CopyFromHelper {
                 value = (T) this.<Object, Object> doCopyMap((Map<Object, Object>) value, baseInterface);
             } else if (isBasicType(vClass)) {
                 // value = value; // nothing to do here
-                if (value instanceof Date) { // because Date it is not inmutable
-                    value = (T) ((Date) value).clone();
+                if (value instanceof ZonedDateTime) { // because ZonedDateTime it is inmutable
+                    value = (T) ((ZonedDateTime) value);
                 }
             } else { // it goes CopyFrom
                 if (value instanceof CopyFrom) {

@@ -31,8 +31,8 @@ import com.rometools.rome.feed.synd.SyndImage;
 import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.utils.Lists;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -66,7 +66,7 @@ public class ConverterForRSS091Userland extends ConverterForRSS090 {
 
         syndFeed.setGenerator(channel.getGenerator());
 
-        final Date pubDate = channel.getPubDate();
+        final ZonedDateTime pubDate = channel.getPubDate();
 
         if (pubDate != null) {
             syndFeed.setPublishedDate(pubDate); // c

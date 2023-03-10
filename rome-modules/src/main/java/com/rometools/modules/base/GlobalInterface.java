@@ -17,7 +17,7 @@ package com.rometools.modules.base;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * This is an interface representing the universals.
@@ -60,7 +60,7 @@ public interface GlobalInterface extends Serializable {
      *
      * @param expirationDate the date this entry will expire
      */
-    public void setExpirationDate(Date expirationDate);
+    public void setExpirationDate(ZonedDateTime expirationDate);
 
     /**
      * Expiration Date for this item. <br>
@@ -99,7 +99,7 @@ public interface GlobalInterface extends Serializable {
      *
      * @return the date this entry will expire
      */
-    public Date getExpirationDate();
+    public ZonedDateTime getExpirationDate();
 
     /**
      * Date and time that the item expires.
@@ -141,7 +141,7 @@ public interface GlobalInterface extends Serializable {
      *
      * @param expirationDateTime Date and time that the item expires.
      */
-    public void setExpirationDateTime(Date expirationDateTime);
+    public void setExpirationDateTime(ZonedDateTime expirationDateTime);
 
     /**
      * Date and time that the item expires.
@@ -183,7 +183,7 @@ public interface GlobalInterface extends Serializable {
      *
      * @return Date and time that the item expires.
      */
-    public Date getExpirationDateTime();
+    public ZonedDateTime getExpirationDateTime();
 
     /**
      * Unique id for this item.

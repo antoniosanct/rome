@@ -16,6 +16,10 @@
 
 package com.rometools.modules.photocast.types;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
 
@@ -34,8 +38,8 @@ public class Metadata {
      * @param photoDate PhotoDate value to use
      * @param comments comments about this photo.
      */
-    public Metadata(final PhotoDate photoDate, final String comments) {
-        this.photoDate = photoDate == null ? new PhotoDate() : photoDate;
+    public Metadata(final PhotoDate pd, final String comments) {
+        this.photoDate = pd == null ? new PhotoDate() : pd;
         this.comments = comments == null ? "" : comments;
     }
 
@@ -45,7 +49,7 @@ public class Metadata {
      * @return Returns the PhotoDate value.
      */
     public PhotoDate getPhotoDate() {
-        return photoDate;
+        return this.photoDate;
     }
 
     /**

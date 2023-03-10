@@ -17,21 +17,22 @@
 package com.rometools.modules.photocast.types;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.math.RoundingMode;
 
 /**
  * This is a specialized Date class for working with the apple PhotoDate format. It provides a
  * constructor taking a dobule value representing the fractional number of days since 00:00:00
  * 01/01/00.
  */
-public class PhotoDate extends Date {
+public class PhotoDate {
 
-    private static final long serialVersionUID = 1L;
     private static final long Y2K = 946616400531l;
     private static final double DAY = 24 * 60 * 60 * 1000;
 
+    private long timeInMillis;
+
     public PhotoDate() {
-        super();
+        
     }
 
     /**
@@ -40,7 +41,7 @@ public class PhotoDate extends Date {
      * @param time milliseconds time
      */
     public PhotoDate(final long time) {
-        super(time);
+        this.timeInMillis = time;
     }
 
     /**
@@ -53,7 +54,11 @@ public class PhotoDate extends Date {
         BigDecimal d = new BigDecimal(photoDateValue);
         d = d.multiply(new BigDecimal(DAY));
         d = d.add(new BigDecimal(Y2K));
-        setTime(d.longValue());
+        this.timeInMillis = d.longValue();
+    }
+
+    public long getTimeInMillis() {
+        return this.timeInMillis;
     }
 
     /**
@@ -63,20 +68,19 @@ public class PhotoDate extends Date {
      */
     @Override
     public String toString() {
-        BigDecimal d = new BigDecimal(getTime());
+        BigDecimal d = new BigDecimal(this.timeInMillis);
         d = d.subtract(new BigDecimal(Y2K));
         d = d.multiply(new BigDecimal(1000000));
-        d = d.divide(new BigDecimal(DAY), BigDecimal.ROUND_HALF_UP);
-        return d.divide(new BigDecimal(1000000), 7, BigDecimal.ROUND_HALF_UP).toString();
+        d = d.divide(new BigDecimal(DAY), RoundingMode.HALF_UP);
+        return d.divide(new BigDecimal(1000000), 7, RoundingMode.HALF_UP).toString();
     }
 
     @Override
     public boolean equals(final Object o) {
-        if (o instanceof Date || ((Date) o).getTime() / 1000 == getTime() / 1000) {
-            return true;
-        } else {
+        if (o == null) {
             return false;
-        }
+        } 
+        return ((PhotoDate) o).getTimeInMillis() == this.getTimeInMillis();
     }
 
 }

@@ -16,7 +16,7 @@
 package com.rometools.modules.photocast;
 
 import java.net.URL;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import com.rometools.modules.photocast.types.Metadata;
 import com.rometools.rome.feed.module.Module;
@@ -38,28 +38,28 @@ public interface PhotocastModule extends Module {
      *
      * @return Returns the Item level photoDate value.
      */
-    public Date getPhotoDate();
+    public ZonedDateTime getPhotoDate();
 
     /**
      * Set the Item level photoDate value.
      *
      * @param photoDate Item level photoDate value
      */
-    public void setPhotoDate(Date photoDate);
+    public void setPhotoDate(ZonedDateTime photoDate);
 
     /**
      * Returns the cropDate value from the item level.
      *
      * @return Item level cropDate value
      */
-    public Date getCropDate();
+    public ZonedDateTime getCropDate();
 
     /**
      * Sets the cropDate value for the item level.
      *
      * @param cropDate cropDate value for the item level
      */
-    public void setCropDate(Date cropDate);
+    public void setCropDate(ZonedDateTime cropDate);
 
     /**
      * The URL of the image.

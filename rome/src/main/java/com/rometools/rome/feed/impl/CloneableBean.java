@@ -19,6 +19,7 @@ package com.rometools.rome.feed.impl;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +60,7 @@ public class CloneableBean {
         BASIC_TYPES.add(Long.class);
         BASIC_TYPES.add(Short.class);
         BASIC_TYPES.add(String.class);
+        BASIC_TYPES.add(ZonedDateTime.class);
     }
 
     private CloneableBean() {
