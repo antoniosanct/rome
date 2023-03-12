@@ -37,7 +37,6 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import com.rometools.modules.AbstractTestCase;
-import com.rometools.modules.sse.SSE091Generator;
 import com.rometools.modules.sse.modules.Conflict;
 import com.rometools.modules.sse.modules.History;
 import com.rometools.modules.sse.modules.SSEModule;
@@ -78,7 +77,7 @@ public class SSEParserTest extends AbstractTestCase {
     }
 
     public void xtestParseGenerateV5() throws Exception {
-        final URL feedURL = new File(getTestFile("xml/v/v5.xml")).toURI().toURL();
+        final File feedURL = new File(getTestFile("xml/v/v5.xml"));
         // parse the document for comparison
         final SAXBuilder builder = new SAXBuilder();
         final Document directlyBuilt = builder.build(feedURL);
@@ -240,7 +239,7 @@ public class SSEParserTest extends AbstractTestCase {
     public void xtestV5() throws Exception {
         final File feed = new File(getTestFile("xml/v/v5.xml"));
         final SyndFeedInput input = new SyndFeedInput();
-        final SyndFeed syndfeed = input.build(new XmlReader(feed.toURI().toURL()));
+        final SyndFeed syndfeed = input.build(new XmlReader(feed));
 
         final List<SyndEntry> entries = syndfeed.getEntries();
         final Iterator<SyndEntry> it = entries.iterator();
