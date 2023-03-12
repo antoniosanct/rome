@@ -16,9 +16,7 @@
 package com.rometools.modules.yahooweather.types;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
 
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;

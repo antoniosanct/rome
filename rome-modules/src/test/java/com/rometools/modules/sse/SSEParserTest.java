@@ -20,7 +20,6 @@
 package com.rometools.modules.sse;
 
 import java.io.File;
-import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -30,7 +30,7 @@ public class DateParserTest {
     public void parseRFC822DateTimeWithTimeZoneIsOk() throws Exception {
     	// Sat, 28 Mar 2020 13:42:38 IST  	
         final ZonedDateTime z1 = ZonedDateTime.of(2020, 3, 28, 13, 42, 38, 0, ZoneId.of("UTC+04:30"));
-        final ZonedDateTime z2 = DateParser.parseRFC822("Sa., 28 März 20 09:12:38 MEZ", Locale.GERMANY);
+        final ZonedDateTime z2 = DateParser.parseRFC822("Sa, 28 Mär 20 09:12:38 MEZ", Locale.GERMANY);
         assertEquals(z1.toInstant(), z2.toInstant());
     }
 

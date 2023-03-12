@@ -449,7 +449,6 @@ public class GoogleBaseParserTest extends AbstractTestCase {
         ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
         Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "Food delivery" }, module.getLabels());
-        LocalDate lc = LocalDate.of(2005, 3, 24);
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, module.getCurrency());
         Assert.assertEquals("Price", 15, module.getPrice().getValue(), 0);
         Assert.assertEquals("PriceType", PriceTypeEnumeration.STARTING, module.getPriceType());
@@ -477,7 +476,6 @@ public class GoogleBaseParserTest extends AbstractTestCase {
         ZonedDateTime zdt = ZonedDateTime.of(2005, 12, 20, 0, 0, 0, 0, ZoneId.of("UTC"));
         Assert.assertEquals("Expiration Date", zdt.toInstant(), module.getExpirationDate().toInstant());
         this.assertEquals("Labels", new String[] { "car", "mini" }, module.getLabels());
-        LocalDate lc = LocalDate.of(2005, 3, 24);
         Assert.assertEquals("Currency", CurrencyEnumeration.USD, module.getCurrency());
         Assert.assertEquals("Price", 24000, module.getPrice().getValue(), 0);
         Assert.assertEquals("PriceType", PriceTypeEnumeration.STARTING, module.getPriceType());
