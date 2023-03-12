@@ -24,8 +24,6 @@ import com.rometools.rome.feed.module.ModuleImpl;
 
 public class SimpleListExtensionImpl extends ModuleImpl implements SimpleListExtension {
 
-    private static final long serialVersionUID = 1L;
-
     private String treatAs = "list";
     private Group[] groupFields;
     private Sort[] sortFields;

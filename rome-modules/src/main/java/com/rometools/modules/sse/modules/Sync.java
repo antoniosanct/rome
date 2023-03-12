@@ -40,8 +40,6 @@ import com.rometools.rome.feed.CopyFrom;
  * .
  */
 public class Sync extends SSEModule {
-    private static final long serialVersionUID = 1L;
-
     public static final String NAME = "sync";
 
     public static final String ID_ATTRIBUTE = "id";

@@ -30,7 +30,6 @@ import com.rometools.rome.feed.module.ModuleImpl;
  * A Module implementation for entry or feed level information.
  */
 public class YWeatherModuleImpl extends ModuleImpl implements YWeatherEntryModule, YWeatherFeedModule {
-    private static final long serialVersionUID = 1L;
     private Location location;
     private Astronomy astronomy;
     private Atmosphere atmosphere;

@@ -39,8 +39,6 @@ import com.rometools.rome.feed.impl.ToStringBean;
  */
 public class SleEntryImpl implements SleEntry {
 
-    private static final long serialVersionUID = 1L;
-
     private static final Logger LOG = LoggerFactory.getLogger(SleEntryImpl.class);
 
     private static final EntryValue[] EMPTY_VALUES = new EntryValue[0];

@@ -32,7 +32,6 @@ import com.rometools.rome.feed.CopyFrom;
  * .
  */
 public class Update extends SSEModule {
-    private static final long serialVersionUID = 1L;
     public static final String NAME = "update";
     public static final String BY_ATTRIBUTE = "by";
     public static final String WHEN_ATTRIBUTE = "when";

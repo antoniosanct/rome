@@ -43,7 +43,6 @@ package com.rometools.modules.activitystreams.types;
  */
 public class Audio extends ActivityObject {
 
-    private static final long serialVersionUID = 1L;
     private String embedCode;
     private String streamLink;
 

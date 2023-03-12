@@ -24,8 +24,6 @@ import com.rometools.rome.feed.CopyFrom;
  */
 public class FeedBurnerImpl implements FeedBurner {
 
-    private static final long serialVersionUID = 1L;
-
     private String awareness;
     private String origLink;
     private String origEnclosureLink;

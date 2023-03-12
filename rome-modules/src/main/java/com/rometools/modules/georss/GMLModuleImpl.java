@@ -22,8 +22,6 @@ package com.rometools.modules.georss;
  */
 public class GMLModuleImpl extends GeoRSSModule {
 
-    private static final long serialVersionUID = 1L;
-
     public GMLModuleImpl() {
         super(GeoRSSModule.class, GeoRSSModule.GEORSS_GML_URI);
     }

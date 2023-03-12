@@ -25,8 +25,6 @@ import com.rometools.rome.feed.module.ModuleImpl;
 
 public class ContentModuleImpl extends ModuleImpl implements ContentModule {
 
-    private static final long serialVersionUID = 1L;
-
     private List<String> encodeds;
     private List<String> contents;
     private List<ContentItem> contentItems;

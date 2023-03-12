@@ -24,7 +24,6 @@ import java.util.List;
  */
 public final class Polygon extends AbstractSurface {
 
-    private static final long serialVersionUID = 1L;
     private AbstractRing exterior;
     private List<AbstractRing> interior;
 

@@ -38,7 +38,6 @@ package com.rometools.modules.activitystreams.types;
  */
 public class Song extends ActivityObject {
 
-    private static final long serialVersionUID = 1L;
     private Audio audio;
 
     /**

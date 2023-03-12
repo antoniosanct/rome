@@ -24,8 +24,6 @@ import com.rometools.rome.feed.rss.Item;
  * <sx:conflict> element within <sx:conflicts>
  */
 public class Conflict extends SSEModule {
-    private static final long serialVersionUID = 1L;
-
     private static final Logger LOG = LoggerFactory.getLogger(Conflict.class);
 
     public static final String CONFLICTS_NAME = "conflicts";

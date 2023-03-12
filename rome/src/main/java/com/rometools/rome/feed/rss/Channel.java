@@ -37,8 +37,6 @@ import com.rometools.utils.Lists;
  */
 public class Channel extends WireFeed {
 
-    private static final long serialVersionUID = 1L;
-
     public static final String SUNDAY = "sunday";
     public static final String MONDAY = "monday";
     public static final String TUESDAY = "tuesday";

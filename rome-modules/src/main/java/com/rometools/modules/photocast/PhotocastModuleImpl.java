@@ -26,7 +26,6 @@ import com.rometools.rome.feed.impl.ToStringBean;
 
 public class PhotocastModuleImpl implements PhotocastModule {
 
-    private static final long serialVersionUID = 1L;
     private Date photoDate;
     private Date cropDate;
     private URL imageUrl;

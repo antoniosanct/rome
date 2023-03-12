@@ -32,8 +32,6 @@ import com.rometools.rome.feed.CopyFrom;
  */
 public class FeedInformationImpl extends AbstractITunesObject implements FeedInformation {
 
-    private static final long serialVersionUID = 1L;
-
     private static final Logger LOG = LoggerFactory.getLogger(FeedInformationImpl.class);
 
     private String ownerName;

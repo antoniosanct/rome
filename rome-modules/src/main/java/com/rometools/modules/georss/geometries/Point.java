@@ -20,7 +20,6 @@ package com.rometools.modules.georss.geometries;
  */
 public final class Point extends AbstractGeometricPrimitive {
 
-    private static final long serialVersionUID = 1L;
     private Position pos;
 
     public Point() {

@@ -25,8 +25,6 @@ import com.rometools.rome.feed.impl.ToStringBean;
 
 public class CreativeCommonsImpl implements CreativeCommons {
 
-    private static final long serialVersionUID = 1L;
-
     public static final String RDF_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     public static final String RSS2_URI = "http://backend.userland.com/creativeCommonsRssModule";
     public static final String RSS1_URI = "http://web.resource.org/cc/";

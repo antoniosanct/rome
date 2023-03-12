@@ -20,7 +20,6 @@ package com.rometools.modules.georss.geometries;
  */
 public final class LineString extends AbstractCurve {
 
-    private static final long serialVersionUID = 1L;
     private PositionList posList;
 
     public LineString() {

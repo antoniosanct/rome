@@ -42,8 +42,6 @@ import com.rometools.rome.feed.impl.EqualsBean;
  */
 public class GoogleBaseImpl implements GoogleBase {
 
-    private static final long serialVersionUID = 1L;
-
     private static final Logger LOG = LoggerFactory.getLogger(GoogleBaseImpl.class);
 
     /** boolean:listing_type */

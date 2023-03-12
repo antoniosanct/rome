@@ -27,7 +27,6 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * modules are the Dublin Core and Syndication modules.
  */
 public abstract class ModuleImpl implements Module {
-    private static final long serialVersionUID = 1L;
     private final Class<?> beanClass;
     private final String uri;
 

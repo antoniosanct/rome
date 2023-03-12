@@ -32,8 +32,6 @@ import com.rometools.rome.feed.CopyFrom;
  * .
  */
 public class Related extends SSEModule {
-    private static final long serialVersionUID = 1L;
-
     public static final String NAME = "related";
 
     /**

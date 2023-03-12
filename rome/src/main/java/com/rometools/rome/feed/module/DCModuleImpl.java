@@ -39,8 +39,6 @@ import com.rometools.utils.Lists;
  */
 public class DCModuleImpl extends ModuleImpl implements DCModule {
 
-    private static final long serialVersionUID = 1L;
-
     private List<String> title;
     private List<String> creator;
     private List<DCSubject> subject;

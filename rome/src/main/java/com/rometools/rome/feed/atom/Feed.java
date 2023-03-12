@@ -30,8 +30,6 @@ import com.rometools.utils.Lists;
  */
 public class Feed extends WireFeed {
 
-    private static final long serialVersionUID = 1L;
-
     private String xmlBase;
     private List<Category> categories;
     private List<SyndPerson> authors;

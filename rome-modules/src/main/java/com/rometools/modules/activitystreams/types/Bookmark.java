@@ -73,8 +73,6 @@ import com.rometools.rome.feed.atom.Link;
  */
 public class Bookmark extends ActivityObject {
 
-    private static final long serialVersionUID = 1L;
-
     @Override
     public String getTypeIRI() {
         return "http://activitystrea.ms/schema/1.0/bookmark";

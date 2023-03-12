@@ -30,8 +30,6 @@ import java.net.URL;
  */
 public class EntryInformationImpl extends AbstractITunesObject implements EntryInformation {
 
-    private static final long serialVersionUID = 1L;
-
     private static final Logger LOG = LoggerFactory.getLogger(EntryInformationImpl.class);
 
     private Duration duration;

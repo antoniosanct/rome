@@ -35,8 +35,6 @@ import com.rometools.utils.Dates;
  */
 public class SyModuleImpl extends ModuleImpl implements SyModule {
 
-    private static final long serialVersionUID = 1L;
-
     private static final Set<String> PERIODS = new HashSet<String>();
     private static final CopyFromHelper COPY_FROM_HELPER;
 

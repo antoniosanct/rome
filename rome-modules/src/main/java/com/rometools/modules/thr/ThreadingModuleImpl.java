@@ -25,8 +25,6 @@ import com.rometools.rome.feed.module.ModuleImpl;
  */
 public class ThreadingModuleImpl extends ModuleImpl implements ThreadingModule {
 
-    private static final long serialVersionUID = 1L;
-
     private String ref;
     private String href;
     private String type;

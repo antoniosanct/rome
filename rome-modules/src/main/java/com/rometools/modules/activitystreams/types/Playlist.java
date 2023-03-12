@@ -33,8 +33,6 @@ package com.rometools.modules.activitystreams.types;
  */
 public class Playlist extends ActivityObject {
 
-    private static final long serialVersionUID = 1L;
-
     @Override
     public String getTypeIRI() {
         return "http://activitystrea.ms/schema/1.0/playlist";

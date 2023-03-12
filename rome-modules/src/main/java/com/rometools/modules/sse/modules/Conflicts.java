@@ -22,7 +22,6 @@ import com.rometools.rome.feed.CopyFrom;
  * The sx:conflicts element MUST contain one or more sx:conflict sub-elements.
  */
 public class Conflicts extends SSEModule {
-    private static final long serialVersionUID = 1L;
     public static final String NAME = "conflicts";
 
     @Override

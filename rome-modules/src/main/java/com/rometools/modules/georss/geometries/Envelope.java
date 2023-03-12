@@ -22,7 +22,6 @@ package com.rometools.modules.georss.geometries;
  */
 public class Envelope extends AbstractGeometry {
 
-    private static final long serialVersionUID = 1L;
     protected double minLatitude, minLongitude, maxLatitude, maxLongitude;
 
     public Envelope() {

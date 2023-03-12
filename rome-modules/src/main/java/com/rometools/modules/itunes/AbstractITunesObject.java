@@ -24,8 +24,6 @@ import java.net.URL;
  */
 public abstract class AbstractITunesObject implements ITunes {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * The URI that iTunes used for its custom tags.
      * <p>

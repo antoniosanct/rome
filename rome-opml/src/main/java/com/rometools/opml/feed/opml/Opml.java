@@ -29,8 +29,6 @@ import com.rometools.rome.feed.WireFeed;
  */
 public class Opml extends WireFeed {
 
-    private static final long serialVersionUID = 1L;
-
     private Date created;
     private Date modified;
     private Integer verticalScrollState;

@@ -28,8 +28,6 @@ import com.rometools.rome.feed.impl.EqualsBean;
  */
 public class DateValue implements EntryValue {
 
-    private static final long serialVersionUID = 1L;
-
     private String element;
     private String label;
     private Date value;

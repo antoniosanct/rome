@@ -31,7 +31,7 @@ import com.rometools.utils.Lists;
 /**
  * Bean for person elements of Atom feeds.
  */
-public class Person implements SyndPerson, Cloneable, Extendable {
+public class Person implements SyndPerson {
 
     private String name;
     private String uri; // since Atom 1.0 (was called url)

@@ -28,8 +28,6 @@ import com.rometools.rome.feed.module.ModuleImpl;
  */
 public abstract class GeoRSSModule extends ModuleImpl {
 
-    private static final long serialVersionUID = 1L;
-
     private static final Logger LOG = LoggerFactory.getLogger(GeoRSSModule.class);
 
     protected AbstractGeometry geometry;

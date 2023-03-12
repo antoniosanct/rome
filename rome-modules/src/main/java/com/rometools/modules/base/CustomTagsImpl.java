@@ -23,8 +23,6 @@ import com.rometools.rome.feed.CopyFrom;
 
 public class CustomTagsImpl implements CustomTags {
 
-    private static final long serialVersionUID = 1L;
-
     private List<CustomTag> values;
 
     @Override

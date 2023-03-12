@@ -21,8 +21,6 @@ import com.rometools.rome.feed.impl.EqualsBean;
 
 public class SlashImpl implements Slash {
 
-    private static final long serialVersionUID = 1L;
-
     private String section;
     private String department;
     private Integer comments;

@@ -34,8 +34,6 @@ import com.rometools.rome.feed.CopyFrom;
  * .
  */
 public class History extends SSEModule {
-    private static final long serialVersionUID = 1L;
-
     // A date-time attribute.
     private Date when;
 

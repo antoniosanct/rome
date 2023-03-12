@@ -51,8 +51,6 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * For compatibility, a medai:adult tag will appear in the ratings as a urn:simple equiv.
  */
 public class Rating extends AbstractSchemeValue {
-    private static final long serialVersionUID = 1L;
-
     /**
      * urn:simple adult. This will be populated on the deprecated media:adult tag as well,
      */

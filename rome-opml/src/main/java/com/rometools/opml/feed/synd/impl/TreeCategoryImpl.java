@@ -20,8 +20,6 @@ import com.rometools.rome.feed.synd.SyndCategoryImpl;
 
 public class TreeCategoryImpl extends SyndCategoryImpl {
 
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean equals(final Object o) {
         final SyndCategory c = (SyndCategory) o;

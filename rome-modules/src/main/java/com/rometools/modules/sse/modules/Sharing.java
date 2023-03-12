@@ -38,8 +38,6 @@ import com.rometools.rome.feed.CopyFrom;
  * .
  */
 public class Sharing extends SSEModule {
-    private static final long serialVersionUID = 1L;
-
     public static final String NAME = "sharing";
 
     public static final String UNTIL_ATTRIBUTE = "until";
