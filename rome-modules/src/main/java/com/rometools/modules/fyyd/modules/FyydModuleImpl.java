@@ -22,7 +22,7 @@ import com.rometools.rome.feed.module.ModuleImpl;
 
 public class FyydModuleImpl
         extends ModuleImpl
-        implements FyydModule, Cloneable {
+        implements FyydModule {
 
     private String verify;
 

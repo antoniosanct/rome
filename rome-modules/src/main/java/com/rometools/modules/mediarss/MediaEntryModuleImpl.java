@@ -31,7 +31,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
 /**
  * Represents information for an Entry/Item level.
  */
-public class MediaEntryModuleImpl extends MediaModuleImpl implements MediaEntryModule, Cloneable {
+public class MediaEntryModuleImpl extends MediaModuleImpl implements MediaEntryModule {
     /*
      * the variables in the MediaModule are set when they apply to all MediaContent instances in the
      * set

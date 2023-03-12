@@ -318,7 +318,7 @@ public class ConditionCode {
         this.code = code;
         this.description = description;
 
-        final Object old = ConditionCode.LOOKUP.put(new Integer(code), this);
+        final Object old = ConditionCode.LOOKUP.put(Integer.valueOf(code), this);
 
         if (old != null) {
             throw new RuntimeException("Duplicate condition code!");
@@ -348,7 +348,7 @@ public class ConditionCode {
      * @return a ConditionCode instance or null
      */
     public static ConditionCode fromCode(final int code) {
-        return ConditionCode.LOOKUP.get(new Integer(code));
+        return ConditionCode.LOOKUP.get(Integer.valueOf(code));
     }
 
     @Override

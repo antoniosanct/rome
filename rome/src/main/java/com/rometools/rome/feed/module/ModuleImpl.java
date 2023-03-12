@@ -26,7 +26,8 @@ import com.rometools.rome.feed.impl.ToStringBean;
  * Base class for modules describing Metadata of feeds, default implementations. Examples of such
  * modules are the Dublin Core and Syndication modules.
  */
-public abstract class ModuleImpl implements Cloneable, Module {
+public abstract class ModuleImpl implements Module {
+    private static final long serialVersionUID = 1L;
     private final Class<?> beanClass;
     private final String uri;
 

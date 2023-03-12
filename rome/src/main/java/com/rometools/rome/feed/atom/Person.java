@@ -22,7 +22,6 @@ import java.util.List;
 import com.rometools.rome.feed.impl.CloneableBean;
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
-import com.rometools.rome.feed.module.Extendable;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.module.impl.ModuleUtils;
 import com.rometools.rome.feed.synd.SyndPerson;

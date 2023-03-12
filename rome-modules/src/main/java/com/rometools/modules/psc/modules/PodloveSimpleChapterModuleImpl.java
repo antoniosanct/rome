@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class PodloveSimpleChapterModuleImpl
         extends ModuleImpl
-        implements PodloveSimpleChapterModule, Cloneable {
+        implements PodloveSimpleChapterModule {
 
     private List<SimpleChapter> chapters;
 

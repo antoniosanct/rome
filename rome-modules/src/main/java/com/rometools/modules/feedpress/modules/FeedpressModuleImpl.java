@@ -7,7 +7,7 @@ import com.rometools.rome.feed.module.ModuleImpl;
 
 public class FeedpressModuleImpl
         extends ModuleImpl
-        implements FeedpressModule, Cloneable {
+        implements FeedpressModule {
 
     private String newsletterId;
     private String locale;
