@@ -15,11 +15,7 @@
  */
 package com.rometools.opml;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
