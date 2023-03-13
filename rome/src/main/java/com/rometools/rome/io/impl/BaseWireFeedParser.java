@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Attr;
@@ -144,14 +143,6 @@ public abstract class BaseWireFeedParser extends ChildNavigator implements WireF
         return styleSheet;
     }
 
-    protected static Namespace createNamespace(final String prefix, final String namespaceURI) {
-    	return XMLEventFactory.newDefaultFactory().createNamespace(prefix, namespaceURI);
-    }
-    
-    protected static Namespace createNamespace(final String namespaceURI) {
-    	return XMLEventFactory.newDefaultFactory().createNamespace(namespaceURI);
-    }
-    
 	protected List<Namespace> getAdditionalNamespaces(final Element element) {
 		List<Namespace> namespaces = new ArrayList<>(1);
 		NamedNodeMap attributes = element.getAttributes();

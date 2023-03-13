@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -59,7 +58,7 @@ public class GoogleBaseParser extends ChildNavigator implements ModuleParser {
     public static final char[] INTEGER_CHARS = "-1234567890".toCharArray();
     public static final char[] FLOAT_CHARS = "-1234567890.".toCharArray();
     
-    static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(GoogleBase.URI);
+    static final Namespace NS = ChildNavigator.createNamespace(GoogleBase.URI);
     static final Properties PROPS2TAGS = new Properties();
     static List<PropertyDescriptor> pds = null;
 

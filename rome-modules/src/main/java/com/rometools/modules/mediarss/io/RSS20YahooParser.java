@@ -23,13 +23,13 @@ package com.rometools.modules.mediarss.io;
 
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.rometools.rome.feed.WireFeed;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.impl.RSS20Parser;
 
 public class RSS20YahooParser extends RSS20Parser {
@@ -58,7 +58,7 @@ public class RSS20YahooParser extends RSS20Parser {
         boolean ok = false;
 
         final Element rssRoot = (Element) document.getFirstChild();
-        final Namespace defaultNS = XMLEventFactory.newDefaultFactory().createNamespace(rssRoot.getNamespaceURI());
+        final Namespace defaultNS = ChildNavigator.createNamespace(rssRoot.getNamespaceURI());
 
         ok = defaultNS != null && defaultNS.equals(getRSSNamespace());
 
@@ -73,7 +73,7 @@ public class RSS20YahooParser extends RSS20Parser {
      */
     @Override
     protected Namespace getRSSNamespace() {
-        return XMLEventFactory.newDefaultFactory().createNamespace(RSS_URI);
+        return ChildNavigator.createNamespace(RSS_URI);
     }
 
     /**

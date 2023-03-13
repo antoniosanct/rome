@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Attr;
@@ -143,8 +142,7 @@ public abstract class BaseWireFeedGenerator extends ChildNavigator implements Wi
         	Attr a = (Attr) list.item(i);
         	if (a.getValue().indexOf("http") >= 0) {
         		final String name = null == a.getLocalName() ? a.getName() : a.getLocalName();
-        		Namespace n = XMLEventFactory.newDefaultFactory()
-        			.createNamespace(name, a.getValue());
+        		Namespace n = ChildNavigator.createNamespace(name, a.getValue());
         		additionalNamespaces.add(n);
         	}
         }

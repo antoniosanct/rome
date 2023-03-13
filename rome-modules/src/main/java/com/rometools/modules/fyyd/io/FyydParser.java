@@ -17,7 +17,6 @@ package com.rometools.modules.fyyd.io;
 
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
@@ -33,7 +32,7 @@ import com.rometools.rome.io.ModuleParser;
  */
 public class FyydParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(FyydModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(FyydModule.URI);
 
     @Override
     public String getNamespaceUri() {

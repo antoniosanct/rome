@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -47,7 +46,7 @@ import com.rometools.rome.io.ModuleParser;
  */
 public class WeatherModuleParser extends ChildNavigator implements ModuleParser {
     private static final Logger LOG = LoggerFactory.getLogger(WeatherModuleParser.class);
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(YWeatherModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(YWeatherModule.URI);
 
     @Override
     public String getNamespaceUri() {

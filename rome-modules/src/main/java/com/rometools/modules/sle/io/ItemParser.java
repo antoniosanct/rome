@@ -23,8 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
-
 import org.w3c.dom.Element;
 
 import com.rometools.modules.sle.SleEntryImpl;
@@ -73,9 +71,9 @@ public class ItemParser extends ChildNavigator implements com.rometools.rome.io.
             value.setLabel(group.getAttribute("label"));
             value.setValue(group.getAttribute("value"));
             if (group.getAttribute("ns") != null) {
-                value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(group.getAttribute("ns")));
+                value.setNamespace(ChildNavigator.createNamespace(group.getAttribute("ns")));
             } else {
-                value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(
+                value.setNamespace(ChildNavigator.createNamespace(
                 		element.getOwnerDocument().getDocumentElement().getFirstChild().getNamespaceURI()));
             }
             values.add(value);
@@ -95,9 +93,9 @@ public class ItemParser extends ChildNavigator implements com.rometools.rome.io.
                 value.setLabel(sort.getAttribute("label"));
                 value.setValue(sort.getAttribute("value"));
                 if (sort.getAttribute("ns") != null) {
-                    value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(sort.getAttribute("ns")));
+                    value.setNamespace(ChildNavigator.createNamespace(sort.getAttribute("ns")));
                 } else {
-                	value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(
+                	value.setNamespace(ChildNavigator.createNamespace(
                     		element.getOwnerDocument().getDocumentElement().getFirstChild().getNamespaceURI()));
                 }
                 values.add(value);
@@ -109,9 +107,9 @@ public class ItemParser extends ChildNavigator implements com.rometools.rome.io.
                 value.setElement(sort.getAttribute("element"));
                 value.setLabel(sort.getAttribute("label"));
                 if (sort.getAttribute("ns") != null) {
-                    value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(sort.getAttribute("ns")));
+                    value.setNamespace(ChildNavigator.createNamespace(sort.getAttribute("ns")));
                 } else {
-                	value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(
+                	value.setNamespace(ChildNavigator.createNamespace(
                     		element.getOwnerDocument().getDocumentElement().getFirstChild().getNamespaceURI()));
                 }
                 Date dateValue = null;
@@ -133,9 +131,9 @@ public class ItemParser extends ChildNavigator implements com.rometools.rome.io.
                 value.setElement(sort.getAttribute("element"));
                 value.setLabel(sort.getAttribute("label"));
                 if (sort.getAttribute("ns") != null) {
-                    value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(sort.getAttribute("ns")));
+                    value.setNamespace(ChildNavigator.createNamespace(sort.getAttribute("ns")));
                 } else {
-                	value.setNamespace(XMLEventFactory.newDefaultFactory().createNamespace(
+                	value.setNamespace(ChildNavigator.createNamespace(
                     		element.getOwnerDocument().getDocumentElement().getFirstChild().getNamespaceURI()));
                 }
 

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -40,8 +39,8 @@ public class SleModuleParser extends ChildNavigator implements ModuleParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(SleModuleParser.class);
 
-    static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("cf", SimpleListExtension.URI);
-    public static final Namespace TEMP = XMLEventFactory.newDefaultFactory().createNamespace("rome-sle", "urn:rome:sle");
+    static final Namespace NS = ChildNavigator.createNamespace("cf", SimpleListExtension.URI);
+    public static final Namespace TEMP = ChildNavigator.createNamespace("rome-sle", "urn:rome:sle");
 
     public SleModuleParser() {
         super();
@@ -78,7 +77,7 @@ public class SleModuleParser extends ChildNavigator implements ModuleParser {
         ArrayList<Object> values = new ArrayList<Object>();
         for (final Element ge : super.getChildren(listInfo, "group", NS)) {
         	final String nsUri = ge.getAttribute("ns") == null ? element.getNamespaceURI() : ge.getAttribute("ns");
-            final Namespace ns = XMLEventFactory.newDefaultFactory().createNamespace(nsUri);
+            final Namespace ns = ChildNavigator.createNamespace(nsUri);
             final String elementName = ge.getAttribute("element");
             final String label = ge.getAttribute("label");
             values.add(new Group(ns, elementName, label));
@@ -90,7 +89,7 @@ public class SleModuleParser extends ChildNavigator implements ModuleParser {
         for (final Element se : super.getChildren(listInfo, "sort", NS)) {
             LOG.debug("Parse cf:sort {} {}", se.getAttribute("element"), se.getAttribute("data-type"));
             final String nsUri = se.getAttribute("ns") == null ? element.getNamespaceURI() : se.getAttribute("ns");
-            final Namespace ns = XMLEventFactory.newDefaultFactory().createNamespace(nsUri);
+            final Namespace ns = ChildNavigator.createNamespace(nsUri);
             final String elementName = se.getAttribute("element");
             final String label = se.getAttribute("label");
             final String dataType = se.getAttribute("data-type");

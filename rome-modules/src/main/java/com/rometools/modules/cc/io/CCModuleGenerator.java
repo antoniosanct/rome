@@ -19,7 +19,6 @@ package com.rometools.modules.cc.io;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
@@ -28,14 +27,15 @@ import com.rometools.modules.cc.CreativeCommons;
 import com.rometools.modules.cc.CreativeCommonsImpl;
 import com.rometools.modules.cc.types.License;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 public class CCModuleGenerator implements ModuleGenerator {
 
-    private static final Namespace RSS1 = XMLEventFactory.newDefaultFactory().createNamespace("cc", CreativeCommonsImpl.RSS1_URI);
-    private static final Namespace RSS2 = XMLEventFactory.newDefaultFactory().createNamespace("creativeCommons", CreativeCommonsImpl.RSS2_URI);
-    private static final Namespace RSS = XMLEventFactory.newDefaultFactory().createNamespace("http://purl.org/rss/1.0/");
-    private static final Namespace RDF = XMLEventFactory.newDefaultFactory().createNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+    private static final Namespace RSS1 = ChildNavigator.createNamespace("cc", CreativeCommonsImpl.RSS1_URI);
+    private static final Namespace RSS2 = ChildNavigator.createNamespace("creativeCommons", CreativeCommonsImpl.RSS2_URI);
+    private static final Namespace RSS = ChildNavigator.createNamespace("http://purl.org/rss/1.0/");
+    private static final Namespace RDF = ChildNavigator.createNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     private static final HashSet<Namespace> NAMESPACES = new HashSet<Namespace>();
     static {
         NAMESPACES.add(RSS1);

@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -46,10 +45,11 @@ import com.rometools.modules.base.types.Size;
 import com.rometools.modules.base.types.YearType;
 import com.rometools.rome.feed.impl.PropertyDescriptor;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 public class GoogleBaseGenerator implements ModuleGenerator {
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("g-core", GoogleBase.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace("g-core", GoogleBase.URI);
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleBaseGenerator.class);
 

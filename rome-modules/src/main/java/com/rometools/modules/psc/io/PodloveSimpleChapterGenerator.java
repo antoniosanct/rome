@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
@@ -29,6 +28,7 @@ import org.w3c.dom.Element;
 import com.rometools.modules.psc.modules.PodloveSimpleChapterModule;
 import com.rometools.modules.psc.types.SimpleChapter;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 /**
@@ -36,7 +36,7 @@ import com.rometools.rome.io.ModuleGenerator;
  */
 public class PodloveSimpleChapterGenerator implements ModuleGenerator {
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(PodloveSimpleChapterAttribute.PREFIX, PodloveSimpleChapterModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(PodloveSimpleChapterAttribute.PREFIX, PodloveSimpleChapterModule.URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {

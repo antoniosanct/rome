@@ -125,29 +125,14 @@ public class WireFeedOutput {
      * @throws FeedException thrown if the XML representation for the feed could not be created.
      *
      */
-    public String outputString(final WireFeed feed, final boolean prettyPrint) throws IllegalArgumentException, FeedException {
-        final Document doc = outputDom(feed);
-		try {
-			TransformerFactory tf = TransformerFactory.newInstance();
-			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-			Transformer t = tf.newTransformer();
-			t.setOutputProperty(OutputKeys.METHOD, "xml");
-			if (prettyPrint) {
-		        t.setOutputProperty(OutputKeys.INDENT, "yes");
-		        t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-	        }
-			if (null != feed.getEncoding()) {
-				t.setOutputProperty(OutputKeys.ENCODING, feed.getEncoding());
-			}
-	        StreamResult result = new StreamResult(new StringWriter());
-	        DOMSource source = new DOMSource(doc);
-	        t.transform(source, result);
-	        return result.getWriter().toString();
-		} catch (TransformerException | TransformerFactoryConfigurationError e) {
+    public String outputString(final WireFeed feed, final boolean prettyPrint) throws FeedException {
+        try (Writer writer = new StringWriter()) {
+            StreamResult result = output(feed, writer, prettyPrint);
+            return result.getWriter().toString();
+		} catch (TransformerFactoryConfigurationError |
+                    IllegalArgumentException | IOException e) {
 			throw new FeedException("Error outputting feed", e);
 		}
-        
     }
 
     /**
@@ -196,11 +181,8 @@ public class WireFeedOutput {
      *
      */
     public void output(final WireFeed feed, final File file, final boolean prettyPrint) throws IllegalArgumentException, IOException, FeedException {
-        final Writer writer = new FileWriter(file);
-        try {
+        try (Writer writer = new FileWriter(file)) {
             this.output(feed, writer, prettyPrint);
-        } finally {
-            writer.close();
         }
     }
 
@@ -247,7 +229,7 @@ public class WireFeedOutput {
      * @throws FeedException thrown if the XML representation for the feed could not be created.
      *
      */
-    public void output(final WireFeed feed, final Writer writer, final boolean prettyPrint) throws IllegalArgumentException, IOException, FeedException {
+    public StreamResult output(final WireFeed feed, final Writer writer, final boolean prettyPrint) throws IllegalArgumentException, IOException, FeedException {
         final Document doc = outputDom(feed);
 		try {
 			TransformerFactory tf = TransformerFactory.newInstance();
@@ -255,7 +237,6 @@ public class WireFeedOutput {
 			tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 			Transformer t = tf.newTransformer();
 			t.setOutputProperty(OutputKeys.METHOD, "xml");
-//			t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			if (prettyPrint) {
 		        t.setOutputProperty(OutputKeys.INDENT, "yes");
 		        t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
@@ -266,6 +247,7 @@ public class WireFeedOutput {
 	        StreamResult result = new StreamResult(writer);
 	        DOMSource source = new DOMSource(doc);
 	        t.transform(source, result);
+            return result;
 		} catch (TransformerException | TransformerFactoryConfigurationError e) {
 			throw new FeedException("Error outputting feed", e);
 		}

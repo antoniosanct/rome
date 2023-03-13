@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -49,7 +48,7 @@ public class CustomTagParser extends ChildNavigator implements ModuleParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomTagParser.class);
 
-    static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("g-custom", CustomTags.URI);
+    static final Namespace NS = ChildNavigator.createNamespace("g-custom", CustomTags.URI);
 
     public CustomTagParser() {
     }

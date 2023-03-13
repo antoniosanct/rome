@@ -18,13 +18,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
 
 import com.rometools.modules.thr.ThreadingModule;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 /**
@@ -32,7 +32,7 @@ import com.rometools.rome.io.ModuleGenerator;
  */
 public class ThreadingModuleGenerator implements ModuleGenerator {
 
-    private static final Namespace NAMESPACE = XMLEventFactory.newDefaultFactory().createNamespace("thr", ThreadingModule.URI);
+    private static final Namespace NAMESPACE = ChildNavigator.createNamespace("thr", ThreadingModule.URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {

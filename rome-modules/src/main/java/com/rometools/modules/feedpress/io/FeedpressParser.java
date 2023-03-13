@@ -17,7 +17,6 @@ package com.rometools.modules.feedpress.io;
 
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
@@ -33,7 +32,7 @@ import com.rometools.rome.io.ModuleParser;
  */
 public class FeedpressParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(FeedpressModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(FeedpressModule.URI);
 
     @Override
     public String getNamespaceUri() {

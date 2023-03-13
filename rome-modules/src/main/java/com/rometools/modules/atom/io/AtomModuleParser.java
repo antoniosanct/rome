@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
@@ -37,7 +36,7 @@ import com.rometools.rome.io.impl.NumberParser;
 
 public class AtomModuleParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(AtomLinkModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(AtomLinkModule.URI);
 
     @Override
     public String getNamespaceUri() {

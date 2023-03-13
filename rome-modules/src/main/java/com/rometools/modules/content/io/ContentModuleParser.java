@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Attr;
@@ -36,8 +35,8 @@ import com.rometools.rome.io.ModuleParser;
 import com.rometools.utils.DOMNodes;
 
 public class ContentModuleParser extends ChildNavigator implements ModuleParser {
-    private static final Namespace CONTENT_NS = XMLEventFactory.newDefaultFactory().createNamespace("content", ContentModule.URI);
-    private static final Namespace RDF_NS = XMLEventFactory.newDefaultFactory().createNamespace("rdf", ContentModule.RDF_URI);
+    private static final Namespace CONTENT_NS = ChildNavigator.createNamespace("content", ContentModule.URI);
+    private static final Namespace RDF_NS = ChildNavigator.createNamespace("rdf", ContentModule.RDF_URI);
     
     public ContentModuleParser() {
     }

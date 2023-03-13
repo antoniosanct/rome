@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -47,7 +46,7 @@ public class ITunesParser extends ChildNavigator implements ModuleParser {
     private static final List<String> EXPLICIT_TRUE = Arrays.asList("yes", "explicit", "true");
     private static final List<String> EXPLICIT_FALSE = Arrays.asList("clean", "no", "false");
 
-    Namespace ns = XMLEventFactory.newDefaultFactory().createNamespace(AbstractITunesObject.URI);
+    Namespace ns = ChildNavigator.createNamespace(AbstractITunesObject.URI);
 
     public ITunesParser() {
     }

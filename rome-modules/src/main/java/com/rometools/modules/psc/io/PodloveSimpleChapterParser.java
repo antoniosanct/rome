@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Attr;
@@ -38,7 +37,7 @@ import com.rometools.rome.io.ModuleParser;
  */
 public class PodloveSimpleChapterParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(PodloveSimpleChapterModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(PodloveSimpleChapterModule.URI);
 
     @Override
     public String getNamespaceUri() {

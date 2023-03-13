@@ -34,7 +34,7 @@ import com.rometools.rome.io.ModuleGenerator;
 
 public class AtomModuleGenerator implements ModuleGenerator {
 
-    static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("atom", AtomLinkModule.URI);
+    static final Namespace NS = XMLEventFactory.newFactory().createNamespace("atom", AtomLinkModule.URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {

@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
@@ -30,11 +29,12 @@ import com.rometools.modules.opensearch.RequiredAttributeMissingException;
 import com.rometools.modules.opensearch.entity.OSQuery;
 import com.rometools.rome.feed.atom.Link;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 public class OpenSearchModuleGenerator implements ModuleGenerator {
 
-    private static final Namespace OS_NS = XMLEventFactory.newDefaultFactory().createNamespace("opensearch", OpenSearchModule.URI);
+    private static final Namespace OS_NS = ChildNavigator.createNamespace("opensearch", OpenSearchModule.URI);
 
     @Override
     public String getNamespaceUri() {

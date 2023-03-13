@@ -58,7 +58,7 @@ public class RSS090Generator extends BaseWireFeedGenerator {
     @Override
     public Document generate(final WireFeed feed) throws FeedException {
     	try {
-    		DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+    		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     		dbf.setNamespaceAware(true);
 //    		dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
 //        	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);

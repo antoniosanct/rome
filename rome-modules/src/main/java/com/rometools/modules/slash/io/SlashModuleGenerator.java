@@ -19,13 +19,13 @@ package com.rometools.modules.slash.io;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
 
 import com.rometools.modules.slash.Slash;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 /**
@@ -33,7 +33,7 @@ import com.rometools.rome.io.ModuleGenerator;
  */
 public class SlashModuleGenerator implements ModuleGenerator {
 
-    private static final Namespace NAMESPACE = XMLEventFactory.newDefaultFactory().createNamespace("slash", Slash.URI);
+    private static final Namespace NAMESPACE = ChildNavigator.createNamespace("slash", Slash.URI);
 
     public SlashModuleGenerator() {
     }

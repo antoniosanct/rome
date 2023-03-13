@@ -25,7 +25,6 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Document;
@@ -64,7 +63,7 @@ import com.rometools.rome.io.ModuleGenerator;
  */
 public class MediaModuleGenerator extends ChildNavigator implements ModuleGenerator {
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("media", MediaModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace("media", MediaModule.URI);
     private static final Set<Namespace> NAMESPACES = new HashSet<Namespace>();
 
     static {

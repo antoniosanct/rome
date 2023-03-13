@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Attr;
@@ -38,7 +37,7 @@ import com.rometools.rome.io.ModuleParser;
 
 public class OpenSearchModuleParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace OS_NS = XMLEventFactory.newDefaultFactory().createNamespace("opensearch", OpenSearchModule.URI);
+    private static final Namespace OS_NS = ChildNavigator.createNamespace("opensearch", OpenSearchModule.URI);
     
     @Override
     public String getNamespaceUri() {

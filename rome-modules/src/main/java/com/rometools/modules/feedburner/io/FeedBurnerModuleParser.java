@@ -18,7 +18,6 @@ package com.rometools.modules.feedburner.io;
 
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
@@ -33,7 +32,7 @@ import com.rometools.rome.io.ModuleParser;
  * ModuleParser implementation for the FeedBurner RSS extension.
  */
 public class FeedBurnerModuleParser extends ChildNavigator implements ModuleParser {
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(FeedBurner.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(FeedBurner.URI);
 
     @Override
     public String getNamespaceUri() {

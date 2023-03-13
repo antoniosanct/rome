@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -35,14 +34,15 @@ import org.w3c.dom.Node;
 import com.rometools.modules.content.ContentItem;
 import com.rometools.modules.content.ContentModule;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 public class ContentModuleGenerator implements ModuleGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContentModuleGenerator.class);
 
-    private static final Namespace CONTENT_NS = XMLEventFactory.newDefaultFactory().createNamespace("content", ContentModule.URI);
-    private static final Namespace RDF_NS = XMLEventFactory.newDefaultFactory().createNamespace("rdf", ContentModule.RDF_URI);
+    private static final Namespace CONTENT_NS = ChildNavigator.createNamespace("content", ContentModule.URI);
+    private static final Namespace RDF_NS = ChildNavigator.createNamespace("rdf", ContentModule.RDF_URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {

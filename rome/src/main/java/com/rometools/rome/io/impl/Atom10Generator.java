@@ -92,7 +92,7 @@ public class Atom10Generator extends BaseWireFeedGenerator {
     @Override
     public Document generate(final WireFeed wFeed) throws FeedException {
 		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setNamespaceAware(true);
 			dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
         	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
@@ -493,7 +493,7 @@ public class Atom10Generator extends BaseWireFeedGenerator {
                 final StringReader tmpDocReader = new StringReader(tmpDocString.toString());
                 Document tmpDoc;
                 try {
-                	DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+                	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 	dbf.setNamespaceAware(true);
                 	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
                 	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);

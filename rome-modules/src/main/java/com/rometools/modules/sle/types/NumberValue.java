@@ -20,10 +20,10 @@ package com.rometools.modules.sle.types;
 import java.math.BigDecimal;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import com.rometools.rome.feed.impl.EqualsBean;
+import com.rometools.rome.io.ChildNavigator;
 
 /**
  * An EntryValue implementation for "number" data-type values.
@@ -35,7 +35,7 @@ public class NumberValue implements EntryValue {
     private String element;
     private String label;
     private BigDecimal value;
-    private Namespace namespace = XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI);
+    private Namespace namespace = ChildNavigator.createNamespace(XMLConstants.XML_NS_URI);
 
     public void setElement(final String element) {
         this.element = element;
@@ -70,7 +70,7 @@ public class NumberValue implements EntryValue {
     }
 
     public void setNamespace(final Namespace namespace) {
-        this.namespace = namespace == null ? XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI) : namespace;
+        this.namespace = namespace == null ? ChildNavigator.createNamespace(XMLConstants.XML_NS_URI) : namespace;
     }
 
     @Override

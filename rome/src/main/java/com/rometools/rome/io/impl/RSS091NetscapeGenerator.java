@@ -42,7 +42,7 @@ public class RSS091NetscapeGenerator extends RSS091UserlandGenerator {
 
     protected Document createDocument(final Element root) throws FeedException {
 		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     		dbf.setNamespaceAware(true);
     		dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
         	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);

@@ -19,13 +19,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
 
 import com.rometools.modules.feedpress.modules.FeedpressModule;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 /**
@@ -33,7 +33,7 @@ import com.rometools.rome.io.ModuleGenerator;
  */
 public class FeedpressGenerator implements ModuleGenerator {
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(FeedpressElement.PREFIX, FeedpressModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(FeedpressElement.PREFIX, FeedpressModule.URI);
     private static final Set<Namespace> NAMESPACES;
 
     static {

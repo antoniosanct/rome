@@ -20,11 +20,11 @@ package com.rometools.modules.sle.types;
 import java.io.Serializable;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import com.rometools.rome.feed.impl.EqualsBean;
 import com.rometools.rome.feed.impl.ToStringBean;
+import com.rometools.rome.io.ChildNavigator;
 
 /**
  * The <code>cf:group</code> element is intended to inform the client that the&nbsp;property to
@@ -61,7 +61,7 @@ import com.rometools.rome.feed.impl.ToStringBean;
 public class Group implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     
-    private Namespace namespace = XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI);
+    private Namespace namespace = ChildNavigator.createNamespace(XMLConstants.XML_NS_URI);
     private final String element;
     private final String label;
 
@@ -71,7 +71,7 @@ public class Group implements Serializable, Cloneable {
      * @param label Label for the grouping.
      */
     public Group(final Namespace namespace, final String element, final String label) {
-        this.namespace = namespace == null ? XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI) : namespace;
+        this.namespace = namespace == null ? ChildNavigator.createNamespace(XMLConstants.XML_NS_URI) : namespace;
         this.element = element;
         this.label = label;
     }

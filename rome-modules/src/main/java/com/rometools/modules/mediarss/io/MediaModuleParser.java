@@ -33,7 +33,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -90,7 +89,7 @@ public class MediaModuleParser extends ChildNavigator implements ModuleParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(MediaModuleParser.class);
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(MediaModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(MediaModule.URI);
 
     private static final Pattern FILESIZE_WITH_UNIT_PATTERN = Pattern.compile("([\\d,.]+)([TGMK])?B", Pattern.CASE_INSENSITIVE);
 

@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
@@ -30,13 +29,14 @@ import com.rometools.modules.yahooweather.YWeatherModule;
 import com.rometools.modules.yahooweather.YWeatherModuleImpl;
 import com.rometools.modules.yahooweather.types.Forecast;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 /**
  * The ModuleGenerator implementation for the Yahoo Weather plug in.
  */
 public class WeatherModuleGenerator implements ModuleGenerator {
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("yweather", YWeatherModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace("yweather", YWeatherModule.URI);
     
 
     public WeatherModuleGenerator() {

@@ -18,10 +18,10 @@
 package com.rometools.modules.sle.types;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import com.rometools.rome.feed.impl.EqualsBean;
+import com.rometools.rome.io.ChildNavigator;
 
 /**
  * An EntryValue implementation for "text" data-types.
@@ -33,7 +33,7 @@ public class StringValue implements EntryValue {
     private String element;
     private String label;
     private String value;
-    private Namespace namespace = XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI);
+    private Namespace namespace = ChildNavigator.createNamespace(XMLConstants.XML_NS_URI);
 
     public void setValue(final String value) {
         this.value = value;
@@ -68,7 +68,7 @@ public class StringValue implements EntryValue {
     }
 
     public void setNamespace(final Namespace namespace) {
-        this.namespace = namespace == null ? XMLEventFactory.newDefaultFactory().createNamespace(XMLConstants.XML_NS_URI) : namespace;
+        this.namespace = namespace == null ? ChildNavigator.createNamespace(XMLConstants.XML_NS_URI) : namespace;
     }
 
     @Override

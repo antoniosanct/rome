@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Document;
@@ -32,12 +31,13 @@ import com.rometools.modules.itunes.FeedInformationImpl;
 import com.rometools.modules.itunes.types.Category;
 import com.rometools.modules.itunes.types.Subcategory;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 public class ITunesGenerator implements ModuleGenerator {
 
     private static final HashSet<Namespace> NAMESPACES = new HashSet<Namespace>();
-    private static final Namespace NAMESPACE = XMLEventFactory.newDefaultFactory().createNamespace(AbstractITunesObject.PREFIX, AbstractITunesObject.URI);
+    private static final Namespace NAMESPACE = ChildNavigator.createNamespace(AbstractITunesObject.PREFIX, AbstractITunesObject.URI);
 
     static {
         NAMESPACES.add(NAMESPACE);

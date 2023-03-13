@@ -19,7 +19,6 @@ package com.rometools.modules.slash.io;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
@@ -35,7 +34,7 @@ import com.rometools.rome.io.ModuleParser;
  */
 public class SlashModuleParser extends ChildNavigator implements ModuleParser {
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(Slash.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(Slash.URI);
 
     public SlashModuleParser() {
         super();

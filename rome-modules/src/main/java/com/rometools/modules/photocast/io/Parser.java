@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -42,7 +41,7 @@ public class Parser extends ChildNavigator implements ModuleParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(Parser.class);
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace(PhotocastModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace(PhotocastModule.URI);
     
 
     public Parser() {

@@ -17,6 +17,14 @@ import org.w3c.dom.Node;
  */
 public class ChildNavigator {
 
+	public static Namespace createNamespace(final String uri) {
+		return XMLEventFactory.newFactory().createNamespace(uri);
+	}
+
+	public static Namespace createNamespace(final String prefix, final String uri) {
+		return XMLEventFactory.newFactory().createNamespace(prefix, uri);
+	}
+
 	protected List<Element> getChildren(final Element element) {
 		List<Element> result = new ArrayList<>(1);
 		if (null != element && null != element.getChildNodes() && element.getChildNodes().getLength() > 0) {
@@ -118,7 +126,7 @@ public class ChildNavigator {
 			for (int i = 0; i < elem.getAttributes().getLength(); i++) {
 				Attr a = (Attr) elem.getAttributes().item(i);
 				if (a.getNodeName().indexOf("xmlns:") == 0) {
-					listNamespaces.add(XMLEventFactory.newDefaultFactory().createNamespace(
+					listNamespaces.add(ChildNavigator.createNamespace(
 							a.getNodeName().substring(a.getNodeName().indexOf("xmlns:")+6), a.getValue()));
 				}
 			}

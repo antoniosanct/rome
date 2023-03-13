@@ -21,18 +21,18 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.w3c.dom.Element;
 
 import com.rometools.modules.photocast.PhotocastModule;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 import com.rometools.rome.io.ModuleGenerator;
 
 public class Generator implements ModuleGenerator {
 
-    private static final Namespace NS = XMLEventFactory.newDefaultFactory().createNamespace("apple-wallpapers", PhotocastModule.URI);
+    private static final Namespace NS = ChildNavigator.createNamespace("apple-wallpapers", PhotocastModule.URI);
     private static final HashSet<Namespace> NAMESPACES = new HashSet<Namespace>();
     private static final String FEED_VERSION = "0.9";
     static {

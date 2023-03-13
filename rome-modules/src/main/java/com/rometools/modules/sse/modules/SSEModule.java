@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Namespace;
 
 import org.slf4j.Logger;
@@ -24,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.rometools.rome.feed.CopyFrom;
 import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.io.ChildNavigator;
 
 /**
  * The base module for SSE data synchronization. Defines a namespace, uri, and basic copying
@@ -38,7 +38,7 @@ public abstract class SSEModule implements Module {
 
     // a default prefix to use for sse tags
     public static final String PREFIX = "sx";
-    public static final Namespace SSE_NS = XMLEventFactory.newDefaultFactory().createNamespace(PREFIX, SSE_SCHEMA_URI);
+    public static final Namespace SSE_NS = ChildNavigator.createNamespace(PREFIX, SSE_SCHEMA_URI);
 
     public static final Set<Namespace> NAMESPACES;
 

@@ -180,17 +180,8 @@ public class WireFeedInput {
      *
      */
     public WireFeed build(final File file) throws FileNotFoundException, IOException, IllegalArgumentException, FeedException {
-    	WireFeed feed;
-    	Reader reader = new FileReader(file);
-        try {
-            if (xmlHealerOn) {
-                reader = new XmlFixerReader(reader);
-            }
-            feed = this.build(new InputSource(reader));
-        } finally {
-            reader.close();
-        }
-        return feed;
+        return this.build(new FileReader(file));
+        
     }
 
     /**
@@ -238,14 +229,14 @@ public class WireFeedInput {
      */
     WireFeed build(final InputSource is) throws IllegalArgumentException, FeedException {
         try {
-        	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        	dbf.setNamespaceAware(true);
-        	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        	dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        	dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        	DocumentBuilder db = dbf.newDocumentBuilder();
-        	db.setErrorHandler(new DefaultHandler());
-			return this.build(db.parse(is));
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            db.setErrorHandler(new DefaultHandler());
+            return this.build(db.parse(is));
         } catch (final Exception ex) {
             throw new FeedException("Invalid XML", ex);
         }
